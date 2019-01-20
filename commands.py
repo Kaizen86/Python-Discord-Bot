@@ -1,8 +1,11 @@
+lengthofthisfile = 565
+
 print("\tLoading command dependencies...")
 #internal
 print("\tInternal (1/2)")
 from io import BytesIO #mca, beauty, protecc
 from os import remove as delete_file #mca, beauty, protecc
+from os import listdir #help
 from os import _exit as force_exit #shutdown
 from random import randint #dice, coin_toss, rps, mca, beauty, protecc
 import re #used to remove non-numbers from mentions to extract the user id
@@ -16,13 +19,42 @@ print("\tExternal (2/2)")
 import pyfiglet #figlet
 from PIL import Image #mca, beauty, protecc
 
-def __getuserid__(string):
-	re.sub("[^0-9]","",array[1])
 
-from discord.ext import commands
+#custom error class for comedic purposes in hilariously catastrophic scenarios
+class ExcuseMeWhatTheFuckError(Exception):
+    pass
+	
+def getUserId(string):
+	re.sub("[^0-9]","",string)
+def isAdmin(userid):
+	for entry in admins:
+		if entry ==  userid:
+			return True
+	return False
+async def reportAccessDenied(message):
+	#in the event that someone attempts to access a management command,
+	#send a direct message to the owner and warn the offending user.
 
+	#construct the embedded message
+	embed = discord.Embed(title="User attempted unauthorised access!")
+	embed.add_field(name="Offending message content", value=message.content, inline=False)
+	embed.add_field(name="Username", value=message.author.name+"#"+str(message.author.discriminator), inline=False)
+	embed.add_field(name="Unique ID", value=message.author.id, inline=False)
+	embed.add_field(name="Avatar", value=" ", inline=False)
+	embed.set_image(url=message.author.avatar_url)
+
+	botownermember = discord.Server.get_member(message.server, admins[0]) #create a new user object and point it at the bot owner
+	if botownermember != None:
+		try:
+			await message.channel.send(botownermember,embed=embed) #send it. this fails if content is over 2000 chars.
+		finally:
+			await message.channel.send("Access denied. This incident has been reported.")
+	else:
+		await message.channel.send("Access denied.")
+		
+		
 #user commands
-async def help(client):
+async def help(message,commandprefix):
 	"""
 	#get number of lines of code in this script and all scripts in the 'modules' folder.
 	#this file
@@ -38,7 +70,8 @@ async def help(client):
 		except Exception:
 			continue #ignore errors if a folder was selected
 	#send help message to dm of user
-	await client.send_message(message.author, """(User Commands)
+	
+	await message.author.send("""(User Commands)
 ```
 These commands are accessible to all users.
 Display this help.
@@ -107,10 +140,10 @@ Execute a shell command on the host computer
 ```
 Created with `"""+str(linecount)+"""` lines of Python written by <@285465719292821506>.
 Python version is """+str(python_info.major)+"."+str(python_info.minor)+".")
-	await client.send_message(message.channel, "List of commands sent in DM.")
-async def test(client):
-	await client.send_message(message.channel, "Yes, <@"+message.author.id+">, This bot is online.")
-async def dice(client):
+	await message.channel.send("List of commands sent in DM.")
+async def test(message,commandprefix):
+	await message.channel.send("Yes, <@"+str(message.author.id)+">. This bot is online.")
+async def dice(message,commandprefix):
 	usage = "Usage: "+commandprefix+"dice [minimum] [maximum]"
 	#get command parameters and allocate into appropriate variables.
 	array = message_content.split()
@@ -122,13 +155,13 @@ async def dice(client):
 			error = format_exc()
 			if "index" in error:
 				#in the event that indexing fails (due to no or insufficient parameters, display the usage.
-				await client.send_message(message.channel, usage)
+				await message.channel.send(usage)
 			elif "invalid literal" in error:
 				#in the event that conversion to an integer fails (likely due to text being entered instead of numbers), display this.
-				await client.send_message(message.channel, """Minimum and maximum values must be numbers.
+				await message.channel.send("""Minimum and maximum values must be numbers.
 """+usage)
 			else:
-				await client.send_message(message.channel, """Unknown error while reading array index.
+				await message.channel.send("""Unknown error while reading array index.
 `"""+error+"`")
 				consoleOutput(error)
 			return #end command
@@ -139,34 +172,34 @@ async def dice(client):
 
 	if min<max:
 		#roll the dice
-		await client.send_message(message.channel, "I rolled "+str(randint(min,max)))
+		await message.channel.send("I rolled "+str(randint(min,max)))
 	else:
-		await client.send_message(message.channel, "Minimum & maximum must be numbers.")
-async def oxygen(client):
-	await client.send_message(message.channel, "Look around and you will find it.")
-async def coin_toss(client):
+		await message.channel.send("Minimum & maximum must be numbers.")
+async def oxygen(message,commandprefix):
+	await message.channel.send("Look around and you will find it.")
+async def coin_toss(message,commandprefix):
 	result = randint(1,8)
 	if result <= 4:
 		result = "Tails"
 	else:
 		result = "Heads"
-	await client.send_message(message.channel, result+".")
-async def reverse(client):
+	await message.channel.send(result+".")
+async def reverse(message,commandprefix):
 	usage = "Usage: "+commandprefix+"reverse <text>"
 	try:
 		#remove command prefix from string we want
 		text = message_content[len(commandprefix)+8:] #change according to length of command name + 1 for the space
 	except:
 		error = format_exc()
-		await client.send_message(message.channel, """Error while reading text.
+		await message.channel.send("""Error while reading text.
 `"""+error+"`")
 		consoleOutput(error)
 		return #end command
 	if not text.replace(" ","") == "":
-		await client.send_message(message.channel, text[::-1]) #mystical string manipulation command to reverse the input
+		await message.channel.send(text[::-1]) #mystical string manipulation command to reverse the input
 	else:
-		await client.send_message(message.channel, usage)
-async def info(client):
+		await message.channel.send(usage)
+async def info(message,commandprefix):
 	usage = "Usage: "+commandprefix+"info <mention>"
 	array = message_content.split()
 	try:
@@ -174,9 +207,9 @@ async def info(client):
 	except:
 		error = format_exc()
 		if "IndexError" in error:
-			await client.send_message(message.channel, usage)
+			await message.channel.send(usage)
 		else:
-			await client.send_message(message.channel, """Error while formatting mention into user id.
+			await message.channel.send("""Error while formatting mention into user id.
 `"""+error+"`")
 			consoleOutput(error)
 		return #end command
@@ -197,17 +230,17 @@ async def info(client):
 	embed.add_field(name="Avatar", value=".", inline=False)
 	embed.set_image(url=user.avatar_url)
 	await client.send_message(message.channel,embed=embed)
-async def avatar(client):
+async def avatar(message,commandprefix):
 	usage = "Usage: "+commandprefix+"avatar <mention>"
 	array = message_content.split()
 	try:
-		userid = re.sub("[^0-9]","",array[1])
+		userid = getUserId(array[1])
 	except:
 		error = format_exc()
 		if "IndexError" in error:
-			await client.send_message(message.channel, usage)
+			await message.channel.send(usage)
 		else:
-			await client.send_message(message.channel, """Error while formatting mention into user id.
+			await message.channel.send("""Error while formatting mention into user id.
 `"""+error+"`")
 			consoleOutput(error)
 		return #end command
@@ -228,7 +261,7 @@ async def avatar(client):
 			consoleOutput("""Unknown error!
 """+error)
 		return
-async def rps(client):
+async def rps(message,commandprefix):
 	usage = "Usage: "+commandprefix+"rps <rock/paper/scissors>"
 	array = message_content.split()
 	try:
@@ -236,10 +269,10 @@ async def rps(client):
 	except:
 		error = format_exc()
 		if "IndexError" in error:
-			await client.send_message(message.channel, usage)
+			await message.channel.send(usage)
 			
 		else:
-			await client.send_message(message.channel, """Error while reading parameter.
+			await message.channel.send("""Error while reading parameter.
 `"""+error+"`")
 			consoleOutput(error)
 		return #end command
@@ -256,7 +289,7 @@ async def rps(client):
 	#game logic
 	#tie
 	if cpuchoice == userchoice:
-		await client.send_message(message.channel, "You chose "+userchoice+". I chose "+cpuchoice+". Tie!")
+		await message.channel.send("You chose "+userchoice+". I chose "+cpuchoice+". Tie!")
 		return
 		
 	#user wins
@@ -271,52 +304,52 @@ async def rps(client):
 
 	#edge case. triggered if user entered invalid string.
 	else:
-		await client.send_message(message.channel, """Invalid option.
+		await message.channel.send("""Invalid option.
 """+usage)
 		return
 
 	#send result
-	await client.send_message(message.channel, "You chose "+userchoice+". I chose "+cpuchoice+". "+result)
-async def say(client):
+	await message.channel.send("You chose "+userchoice+". I chose "+cpuchoice+". "+result)
+async def say(message,commandprefix):
 	usage = "Usage: "+commandprefix+"say <text>"
 	try:
 		#remove command prefix from string we want
 		text = message.content[len(commandprefix)+4:] #change according to length of command name + 1 for the space
 	except:
 		error = format_exc()
-		await client.send_message(message.channel, """Error while reading text.
+		await message.channel.send("""Error while reading text.
 `"""+error+"`")
 		consoleOutput(error)
 		return #end command
 	if not text.replace(" ","") == "":
-		await client.send_message(message.channel, text) #send the message that the user wanted
-		await client.delete_message(message) #cover their tracks for them
+		await message.channel.send(text) #send the message that the user wanted
+		await client.delete_message(message,commandprefix) #cover their tracks for them
 	else:
-		await client.send_message(message.channel, usage)
-async def list_meeps(client):
+		await message.channel.send(usage)
+async def list_meeps(message,commandprefix):
 	usage = "Usage: "+commandprefix+"list_meeps <mention>"
 	array = message_content.split()
 	try:
-		userid = re.sub("[^0-9]","",array[1])
+		userid = getUserId(array[1])
 	except:
 		error = format_exc()
 		if "IndexError" in error:
-			await client.send_message(message.channel, usage)
+			await message.channel.send(usage)
 		else:
-			await client.send_message(message.channel, """Error while formatting mention into user id.
+			await message.channel.send("""Error while formatting mention into user id.
 `"""+error+"`")
 			consoleOutput(error)
 		return #end command
 	value = str(userData.get_user_data(userid,"meeps"))
-	await client.send_message(message.channel, "<@"+userid+"> has meeped "+value+" times.")
-async def mca(client):
+	await message.channel.send("<@"+userid+"> has meeped "+value+" times.")
+async def mca(message,commandprefix):
 	usage = "Usage: "+commandprefix+"mca <text>"
 	try:
 		#remove command prefix from string we want
 		text = message_content[len(commandprefix)+4:] #change according to length of command name + 1 for the space
 	except:
 		error = format_exc()
-		await client.send_message(message.channel, """Error while reading text.
+		await message.channel.send("""Error while reading text.
 `"""+error+"`")
 		consoleOutput(error)
 		return #end command
@@ -331,8 +364,8 @@ async def mca(client):
 		await client.send_file(message.channel, imageid) #then send the image.
 		delete_file(imageid) #delete the file afterwards.
 	else:
-		await client.send_message(message.channel, usage)
-async def translate(client):
+		await message.channel.send(usage)
+async def translate(message,commandprefix):
 	usage = "Usage: "+commandprefix+"translate <to/from> <text>"
 	#get command parameters and allocate into appropriate variables.
 	array = message_content.split()
@@ -342,30 +375,30 @@ async def translate(client):
 		error = format_exc()
 		if "index" in error:
 			#in the event that indexing fails (due to no or insufficient parameters), display the usage.
-			await client.send_message(message.channel, """Missing parameter.
+			await message.channel.send("""Missing parameter.
 """+usage)
 		else:
-			await client.send_message(message.channel, """Unknown error while reading array index.
+			await message.channel.send("""Unknown error while reading array index.
 `"""+error+"`")
 			consoleOutput(error)
 			return #end command
 
 		if "to" not in message_content.lower() and "from" not in message_content.lower(): #check for invalid mode
-			await client.send_message(message.channel, """Invalid mode.
+			await message.channel.send("""Invalid mode.
 """+usage)
 			return #end command
 		#proper mode selected, lets get separate the text to be translated from the command
 		length = len("translate")+2+len(mode) #length of command, 2 for the space, then the length of the mode
 		text = message_content[length::].upper() #separate it then capitalize
 		if mode == "from":
-			await client.send_message(message.channel, "`"+shadowtranslator.ConvertFromShadow(text)+"`")
+			await message.channel.send("`"+shadowtranslator.ConvertFromShadow(text)+"`")
 		elif mode == "to":
-			await client.send_message(message.channel, "`"+shadowtranslator.ConvertToShadow(text)+"`")
+			await message.channel.send("`"+shadowtranslator.ConvertToShadow(text)+"`")
 		else:
 			#wat.
 			#how did you get here??
 			raise ExcuseMeWhatTheFuckError("Unexpected error in mode selection")
-async def figlet(client):
+async def figlet(message,commandprefix):
 	usage = "Usage: "+commandprefix+"figlet <text>"
 				
 	#find length of input text, then isolate it from the command.
@@ -374,27 +407,27 @@ async def figlet(client):
 				
 	#check if the input text is empty. if it is, show the usage.
 	if text.split() == []:
-		await client.send_message(message.channel, usage)
+		await message.channel.send(usage)
 		return
 				
 	try:
-		await client.send_message(message.channel, "```"+pyfiglet.figlet_format(text)+"```")
+		await message.channel.send("```"+pyfiglet.figlet_format(text)+"```")
 	except discord.errors.HTTPException:
-		await client.send_message(message.channel, "Message too long.")
+		await message.channel.send("Message too long.")
 				
 #image manipulation commands
-async def beauty(client):
+async def beauty(message,commandprefix):
 	usage = "Usage: "+commandprefix+"beauty <mention>"
 	array = message_content.split()
 	try:
-			userid = re.sub("[^0-9]","",array[1])
+			userid = getUserId(array[1])
 	except:
 			error = format_exc()
 			if "IndexError" in error:
-				await client.send_message(message.channel, usage)
+				await message.channel.send(usage)
 				return #end command
 			else:
-				await client.send_message(message.channel, """Error while formatting mention into user id.
+				await message.channel.send("""Error while formatting mention into user id.
 `"""+error+"`")
 				consoleOutput(error)
 				return
@@ -413,18 +446,18 @@ async def beauty(client):
 	background.save(imageid) #save it...
 	await client.send_file(message.channel, imageid) #then send the image.
 	delete_file(imageid) #delete the file afterwards.
-async def protecc(client):
+async def protecc(message,commandprefix):
 				usage = "Usage: "+commandprefix+"protecc <mention>"
 				array = message_content.split()
 				try:
-						userid = re.sub("[^0-9]","",array[1])
+						userid = getUserId(array[1])
 				except:
 						error = format_exc()
 						if "IndexError" in error:
-								await client.send_message(message.channel, usage)
+								await message.channel.send(usage)
 								return #end command
 						else:
-								await client.send_message(message.channel, """Error while formatting mention into user id.
+								await message.channel.send("""Error while formatting mention into user id.
 `"""+error+"`")
 								consoleOutput(error)
 								return
@@ -444,68 +477,68 @@ async def protecc(client):
 				delete_file(imageid) #delete the file afterwards.
 
 #criminality commands
-async def list_crime(client):
+async def list_crime(message,commandprefix):
 				usage = "Usage: "+commandprefix+"list_crime <mention>"
 				array = message_content.split()
 				try:
-						userid = re.sub("[^0-9]","",array[1])
+						userid = getUserId(array[1])
 				except:
 						error = format_exc()
 						if "IndexError" in error:
-								await client.send_message(message.channel, usage)
+								await message.channel.send(usage)
 								return #end command
 						else:
-								await client.send_message(message.channel, """Error while formatting mention into user id.
+								await message.channel.send("""Error while formatting mention into user id.
 `"""+error+"`")
 								consoleOutput(error)
 								return
 
 				if len(array) != 2:
-						await client.send_message(message.channel, usage)
+						await message.channel.send(usage)
 						return
 				value = userData.get_user_data(userid,"criminality")
-				await client.send_message(message.channel, "Criminality value for <@"+userid+"> is "+str(value)+".")
+				await message.channel.send("Criminality value for <@"+userid+"> is "+str(value)+".")
 				consoleOutput("Criminality value is now "+str(value)+".")
-async def set_crime(client):
+async def set_crime(message,commandprefix):
 				usage = "Usage: "+commandprefix+"set_crime <mention> <value>"
 				array = message_content.split()
 				try:
-						userid = re.sub("[^0-9]","",array[1])
+						userid = getUserId(array[1])
 				except:
 						error = format_exc()
 						if "IndexError" in error:
-								await client.send_message(message.channel, usage)
+								await message.channel.send(usage)
 								return #end command
 						else:
-								await client.send_message(message.channel, """Error while formatting mention into user id.
+								await message.channel.send("""Error while formatting mention into user id.
 `"""+error+"`")
 								consoleOutput(error)
 								return
 				if len(array) != 3:
-						await client.send_message(message.channel, usage)
+						await message.channel.send(usage)
 						return
 				value = array[2]
 				userData.set_user_data(userid,"criminality",value)
-				await client.send_message(message.channel, "Updated criminality value for <@"+userid+"> to "+str(value)+".")
+				await message.channel.send("Updated criminality value for <@"+userid+"> to "+str(value)+".")
 				consoleOutput("Updated value to "+str(value)+".")
-async def change_crime(client):
+async def change_crime(message,commandprefix):
 				usage = "Usage: "+commandprefix+"change_crime <mention> <value>"
 				array = message_content.split()
 				try:
-						userid = re.sub("[^0-9]","",array[1])
+						userid = getUserId(array[1])
 				except:
 						error = format_exc()
 						if "IndexError" in error:
-								await client.send_message(message.channel, usage)
+								await message.channel.send(usage)
 								return #end command
 						else:
-								await client.send_message(message.channel, """Error while formatting mention into user id.
+								await message.channel.send("""Error while formatting mention into user id.
 `"""+error+"`")
 								consoleOutput(error)
 								return
 
 				if len(array) != 3:
-						await client.send_message(message.channel, usage)
+						await message.channel.send(usage)
 						return
 
 				prevvalue = userData.get_user_data(userid,"criminality")
@@ -517,51 +550,51 @@ async def change_crime(client):
 				finalvalue = prevvalue+value
 				userData.set_user_data(userid,"criminality",finalvalue)
 
-				await client.send_message(message.channel, "Changed criminality value for <@"+userid+"> by "+str(value)+" to equal "+str(finalvalue)+".")
+				await message.channel.send("Changed criminality value for <@"+userid+"> by "+str(value)+" to equal "+str(finalvalue)+".")
 				consoleOutput("Changed criminality value by "+str(value)+" to equal "+str(finalvalue)+".")
 
 #exclusive management commands. foolproofing isnt required since only i can use them
-async def shutdown(client):
+async def shutdown(message,commandprefix):
 				#id check
 				if isAdmin(message.author.id):
-						await client.send_message(message.channel, "Access granted. Shutting down bot.")
+						await message.channel.send("Access granted. Shutting down bot.")
 						consoleOutput("Access granted. Shutting down bot.")
 						await client.change_presence(status=discord.Status.invisible)
 						sleep(2)
 						force_exit(0)
 				else:
-						await reportAccessDenied(message)
+						await reportAccessDenied(message,commandprefix)
 						consoleOutput("Access denied.")
-async def getuserdata(client):
+async def getuserdata(message,commandprefix):
 				#id check
 				if isAdmin(message.author.id):
 						array = message_content.split()
-						userid = re.sub("[^0-9]","",array[1])
-						await client.send_message(message.channel, "Access granted.")
+						userid = getUserId(array[1])
+						await message.channel.send("Access granted.")
 						consoleOutput("Access granted.")
 						value = str(userData.get_user_data(userid,array[2]))
-						await client.send_message(message.channel, "Value stored with name '"+array[2]+"' for <@"+userid+"> is "+value)
+						await message.channel.send("Value stored with name '"+array[2]+"' for <@"+userid+"> is "+value)
 						consoleOutput("Value stored is "+value)
 				else:
-						await reportAccessDenied(message)
+						await reportAccessDenied(message,commandprefix)
 						consoleOutput("Access denied.")
-async def setuserdata(client):
+async def setuserdata(message,commandprefix):
 				#id check
 				if isAdmin(message.author.id):
 						array = message_content.split()
-						userid = re.sub("[^0-9]","",array[1])
-						await client.send_message(message.channel, "Access granted. Setting user data for <@"+userid+">.")
+						userid = getUserId(array[1])
+						await message.channel.send("Access granted. Setting user data for <@"+userid+">.")
 						consoleOutput("Access granted. Setting user data.")
 						userData.set_user_data(userid,array[2],array[3])
-						await client.send_message(message.channel, "Updated value.")
+						await message.channel.send("Updated value.")
 						consoleOutput("Updated value.")
 				else:
-						await reportAccessDenied(message)
+						await reportAccessDenied(message,commandprefix)
 						consoleOutput("Access denied.")
-async def execute(client):
+async def execute(message,commandprefix):
 	#id check
 	if isAdmin(message.author.id):
-			await client.send_message(message.channel, "Access granted. Executing command...")
+			await message.channel.send("Access granted. Executing command...")
 			consoleOutput("Access granted. Executing command...")
 			cmd = message_content[len(commandprefix)+5:]
 			output = str(bytes(str(shell_exec(cmd, shell=True, stdout=SUB_PIPE).stdout.read()), "utf-8").decode("unicode_escape"))
@@ -569,8 +602,8 @@ async def execute(client):
 			output = output[3:]
 			output = output[:-1]
 			#send it :D
-			await client.send_message(message.channel, """```
+			await message.channel.send("""```
 """+output+"```")
 	else:
-		await reportAccessDenied(message)
+		await reportAccessDenied(message,commandprefix)
 		consoleOutput("Access denied.")

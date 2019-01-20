@@ -1,8 +1,8 @@
 print("Program is now executing.")
-lengthofthisfile = 766
+lengthofthisfile = 207
 
-from time import localtime #file logs, shutdown
-from os import listdir #help, folder existence checks
+from time import localtime #file logs
+from os import listdir #folder existence checks
 from os import mkdir #make new folder if needed
 
 def verifyFolderExistence(foldername):
@@ -77,36 +77,11 @@ shadowtranslator = shadow_translator.ShadowTranslator()
 class ExcuseMeWhatTheFuckError(Exception):
     pass
 	
-def isAdmin(userid):
-	for entry in admins:
-		if entry ==  userid:
-			return True
-	return False
-async def reportAccessDenied(message):
-	#in the event that someone attempts to access a management command,
-	#send a direct message to the owner and warn the offending user.
-
-	#construct the embedded message
-	embed = discord.Embed(title="User attempted unauthorised access!")
-	embed.add_field(name="Offending message content", value=message.content, inline=False)
-	embed.add_field(name="Username", value=message.author.name+"#"+str(message.author.discriminator), inline=False)
-	embed.add_field(name="Unique ID", value=message.author.id, inline=False)
-	embed.add_field(name="Avatar", value=" ", inline=False)
-	embed.set_image(url=message.author.avatar_url)
-
-	botownermember = discord.Server.get_member(message.server, admins[0]) #create a new user object and point it at the bot owner
-	if botownermember != None:
-		try:
-			await message.channel.send(botownermember,embed=embed) #send it. this fails if content is over 2000 chars.
-		finally:
-			await message.channel.send("Access denied. This incident has been reported.")
-	else:
-		await message.channel.send( "Access denied.")
-
 @client.event
 async def on_ready():
 	consoleOutput("Logged on as " + client.user.name + " with the ID " + str(client.user.id) + ".")
 	consoleOutput("------")
+	#await client.change_presence(activity=discord.Game(name="DEBUG MODE, BOT NON-FUNCTIONAL"))
 	await client.change_presence(activity=discord.Game(name=commandprefix+"help"))
 		
 @client.event
@@ -121,30 +96,30 @@ async def on_message(message):
 		message_content = message.content.encode('ascii','ignore').decode('ascii','ignore')
 
 		try:
-			command = message_content.lower().split()[0][len(commandprefix:]
+			command = message_content.lower().split()[0][len(commandprefix):]
 		except:
 			#bot joins / emoji throws an exception, so this ignores that.
 			return
 
 		#log command usage
-		if command.startswith(commandprefix):
+		if message_content.startswith(commandprefix):
 			consoleOutput(author_name + " executed command  " + message_content)
 			#start the bot 'typing'. this gives feedback that the bot is calculating the command output.
 			await message.channel.trigger_typing() #typing stops either after 10 seconds or when a message is sent.
 
 			#https://stackoverflow.com/questions/35484190/python-if-elif-else-chain-alternitive
-			mydict = {'help':commands.help, 'test':commands.test}
+			mydict = {'help':commands.help, 'test':commands.test, "shutdown":commands.shutdown}
 			if command in mydict:
 				action = mydict[command]
 				# set up args from the dictionary .
-				action(message)
-		
-			#if none of the above worked, report unknown command.
-			await message.channel.send( "Unknown command '"+command+"'.")
+				await action(message,commandprefix)
+			else:
+				#if none of the above worked, report unknown command.
+				await message.channel.send("Unknown command '"+command+"'.")
 
 		#triggerwords
 		if "meep" in message_content.lower() and "list_" not in message_content.lower(): #prevents >list_meeps from triggering.
-				await message.channel.send( "Meep")
+				await message.channel.send("Meep")
 				userData.set_user_data(message.author.id,"meeps",int(userData.get_user_data(message.author.id,"meeps"))+1)
 		if "wheatley"  in message_content.lower() and "moron" in message_content.lower(): #message must have the words "wheatley" and "moron" to trigger.
 				await message.channel.send("I AM NOT A MORON!")
@@ -167,7 +142,7 @@ Economy
 
 	except:
 		error = format_exc()
-		await message.channel.send( """Internal error while running command! Error traceback:
+		await message.channel.send("""Internal error while running command! Error traceback:
 `"""+error+"`")
 		consoleOutput(error)
 			
