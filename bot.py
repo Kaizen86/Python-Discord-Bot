@@ -108,10 +108,33 @@ async def on_message(message):
 			await message.channel.trigger_typing() #typing stops either after 10 seconds or when a message is sent.
 
 			#https://stackoverflow.com/questions/35484190/python-if-elif-else-chain-alternitive
-			mydict = {'help':commands.help, 'test':commands.test, "shutdown":commands.shutdown}
-			if command in mydict:
-				action = mydict[command]
-				# set up args from the dictionary .
+			command_set = {
+				"help":commands.help,
+				"test":commands.test,
+				"dice":commands.dice,
+				"oxygen":commands.oxygen,
+				"coin_toss":commands.coin_toss,
+				"reverse":commands.reverse,
+				"info":commands.info,
+				"avatar":commands.avatar,
+				"rps":commands.rps,
+				"say":commands.say,
+				"list_meeps":commands.list_meeps,
+				"translate":commands.translate,
+				"beauty":commands.beauty,
+				"protecc":commands.protecc,
+				"list_crime":commands.list_crime,
+				"set_crime":commands.set_crime,
+				"change_crime":commands.change_crime,
+				"shutdown":commands.shutdown,
+				"getuserdata":commands.getuserdata,
+				"setuserdata":commands.setuserdata,
+				"execute":commands.execute
+			}
+			if command in command_set:
+				#find the command being referenced
+				action = command_set[command]
+				#execute the command
 				await action(message,commandprefix)
 			else:
 				#if none of the above worked, report unknown command.
