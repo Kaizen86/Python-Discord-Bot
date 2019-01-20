@@ -43,7 +43,6 @@ from modules import database #for all database controls
 consoleOutput("Loading commands and their libraries...")
 import commands #Load all the commands and their code from the commands.py file
 from time import sleep #bot loop
-from modules import shadow_translator #translate (i made this one :D)
 
 consoleOutput("Modules loaded. Loading configs...")
 commandprefix = ">" #sets the command prefix.
@@ -67,11 +66,10 @@ except:
 		consoleOutput("ERROR! 'admins.config' is missing. Aborting...")
 		exit()
 
-#initialize client, databases and shadow_translator
+#initialize client and databases
 client = discord.Client()
 verifyFolderExistence("databases")
 userData = database.Database("databases\\users.json")
-shadowtranslator = shadow_translator.ShadowTranslator()
 
 #custom error class for comedic purposes in hilariously catastrophic scenarios
 class ExcuseMeWhatTheFuckError(Exception):
@@ -81,8 +79,8 @@ class ExcuseMeWhatTheFuckError(Exception):
 async def on_ready():
 	consoleOutput("Logged on as " + client.user.name + " with the ID " + str(client.user.id) + ".")
 	consoleOutput("------")
-	#await client.change_presence(activity=discord.Game(name="DEBUG MODE, BOT NON-FUNCTIONAL"))
-	await client.change_presence(activity=discord.Game(name=commandprefix+"help"))
+	await client.change_presence(activity=discord.Game(name="DEBUG MODE, BOT NON-FUNCTIONAL"))
+	#await client.change_presence(activity=discord.Game(name=commandprefix+"help"))
 		
 @client.event
 async def on_message(message):
@@ -91,19 +89,18 @@ async def on_message(message):
 		if client.user.id == message.author.id:
 			return
 
-		#convert any unicode to ascii. quick and dirty way to prevent codec errors
+		#convert any unicode in author name to ascii. quick and dirty way to prevent codec errors
 		author_name = message.author.name.encode('ascii','ignore').decode('ascii','ignore')
-		message_content = message.content.encode('ascii','ignore').decode('ascii','ignore')
-
+		
 		try:
-			command = message_content.lower().split()[0][len(commandprefix):]
+			command = message.content.lower().split()[0][len(commandprefix):]
 		except:
 			#bot joins / emoji throws an exception, so this ignores that.
 			return
 
 		#log command usage
-		if message_content.startswith(commandprefix):
-			consoleOutput(author_name + " executed command  " + message_content)
+		if message.content.startswith(commandprefix):
+			consoleOutput(author_name + " executed command  " + message.content)
 			#start the bot 'typing'. this gives feedback that the bot is calculating the command output.
 			await message.channel.trigger_typing() #typing stops either after 10 seconds or when a message is sent.
 
@@ -120,7 +117,9 @@ async def on_message(message):
 				"rps":commands.rps,
 				"say":commands.say,
 				"list_meeps":commands.list_meeps,
+				"mca":commands.mca,
 				"translate":commands.translate,
+				"figlet":commands.figlet,
 				"beauty":commands.beauty,
 				"protecc":commands.protecc,
 				"list_crime":commands.list_crime,
@@ -131,22 +130,31 @@ async def on_message(message):
 				"setuserdata":commands.setuserdata,
 				"execute":commands.execute
 			}
+			
 			if command in command_set:
+				"""
+				#permission check
+				if isAdmin(message.author.id):
+					#do thing
+				else:
+					await reportAccessDenied(client,message,commandprefix)
+					consoleOutput("Access denied.")
+				"""
 				#find the command being referenced
 				action = command_set[command]
 				#execute the command
-				await action(message,commandprefix)
+				await action(client,message,commandprefix,userData)
 			else:
 				#if none of the above worked, report unknown command.
 				await message.channel.send("Unknown command '"+command+"'.")
 
 		#triggerwords
-		if "meep" in message_content.lower() and "list_" not in message_content.lower(): #prevents >list_meeps from triggering.
+		if "meep" in message.content.lower() and "list_" not in message.content.lower(): #prevents >list_meeps from triggering.
 				await message.channel.send("Meep")
 				userData.set_user_data(message.author.id,"meeps",int(userData.get_user_data(message.author.id,"meeps"))+1)
-		if "wheatley"  in message_content.lower() and "moron" in message_content.lower(): #message must have the words "wheatley" and "moron" to trigger.
+		if "wheatley"  in message.content.lower() and "moron" in message.content.lower(): #message must have the words "wheatley" and "moron" to trigger.
 				await message.channel.send("I AM NOT A MORON!")
-		if "pineapple" in message_content.lower():
+		if "pineapple" in message.content.lower():
 				await message.channel.send("""```
 Pine
 Independance
@@ -158,9 +166,9 @@ Providing
 Little
 Economy
 ```""")
-		if "no u" in message_content.lower() or "no you" in message_content.lower():
+		if "no u" in message.content.lower() or "no you" in message.content.lower():
 				await message.channel.send_file(message.channel, fp="images\\no_u.jpg")
-		if "the more you know" in message_content.lower():
+		if "the more you know" in message.content.lower():
 				await message.channel.send_file(message.channel, fp="images\\moreyouknow.gif")
 
 	except:
