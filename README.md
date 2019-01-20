@@ -1,4 +1,4 @@
-# Wheatley-Discord-Bot
+# Wheatley Discord Bot
 This is a Discord bot I made in Python. It is based of the discord.py library and was created more or less for fun and to add moderation utilities that me or my friends find useful in our servers. It is named after and has the icon of the Wheatley Core from Portal 2. I did that because I thought it was funny, to be honest.
 
 
@@ -21,24 +21,24 @@ In a word, no. The hack was entirely the result of my error and I take full resp
 ## Commands
 Below is a copy of the bot help, containing a list of commands.
 
-(User Commands)
+User Commands
 ```
 These commands are accessible to all users.
 Display this help.
 	>help
 Tests if the bot is working.
 	>test
-Rolls a dice with an optional minimum and maximum limits
+Rolls a dice with an optional minimum and maximum limits.
 	>dice [minimum [maximum]
 Gives advice on where to find oxygen. In other words, the perfect command.
 	>oxygen
 Tosses a coin. That's it.
 	>coin_toss
-Reverses the given text
+Reverses the given text.
 	>reverse <text>
-Gets information about a mentioned user
+Gets information about a mentioned user.
 	>info <mention>
-Gets the avatar of a mentioned user
+Gets the avatar of a mentioned user.
 	>avatar <mention>
 Play a game of rock paper scissors with the bot. (I promise it doesn't cheat)
 	>rps <rock/paper/scissors>
@@ -46,8 +46,12 @@ Gets the bot to repeat the input text. The bot will then try and delete your mes
 	>say <text>
 Gets the number of times the mentioned user has "meeped".
 	>list_meeps <mention>
+Generates a minecraft achievement with a random icon, with text based on the input.
+	>mca <text>
 This command allow translation to and from Basic Shadow, which is a language invented by <@284415695050244106>.
 	>translate <to/from> <english>
+Generates an ASCII art of the input text.
+	>figlet <text>
 ```
 
 Image manipulation commands
@@ -67,15 +71,14 @@ These commands control or list the criminality values of a user.
 Trigger Words
 ```
 These are words that have make the bot do something if you say them.
-
 	"meep"
 	"wheatley" AND "moron"
 	"pineapple"
-	"no u" or "no you"
+	"no u" OR "no you"
 	"the more you know"
 ```
 
-(Bot Administration Commands)
+Bot Administration Commands
 ```
 These commands are strictly for the bot owners. Accessing them will send a warning to the owner.
 
@@ -86,7 +89,7 @@ Retrieve stored value for user attribute in database.
 Update stored value for user attribute in database.
 	>setuserdata <mention> <attribute> <value>
 Execute a shell command on the host computer.
-	>exec <shell command>
+	>execute <shell command>
 ```
 ## Dependencies
 Run 'pip install' on all of of these packages to install them:
