@@ -613,21 +613,6 @@ async def execute(client,message,commandprefix,userData):
 	#send it :D
 	await message.channel.send("""```
 """+output+"```")
-	usage = "Usage: "+commandprefix+"say <text>"
-	try:
-		#remove command prefix from string we want
-		text = message.content[len(commandprefix)+4:] #change according to length of command name + 1 for the space
-	except:
-		error = format_exc()
-		await message.channel.send("""Error while reading text.
-`"""+error+"`")
-		consoleOutput(error)
-		return #end command
-	if not text.replace(" ","") == "":
-		await message.channel.send(text) #send the message that the user wanted
-		await message.delete() #cover their tracks for them
-	else:
-		await message.channel.send(usage)
 async def purge(client,message,commandprefix,userData):
 	usage = "Usage: "+commandprefix+"purge <number of messages>"
 	array = message.content.split()
