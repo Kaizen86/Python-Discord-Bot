@@ -1,5 +1,4 @@
 print("Program is now executing.")
-lengthofthisfile = 207
 
 from time import localtime #file logs
 from os import listdir #folder existence checks

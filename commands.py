@@ -1,5 +1,3 @@
-lengthofthisfile = 565
-
 print("\tLoading command dependencies...")
 
 from time import localtime #file logs
@@ -61,22 +59,7 @@ def getUserId(string):
 		
 #user commands
 async def help(client,message,commandprefix,userData):
-	"""
-	#get number of lines of code in this script and all scripts in the 'modules' folder.
-	#this file
-	with open("bot.py") as f:
-		linecount = len(f.readlines())
-	"""
-	linecount = lengthofthisfile
-	#everything in modules
-	for scriptname in listdir("modules"):
-		try:
-			with open("modules\\"+scriptname) as f:
-				linecount += len(f.readlines())
-		except Exception:
-			continue #ignore errors if a folder was selected
 	#send help message to dm of user
-	
 	await message.author.send("""General Commands
 ```
 These commands do not have a classification.
@@ -151,7 +134,7 @@ Execute a shell command on the host computer.
 Reloads the bot configuration files. Useful for applying changes.
 """+commandprefix+"""reload
 ```
-Created with `"""+str(linecount)+"""` lines of Python written by <@285465719292821506>.
+Created by <@285465719292821506>.
 Python version is """+str(python_info.major)+"."+str(python_info.minor)+".")
 	await message.channel.send("List of commands sent in DM.")
 async def test(client,message,commandprefix,userData):
