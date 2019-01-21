@@ -77,9 +77,9 @@ async def help(client,message,commandprefix,userData):
 			continue #ignore errors if a folder was selected
 	#send help message to dm of user
 	
-	await message.author.send("""User Commands
+	await message.author.send("""General Commands
 ```
-These commands are accessible to all users.
+These commands do not have a classification.
 Display this help.
 """+commandprefix+"""help
 Tests if the bot is working.
@@ -108,6 +108,8 @@ This command allow translation to and from Basic Shadow, which is a language inv
 """+commandprefix+"""translate <to/from> <english>
 Generates an ASCII art of the input text.
 """+commandprefix+"""figlet <text>
+Deletes a certain number of messages in the same channel that the command was sent.
+"""+commandprefix+"""purge <number of messages>
 ```""")
 	await message.author.send("""
 Image manipulation commands
@@ -136,7 +138,7 @@ These are words that have make the bot do something if you say them.
 
 Bot Administration Commands
 ```
-These commands are strictly for the bot owners. Accessing them will send a warning to the owner.
+These commands are intended for the bot owners. Accessing them will send a warning to the owner.
 
 Shutdown the bot.
 """+commandprefix+"""shutdown
@@ -244,7 +246,6 @@ async def info(client,message,commandprefix,userData):
 async def avatar(client,message,commandprefix,userData):
 	usage = "Usage: "+commandprefix+"avatar <mention>"
 	array = message.content.split()
-	print(array)
 	try:
 		userid = getUserId(array[1])
 	except:
@@ -352,7 +353,6 @@ async def list_meeps(client,message,commandprefix,userData):
 `"""+error+"`")
 			consoleOutput(error)
 		return #end command
-	print(userid)
 	value = str(userData.get_user_data(userid,"meeps"))
 	await message.channel.send("<@"+userid+"> has meeped "+value+" times.")
 async def mca(client,message,commandprefix,userData):
@@ -613,3 +613,34 @@ async def execute(client,message,commandprefix,userData):
 	#send it :D
 	await message.channel.send("""```
 """+output+"```")
+	usage = "Usage: "+commandprefix+"say <text>"
+	try:
+		#remove command prefix from string we want
+		text = message.content[len(commandprefix)+4:] #change according to length of command name + 1 for the space
+	except:
+		error = format_exc()
+		await message.channel.send("""Error while reading text.
+`"""+error+"`")
+		consoleOutput(error)
+		return #end command
+	if not text.replace(" ","") == "":
+		await message.channel.send(text) #send the message that the user wanted
+		await message.delete() #cover their tracks for them
+	else:
+		await message.channel.send(usage)
+async def purge(client,message,commandprefix,userData):
+	usage = "Usage: "+commandprefix+"purge <number of messages>"
+	array = message.content.split()
+	try:
+		msgcount = int(array[1])
+	except:
+		error = format_exc()
+		if "ValueError" in error:
+			await message.channel.send(usage)
+		else:
+			await message.channel.send("""Unknown error while parsing arguments.
+`"""+error+"`")
+			consoleOutput(error)
+		return #end command
+	deletedmsgs = await message.channel.purge(limit=msgcount) #returns a list of information about the deleted messages.
+	await message.channel.send("Deleted "+str(len(deletedmsgs))+" messages.")

@@ -162,6 +162,7 @@ async def on_message(message):
 				"mca":commands.mca,
 				"translate":commands.translate,
 				"figlet":commands.figlet,
+				"purge":commands.purge,
 				"beauty":commands.beauty,
 				"protecc":commands.protecc,
 				"list_crime":commands.list_crime,
