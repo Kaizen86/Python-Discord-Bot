@@ -39,6 +39,7 @@ print("Loading sub-vital...")
 #sub-vital
 from traceback import format_exc #for error handling
 from modules import database #for all database controls
+import json #for parsing command permission configs
 
 consoleOutput("Loading commands and their libraries...")
 import commands #Load all the commands and their code from the commands.py file
@@ -49,22 +50,55 @@ commandprefix = ">" #sets the command prefix.
 
 #get ids of bot admins from admins.config. 
 #used for exclusive management commands and access denied reporting.
-admins = []
-try:
-	for line in open("admins.config").readlines():
-		line = line.replace("\n","")
-		if line.split() == [] or line.startswith("#"):
-			continue
-		else:
-			admins.append(line)
-	if len(admins) == 0:
-		consoleOutput("ERROR! No admins are defined in admin.config! Aborting...")
-		exit()
-except:
-	error = format_exc()
-	if "FileNotFound" in error:
-		consoleOutput("ERROR! 'admins.config' is missing. Aborting...")
-		exit()
+#custom error class for comedic purposes in hilariously catastrophic scenarios
+class EmptyConfigFileError(Exception):
+    pass
+class ConfigFileError(Exception):
+    pass
+class ConfigLoader():
+	def loadAdmins():
+		admins = []
+		try:
+			for line in open("admins.config").readlines():
+				line = line.replace("\n","")
+				if line.split() == [] or line.startswith("#"):
+					continue
+				else:
+					admins.append(line)
+			if len(admins) == 0:
+				raise EmptyConfigFileError("ERROR! No admins are defined in admins.config! Aborting...")
+			return admins
+		except:
+			raise ConfigFileError("Unable to open admins.config")
+	def loadCommandPerms():
+		try:
+			with open('commands.config') as json_data:
+				config = json.load(json_data)
+				return config
+		except:
+			raise ConfigFileError("Unable to open commands.config")
+			
+async def reloadConfigs(client,message,commandprefix,userData):
+	global admins
+	global command_perms
+	try:
+		admins = ConfigLoader.loadAdmins()
+	except:
+		error = format_exc()
+		if "FileNotFound" in error:
+			await message.channel.send("ERROR! 'admins.config' is missing.")
+	try:
+		command_perms = ConfigLoader.loadCommandPerms()
+	except:
+		error = format_exc()
+		if "FileNotFound" in error:
+			await message.channel.send("ERROR! 'commands.config' is missing.")
+	
+	await message.channel.send("Reloaded configuration files.")
+	consoleOutput("Reloaded configuration files.")
+
+admins = ConfigLoader.loadAdmins()
+command_perms = ConfigLoader.loadCommandPerms()
 
 #initialize client and databases
 client = discord.Client()
@@ -74,13 +108,21 @@ userData = database.Database("databases\\users.json")
 #custom error class for comedic purposes in hilariously catastrophic scenarios
 class ExcuseMeWhatTheFuckError(Exception):
     pass
+
+def isAdmin(userid):
+	userid = str(userid)
+	for entry in admins:
+		entry = str(entry)
+		if entry == userid:
+			return True
+	return False
 	
 @client.event
 async def on_ready():
 	consoleOutput("Logged on as " + client.user.name + " with the ID " + str(client.user.id) + ".")
 	consoleOutput("------")
-	await client.change_presence(activity=discord.Game(name="DEBUG MODE, BOT NON-FUNCTIONAL"))
-	#await client.change_presence(activity=discord.Game(name=commandprefix+"help"))
+	#await client.change_presence(activity=discord.Game(name="DEBUG MODE, BOT NON-FUNCTIONAL"))
+	await client.change_presence(activity=discord.Game(name=commandprefix+"help"))
 		
 @client.event
 async def on_message(message):
@@ -128,22 +170,29 @@ async def on_message(message):
 				"shutdown":commands.shutdown,
 				"getuserdata":commands.getuserdata,
 				"setuserdata":commands.setuserdata,
-				"execute":commands.execute
+				"execute":commands.execute,
+				"reload":reloadConfigs
 			}
 			
-			if command in command_set:
-				"""
-				#permission check
-				if isAdmin(message.author.id):
-					#do thing
+			if command in command_set and command in command_perms:
+				can_do_command = True
+				if command_perms[command]["enabled"]:
+					if command_perms[command]["adminsonly"]:
+						#permission check
+						if not isAdmin(message.author.id):
+							can_do_command = False
+							await message.channel.send("Access denied.")
+							consoleOutput("Access denied.")
 				else:
-					await reportAccessDenied(client,message,commandprefix)
-					consoleOutput("Access denied.")
-				"""
-				#find the command being referenced
-				action = command_set[command]
-				#execute the command
-				await action(client,message,commandprefix,userData)
+					can_do_command = False
+					await message.channel.send("This command has been disabled.")
+					consoleOutput("Command has been disabled.")
+				
+				if can_do_command:
+					#find the command being referenced
+					action = command_set[command]
+					#execute the command
+					await action(client,message,commandprefix,userData)
 			else:
 				#if none of the above worked, report unknown command.
 				await message.channel.send("Unknown command '"+command+"'.")

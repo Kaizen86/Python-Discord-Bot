@@ -90,6 +90,8 @@ Update stored value for user attribute in database.
 	>setuserdata <mention> <attribute> <value>
 Execute a shell command on the host computer.
 	>execute <shell command>
+Reloads the bot configuration files. Useful for applying changes.
+	>reload
 ```
 ## Dependencies
 Run 'pip install' on all of of these packages to install them:

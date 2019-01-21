@@ -38,8 +38,9 @@ from os import _exit as force_exit #shutdown
 from random import randint #dice, coin_toss, rps, mca, beauty, protecc
 import re #used to remove non-numbers from mentions to extract the user id
 from requests import get #mca, beauty, protecc
-from subprocess import PIPE as SUB_PIPE #exec
-from subprocess import Popen as shell_exec #exec
+from subprocess import PIPE as SUB_PIPE #execute
+from subprocess import Popen as shell_exec #execute
+import shlex #execute
 from sys import version_info as python_info #help
 from time import sleep #shutdown
 #external (3rd party)
@@ -56,32 +57,7 @@ class ExcuseMeWhatTheFuckError(Exception):
 	
 def getUserId(string):
 	return re.sub("[^0-9]","",string)
-def isAdmin(userid):
-	for entry in admins:
-		if entry ==  userid:
-			return True
-	return False
-async def reportAccessDenied(message):
-	#in the event that someone attempts to access a management command,
-	#send a direct message to the owner and warn the offending user.
-
-	#construct the embedded message
-	embed = discord.Embed(title="User attempted unauthorised access!")
-	embed.add_field(name="Offending message content", value=message.content, inline=False)
-	embed.add_field(name="Username", value=message.author.name+"#"+str(message.author.discriminator), inline=False)
-	embed.add_field(name="Unique ID", value=message.author.id, inline=False)
-	embed.add_field(name="Avatar", value=" ", inline=False)
-	embed.set_image(url=message.author.avatar_url)
-
-	botownermember = discord.Server.get_member(message.server, admins[0]) #create a new user object and point it at the bot owner
-	if botownermember != None:
-		try:
-			await message.channel.send(botownermember,embed=embed) #send it. this fails if content is over 2000 chars.
-		finally:
-			await message.channel.send("Access denied. This incident has been reported.")
-	else:
-		await message.channel.send("Access denied.")
-		
+	
 		
 #user commands
 async def help(client,message,commandprefix,userData):
@@ -101,24 +77,24 @@ async def help(client,message,commandprefix,userData):
 			continue #ignore errors if a folder was selected
 	#send help message to dm of user
 	
-	await message.author.send("""(User Commands)
+	await message.author.send("""User Commands
 ```
 These commands are accessible to all users.
 Display this help.
 """+commandprefix+"""help
 Tests if the bot is working.
 """+commandprefix+"""test
-Rolls a dice with an optional minimum and maximum limits
+Rolls a dice with an optional minimum and maximum limits.
 """+commandprefix+"""dice [minimum [maximum]
 Gives advice on where to find oxygen. In other words, the perfect command.
 """+commandprefix+"""oxygen
 Tosses a coin. That's it.
 """+commandprefix+"""coin_toss
-Reverses the given text
+Reverses the given text.
 """+commandprefix+"""reverse <text>
-Gets information about a mentioned user
+Gets information about a mentioned user.
 """+commandprefix+"""info <mention>
-Gets the avatar of a mentioned user
+Gets the avatar of a mentioned user.
 """+commandprefix+"""avatar <mention>
 Play a game of rock paper scissors with the bot. (I promise it doesn't cheat)
 """+commandprefix+"""rps <rock/paper/scissors>
@@ -130,10 +106,10 @@ Generates a minecraft achievement with a random icon, with text based on the inp
 """+commandprefix+"""mca <text>
 This command allow translation to and from Basic Shadow, which is a language invented by <@284415695050244106>.
 """+commandprefix+"""translate <to/from> <english>
-Generates an ASCII art of the input text
+Generates an ASCII art of the input text.
 """+commandprefix+"""figlet <text>
-```
-
+```""")
+	await message.author.send("""
 Image manipulation commands
 ```
 """+commandprefix+"""beauty <mention>
@@ -151,26 +127,27 @@ These commands control or list the criminality values of a user.
 Trigger Words
 ```
 These are words that have make the bot do something if you say them.
-
-"meep"
-"wheatley" AND "moron"
-"pineapple"
-"no u" or "no you"
-"the more you know"
+	"meep"
+	"wheatley" AND "moron"
+	"pineapple"
+	"no u" OR "no you"
+	"the more you know"
 ```
 
-(Bot Administration Commands)
+Bot Administration Commands
 ```
 These commands are strictly for the bot owners. Accessing them will send a warning to the owner.
 
 Shutdown the bot.
 """+commandprefix+"""shutdown
-Retrieve stored value for user attribute in database
+Retrieve stored value for user attribute in database.
 """+commandprefix+"""getuserdata <mention> <attribute>
-Update stored value for user attribute in database
+Update stored value for user attribute in database.
 """+commandprefix+"""setuserdata <mention> <attribute> <value>
-Execute a shell command on the host computer
+Execute a shell command on the host computer.
 """+commandprefix+"""execute <shell command>
+Reloads the bot configuration files. Useful for applying changes.
+"""+commandprefix+"""reload
 ```
 Created with `"""+str(linecount)+"""` lines of Python written by <@285465719292821506>.
 Python version is """+str(python_info.major)+"."+str(python_info.minor)+".")
@@ -617,10 +594,21 @@ async def setuserdata(client,message,commandprefix,userData):
 async def execute(client,message,commandprefix,userData):
 	await message.channel.send("Access granted. Executing command...")
 	consoleOutput("Access granted. Executing command...")
-	cmd = message.content[len(commandprefix)+5:]
+	try:
+		cmd = shlex.split(message.content)[1]
+	except:
+		error = format_exc()
+		if "IndexError" in error:
+			await message.channel.send(usage)
+			return #end command
+		else:
+			await message.channel.send("""No command was specified.
+`"""+error+"`")
+			consoleOutput(error)
+			return
 	output = str(bytes(str(shell_exec(cmd, shell=True, stdout=SUB_PIPE).stdout.read()), "utf-8").decode("unicode_escape"))
-	#trim "b' " and "'" from start and end.
-	output = output[3:]
+	#trim "b'" and "'" from start and end.
+	output = output[2:]
 	output = output[:-1]
 	#send it :D
 	await message.channel.send("""```
