@@ -44,8 +44,10 @@ consoleOutput("Loading commands and their libraries...")
 import commands #Load all the commands and their code from the commands.py file
 from time import sleep #bot loop
 
+consoleOutput("Loading trigger words...")
+import events #Load all the commands and their code from the commands.py file
+
 consoleOutput("Modules loaded. Loading configs...")
-commandprefix = ">" #sets the command prefix.
 
 #get ids of bot admins from admins.config. 
 #used for exclusive management commands and access denied reporting.
@@ -55,6 +57,13 @@ class EmptyConfigFileError(Exception):
 class ConfigFileError(Exception):
     pass
 class ConfigLoader():
+	def loadGeneralConfig(key):
+		try:
+			with open('bot.config') as json_data:
+				config = json.load(json_data)
+				return config[key]
+		except:
+			raise ConfigFileError("Unable to open bot.config")
 	def loadAdmins():
 		admins = []
 		try:
@@ -78,8 +87,18 @@ class ConfigLoader():
 			raise ConfigFileError("Unable to open commands.config")
 			
 async def reloadConfigs(client,message,commandprefix,userData):
+	global commandprefix
+	global core_files_foldername
 	global admins
 	global command_perms
+
+	try:
+		commandprefix, core_files_foldername = ConfigLoader.loadGeneralConfig()
+	except:
+		error = format_exc()
+		if "FileNotFound" in error:
+			await message.channel.send("ERROR! 'commands.config' is missing.")
+
 	try:
 		admins = ConfigLoader.loadAdmins()
 	except:
@@ -96,6 +115,8 @@ async def reloadConfigs(client,message,commandprefix,userData):
 	await message.channel.send("Reloaded configuration files.")
 	consoleOutput("Reloaded configuration files.")
 
+commandprefix = ConfigLoader.loadGeneralConfig("commandprefix") #sets the command prefix.
+core_files_foldername = ConfigLoader.loadGeneralConfig("core_files_foldername") #folder in which the bot looks for its resources
 admins = ConfigLoader.loadAdmins()
 command_perms = ConfigLoader.loadCommandPerms()
 
@@ -216,9 +237,9 @@ Little
 Economy
 ```""")
 		if "no u" in message.content.lower() or "no you" in message.content.lower():
-				await message.channel.send_file(message.channel, fp="images\\no_u.jpg")
+				await message.channel.send(file=discord.File(core_files_foldername+"\\images\\no_u.jpg", filename="img.png"))
 		if "the more you know" in message.content.lower():
-				await message.channel.send_file(message.channel, fp="images\\moreyouknow.gif")
+				await message.channel.send(file=discord.File(core_files_foldername+"\\images\\moreyouknow.gif", filename="img.png"))
 
 	except:
 		error = format_exc()
