@@ -44,9 +44,6 @@ consoleOutput("Loading commands and their libraries...")
 import commands #Load all the commands and their code from the commands.py file
 from time import sleep #bot loop
 
-consoleOutput("Loading trigger words...")
-import events #Load all the commands and their code from the commands.py file
-
 consoleOutput("Modules loaded. Loading configs...")
 
 #get ids of bot admins from admins.config. 
@@ -87,7 +84,6 @@ class ConfigLoader():
 			raise ConfigFileError("Unable to open commands.config")
 			
 async def reloadConfigs(client,message,commandprefix,userData):
-	global commandprefix
 	global core_files_foldername
 	global admins
 	global command_perms
