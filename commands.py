@@ -58,7 +58,7 @@ def getUserId(string):
 	
 		
 #user commands
-async def help(client,message,commandprefix,userData):
+async def help(client,message,commandprefix,userData,core_files_foldername):
 	#send help message to dm of user
 	await message.author.send("""General Commands
 ```
@@ -137,9 +137,9 @@ Reloads the bot configuration files. Useful for applying changes.
 Created by <@285465719292821506>.
 Python version is """+str(python_info.major)+"."+str(python_info.minor)+".")
 	await message.channel.send("List of commands sent in DM.")
-async def test(client,message,commandprefix,userData):
+async def test(client,message,commandprefix,userData,core_files_foldername):
 	await message.channel.send("Yes, <@"+str(message.author.id)+">. This bot is online.")
-async def dice(client,message,commandprefix,userData):
+async def dice(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"dice [minimum] [maximum]"
 	#get command parameters and allocate into appropriate variables.
 	array = message.content.split()
@@ -171,16 +171,16 @@ async def dice(client,message,commandprefix,userData):
 		await message.channel.send("I rolled "+str(randint(min,max)))
 	else:
 		await message.channel.send("Minimum & maximum must be numbers.")
-async def oxygen(client,message,commandprefix,userData):
+async def oxygen(client,message,commandprefix,userData,core_files_foldername):
 	await message.channel.send("Look around and you will find it.")
-async def coin_toss(client,message,commandprefix,userData):
+async def coin_toss(client,message,commandprefix,userData,core_files_foldername):
 	result = randint(1,8)
 	if result <= 4:
 		result = "Tails"
 	else:
 		result = "Heads"
 	await message.channel.send(result+".")
-async def reverse(client,message,commandprefix,userData):
+async def reverse(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"reverse <text>"
 	try:
 		#remove command prefix from string we want
@@ -195,7 +195,7 @@ async def reverse(client,message,commandprefix,userData):
 		await message.channel.send(text[::-1]) #mystical string manipulation command to reverse the input
 	else:
 		await message.channel.send(usage)
-async def info(client,message,commandprefix,userData):
+async def info(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"info <mention>"
 	array = message.content.split()
 	try:
@@ -226,7 +226,7 @@ async def info(client,message,commandprefix,userData):
 	embed.add_field(name="Avatar", value=".", inline=False)
 	embed.set_image(url=user.avatar_url)
 	await message.channel.send(embed=embed)
-async def avatar(client,message,commandprefix,userData):
+async def avatar(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"avatar <mention>"
 	array = message.content.split()
 	try:
@@ -257,7 +257,7 @@ async def avatar(client,message,commandprefix,userData):
 			consoleOutput("""Unknown error!
 """+error)
 		return
-async def rps(client,message,commandprefix,userData):
+async def rps(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"rps <rock/paper/scissors>"
 	array = message.content.split()
 	try:
@@ -306,7 +306,7 @@ async def rps(client,message,commandprefix,userData):
 
 	#send result
 	await message.channel.send("You chose "+userchoice+". I chose "+cpuchoice+". "+result)
-async def say(client,message,commandprefix,userData):
+async def say(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"say <text>"
 	try:
 		#remove command prefix from string we want
@@ -322,7 +322,7 @@ async def say(client,message,commandprefix,userData):
 		await message.delete() #cover their tracks for them
 	else:
 		await message.channel.send(usage)
-async def list_meeps(client,message,commandprefix,userData):
+async def list_meeps(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"list_meeps <mention>"
 	array = message.content.split()
 	try:
@@ -338,7 +338,7 @@ async def list_meeps(client,message,commandprefix,userData):
 		return #end command
 	value = str(userData.get_user_data(userid,"meeps"))
 	await message.channel.send("<@"+userid+"> has meeped "+value+" times.")
-async def mca(client,message,commandprefix,userData):
+async def mca(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"mca <text>"
 	try:
 		#remove command prefix from string we want
@@ -361,7 +361,7 @@ async def mca(client,message,commandprefix,userData):
 		delete_file(imageid) #delete the file afterwards.
 	else:
 		await message.channel.send(usage)
-async def translate(client,message,commandprefix,userData):
+async def translate(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"translate <to/from> <text>"
 	#get command parameters and allocate into appropriate variables.
 	array = message.content.split()
@@ -394,7 +394,7 @@ async def translate(client,message,commandprefix,userData):
 		#wat.
 		#how did you get here??
 		raise ExcuseMeWhatTheFuckError("Unexpected error in mode selection")
-async def figlet(client,message,commandprefix,userData):
+async def figlet(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"figlet <text>"
 				
 	#find length of input text, then isolate it from the command.
@@ -412,7 +412,7 @@ async def figlet(client,message,commandprefix,userData):
 		await message.channel.send("Message too long.")
 				
 #image manipulation commands
-async def beauty(client,message,commandprefix,userData):
+async def beauty(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"beauty <mention>"
 	array = message.content.split()
 	try:
@@ -427,7 +427,7 @@ async def beauty(client,message,commandprefix,userData):
 `"""+error+"`")
 				consoleOutput(error)
 				return
-	background = Image.open("images\\beauty.jpg").convert("RGBA") #original meme image
+	background = Image.open(core_files_foldername+"\\images\\beauty.jpg").convert("RGBA") #original meme image
 
 	userdata = await client.get_user_info(userid) #retrieve information of user
 	response = get(userdata.avatar_url) #get the image data from the avatar_url and store that into response.
@@ -443,7 +443,7 @@ async def beauty(client,message,commandprefix,userData):
 	background.save(imageid) #save it...
 	await message.channel.send(file=discord.File(imageid, filename="img.png")) #then send the image.
 	delete_file(imageid) #delete the file afterwards.
-async def protecc(client,message,commandprefix,userData):
+async def protecc(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"protecc <mention>"
 	array = message.content.split()
 	try:
@@ -458,7 +458,7 @@ async def protecc(client,message,commandprefix,userData):
 `"""+error+"`")
 			consoleOutput(error)
 			return
-	background = Image.open("images\\protecc.png").convert("RGBA") #original meme image
+	background = Image.open(core_files_foldername+"\\images\\protecc.png").convert("RGBA") #original meme image
 
 	userdata = await client.get_user_info(userid) #retrieve information of user
 	response = get(userdata.avatar_url) #get the image data from the avatar_url and store that into response.
@@ -474,7 +474,7 @@ async def protecc(client,message,commandprefix,userData):
 	delete_file(imageid) #delete the file afterwards.
 
 #criminality commands
-async def list_crime(client,message,commandprefix,userData):
+async def list_crime(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"list_crime <mention>"
 	array = message.content.split()
 	try:
@@ -496,7 +496,7 @@ async def list_crime(client,message,commandprefix,userData):
 	value = userData.get_user_data(userid,"criminality")
 	await message.channel.send("Criminality value for <@"+userid+"> is "+str(value)+".")
 	consoleOutput("Criminality value is now "+str(value)+".")
-async def set_crime(client,message,commandprefix,userData):
+async def set_crime(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"set_crime <mention> <value>"
 	array = message.content.split()
 	try:
@@ -518,7 +518,7 @@ async def set_crime(client,message,commandprefix,userData):
 	userData.set_user_data(userid,"criminality",value)
 	await message.channel.send("Updated criminality value for <@"+userid+"> to "+str(value)+".")
 	consoleOutput("Updated value to "+str(value)+".")
-async def change_crime(client,message,commandprefix,userData):
+async def change_crime(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"change_crime <mention> <value>"
 	array = message.content.split()
 	try:
@@ -553,12 +553,12 @@ async def change_crime(client,message,commandprefix,userData):
 	consoleOutput("Changed criminality value by "+str(value)+" to equal "+str(finalvalue)+".")
 
 #exclusive management commands. foolproofing isnt required since only i can use them
-async def shutdown(client,message,commandprefix,userData):
+async def shutdown(client,message,commandprefix,userData,core_files_foldername):
 	await message.channel.send("Shutting down bot...")
 	await client.change_presence(status=discord.Status.invisible)
 	sleep(2)
 	force_exit(0)
-async def getuserdata(client,message,commandprefix,userData):
+async def getuserdata(client,message,commandprefix,userData,core_files_foldername):
 	array = message.content.split()
 	userid = getUserId(array[1])
 	await message.channel.send("Access granted.")
@@ -566,7 +566,7 @@ async def getuserdata(client,message,commandprefix,userData):
 	value = str(userData.get_user_data(userid,array[2]))
 	await message.channel.send("Value stored with name '"+array[2]+"' for <@"+userid+"> is "+value)
 	consoleOutput("Value stored is "+value)
-async def setuserdata(client,message,commandprefix,userData):
+async def setuserdata(client,message,commandprefix,userData,core_files_foldername):
 	array = message.content.split()
 	userid = getUserId(array[1])
 	await message.channel.send("Access granted. Setting user data for <@"+userid+">.")
@@ -574,7 +574,7 @@ async def setuserdata(client,message,commandprefix,userData):
 	userData.set_user_data(userid,array[2],array[3])
 	await message.channel.send("Updated value.")
 	consoleOutput("Updated value.")
-async def execute(client,message,commandprefix,userData):
+async def execute(client,message,commandprefix,userData,core_files_foldername):
 	await message.channel.send("Access granted. Executing command...")
 	consoleOutput("Access granted. Executing command...")
 	try:
@@ -596,7 +596,7 @@ async def execute(client,message,commandprefix,userData):
 	#send it :D
 	await message.channel.send("""```
 """+output+"```")
-async def purge(client,message,commandprefix,userData):
+async def purge(client,message,commandprefix,userData,core_files_foldername):
 	usage = "Usage: "+commandprefix+"purge <number of messages>"
 	array = message.content.split()
 	try:

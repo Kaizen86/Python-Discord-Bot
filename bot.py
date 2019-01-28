@@ -83,13 +83,14 @@ class ConfigLoader():
 		except:
 			raise ConfigFileError("Unable to open commands.config")
 			
-async def reloadConfigs(client,message,commandprefix,userData):
-	global core_files_foldername
+async def reloadConfigs(client,message,commandprefix,userData, core_files_foldername):
+	global core_files_foldername #uh oh...
 	global admins
 	global command_perms
 
 	try:
-		commandprefix, core_files_foldername = ConfigLoader.loadGeneralConfig()
+		commandprefix = ConfigLoader.loadGeneralConfig("commandprefix")
+		core_files_foldername = ConfigLoader.loadGeneralConfig("core_files_foldername")
 	except:
 		error = format_exc()
 		if "FileNotFound" in error:
@@ -209,7 +210,7 @@ async def on_message(message):
 					#find the command being referenced
 					action = command_set[command]
 					#execute the command
-					await action(client,message,commandprefix,userData)
+					await action(client,message,commandprefix,userData,core_files_foldername)
 			else:
 				#if none of the above worked, report unknown command.
 				await message.channel.send("Unknown command '"+command+"'.")
