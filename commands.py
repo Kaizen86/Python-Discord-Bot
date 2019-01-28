@@ -64,49 +64,49 @@ async def help(client,message,commandprefix,userData,core_files_foldername):
 ```
 These commands do not have a classification.
 Display this help.
-"""+commandprefix+"""help
+{0}help
 Tests if the bot is working.
-"""+commandprefix+"""test
+{0}test
 Rolls a dice with an optional minimum and maximum limits.
-"""+commandprefix+"""dice [minimum [maximum]
+{0}dice [minimum] [maximum]
 Gives advice on where to find oxygen. In other words, the perfect command.
-"""+commandprefix+"""oxygen
+{0}oxygen
 Tosses a coin. That's it.
-"""+commandprefix+"""coin_toss
+{0}coin_toss
 Reverses the given text.
-"""+commandprefix+"""reverse <text>
+{0}reverse <text>
 Gets information about a mentioned user.
-"""+commandprefix+"""info <mention>
+{0}info <mention>
 Gets the avatar of a mentioned user.
-"""+commandprefix+"""avatar <mention>
+{0}avatar <mention>
 Play a game of rock paper scissors with the bot. (I promise it doesn't cheat)
-"""+commandprefix+"""rps <rock/paper/scissors>
+{0}rps <rock/paper/scissors>
 Gets the bot to repeat the input text. The bot will then try and delete your message to make it look real.
-"""+commandprefix+"""say <text>
+{0}say <text>
 Gets the number of times the mentioned user has "meeped".
-"""+commandprefix+"""list_meeps <mention>
+{0}list_meeps <mention>
 Generates a minecraft achievement with a random icon, with text based on the input.
-"""+commandprefix+"""mca <text>
+{0}mca <text>
 This command allow translation to and from Basic Shadow, which is a language invented by <@284415695050244106>.
-"""+commandprefix+"""translate <to/from> <english>
+{0}translate <to/from> <english>
 Generates an ASCII art of the input text.
-"""+commandprefix+"""figlet <text>
+{0}figlet <text>
 Deletes a certain number of messages in the same channel that the command was sent.
-"""+commandprefix+"""purge <number of messages>
-```""")
+{0}purge <number of messages>
+```""".format(commandprefix))
 	await message.author.send("""
 Image manipulation commands
 ```
-"""+commandprefix+"""beauty <mention>
-"""+commandprefix+"""protecc <mention>
+{0}beauty <mention>
+{0}protecc <mention>
 ```
 
 Criminality Commands
 ```
 These commands control or list the criminality values of a user.
-"""+commandprefix+"""list_crime <mention>
-"""+commandprefix+"""set_crime <mention> <value>
-"""+commandprefix+"""change_crime <mention> <increment value by>
+{0}list_crime <mention>
+{0}set_crime <mention> <value>
+{0}change_crime <mention> <increment value by>
 ```
 
 Trigger Words
@@ -124,18 +124,18 @@ Bot Administration Commands
 These commands are intended for the bot owners. Accessing them will send a warning to the owner.
 
 Shutdown the bot.
-"""+commandprefix+"""shutdown
+{0}shutdown
 Retrieve stored value for user attribute in database.
-"""+commandprefix+"""getuserdata <mention> <attribute>
+{0}getuserdata <mention> <attribute>
 Update stored value for user attribute in database.
-"""+commandprefix+"""setuserdata <mention> <attribute> <value>
+{0}setuserdata <mention> <attribute> <value>
 Execute a shell command on the host computer.
-"""+commandprefix+"""execute <shell command>
+{0}execute <shell command>
 Reloads the bot configuration files. Useful for applying changes.
-"""+commandprefix+"""reload
+{0}reload
 ```
 Created by <@285465719292821506>.
-Python version is """+str(python_info.major)+"."+str(python_info.minor)+".")
+Python version is {1}.{2}""".format(commandprefix,str(python_info.major),str(python_info.minor)))
 	await message.channel.send("List of commands sent in DM.")
 async def test(client,message,commandprefix,userData,core_files_foldername):
 	await message.channel.send("Yes, <@"+str(message.author.id)+">. This bot is online.")
