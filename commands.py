@@ -30,6 +30,7 @@ from traceback import format_exc #for error handling
 #internal
 print("\tInternal (1/2)")
 from io import BytesIO #mca, beauty, protecc
+from typing import BinaryIO #rickroll
 from os import remove as delete_file #mca, beauty, protecc
 from os import listdir #help
 from os import _exit as force_exit #shutdown
@@ -43,7 +44,10 @@ from sys import version_info as python_info #help
 from time import sleep #shutdown
 #external (3rd party)
 print("\tExternal (2/2)")
+from discord import FFmpegPCMAudio #rickroll
+from discord import PCMVolumeTransformer #rickroll
 import pyfiglet #figlet
+import nacl #rickroll
 from PIL import Image #mca, beauty, protecc
 from modules import shadow_translator #translate (i made this one :D)
 shadowtranslator = shadow_translator.ShadowTranslator()
@@ -461,7 +465,49 @@ async def figlet(passedvariables):
 		await message.channel.send("```"+pyfiglet.figlet_format(text)+"```")
 	except discord.errors.HTTPException:
 		await message.channel.send("Message too long.")
-				
+async def rickroll(passedvariables):
+	#include all the required variables
+	client = passedvariables["client"]
+	core_files_foldername = passedvariables["core_files_foldername"]
+
+	### THIS IS IN ALPHA TESTING AND IS NOT COMPLETED!
+	await message.channel.send("THIS IS IN ALPHA TESTING AND IS NOT COMPLETED!")
+	
+	channel = client.get_channel(426848559426699269) #this should be replaced with either a user specified channel or the channel the user is currently in. maybe both. idk.
+	consoleOutput("Located channel.")
+	
+	audio = discord.FFmpegPCMAudio(core_files_foldername+"/audio/rickroll.mp3", executable='ffmpeg') #open file
+	audio.volume = 3 #set audio level to 3 out of... something. probably 10.
+	consoleOutput("Opened audio file.")
+	
+	voiceclient = await channel.connect() #connect to the channel
+	consoleOutput("Connected.")
+	
+	voiceclient.play(audio) #and finally, play the audio file.
+	consoleOutput("Rickrolling.")
+async def purge(passedvariables):
+	#include all the required variables
+	message = passedvariables["message"]
+	commandprefix = passedvariables["commandprefix"]
+	
+	usage = "Usage: "+commandprefix+"purge <number of messages>"
+	array = message.content.split()
+	try:
+		msgcount = int(array[1])
+	except:
+		error = format_exc()
+		if "ValueError" in error:
+			await message.channel.send(usage)
+		else:
+			await message.channel.send("""Unknown error while parsing arguments.
+`"""+error+"`")
+			consoleOutput(error)
+		return #end command
+	deletedmsgs = await message.channel.purge(limit=msgcount) #returns a list of information about the deleted messages.
+	await message.channel.send("Deleted "+str(len(deletedmsgs))+" messages.")
+	
+	
+	
 #image manipulation commands
 async def beauty(passedvariables):
 	#include all the required variables
@@ -535,6 +581,8 @@ async def protecc(passedvariables):
 	background.save(imageid) #save it...
 	await message.channel.send(file=discord.File(imageid, filename="img.png")) #then send the image.
 	delete_file(imageid) #delete the file afterwards.
+
+
 
 #criminality commands
 async def list_crime(passedvariables):
@@ -630,6 +678,8 @@ async def change_crime(passedvariables):
 	await message.channel.send("Changed criminality value for <@"+userid+"> by "+str(value)+" to equal "+str(finalvalue)+".")
 	consoleOutput("Changed criminality value by "+str(value)+" to equal "+str(finalvalue)+".")
 
+
+
 #exclusive management commands.
 async def shutdown(passedvariables):
 	#include all the required variables
@@ -689,23 +739,3 @@ async def execute(passedvariables):
 	#send it :D
 	await message.channel.send("""```
 """+output+"```")
-async def purge(passedvariables):
-	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
-	
-	usage = "Usage: "+commandprefix+"purge <number of messages>"
-	array = message.content.split()
-	try:
-		msgcount = int(array[1])
-	except:
-		error = format_exc()
-		if "ValueError" in error:
-			await message.channel.send(usage)
-		else:
-			await message.channel.send("""Unknown error while parsing arguments.
-`"""+error+"`")
-			consoleOutput(error)
-		return #end command
-	deletedmsgs = await message.channel.purge(limit=msgcount) #returns a list of information about the deleted messages.
-	await message.channel.send("Deleted "+str(len(deletedmsgs))+" messages.")

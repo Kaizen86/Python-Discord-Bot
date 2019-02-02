@@ -124,6 +124,14 @@ client = discord.Client()
 verifyFolderExistence("databases")
 userData = database.Database("databases\\users.json")
 
+#Load opus library. Needed for voice channel support
+try:
+	discord.opus.load_opus(core_files_foldername+"\\libopus-0.x86.dll")
+except:
+	error = format_exc()
+	consoleOutput("ERROR LOADING OPUS LIBRARY!")
+	consoleOutput("Commands that utilise voice channels will not work.")
+		
 #custom error class for comedic purposes in hilariously catastrophic scenarios
 class ExcuseMeWhatTheFuckError(Exception):
     pass
@@ -181,12 +189,16 @@ async def on_message(message):
 				"mca":commands.mca,
 				"translate":commands.translate,
 				"figlet":commands.figlet,
+				"rickroll":commands.rickroll,
 				"purge":commands.purge,
+				
 				"beauty":commands.beauty,
 				"protecc":commands.protecc,
+				
 				"list_crime":commands.list_crime,
 				"set_crime":commands.set_crime,
 				"change_crime":commands.change_crime,
+				
 				"shutdown":commands.shutdown,
 				"getuserdata":commands.getuserdata,
 				"setuserdata":commands.setuserdata,
@@ -211,8 +223,8 @@ async def on_message(message):
 				if can_do_command:
 					#find the command being referenced
 					action = command_set[command]
-					#execute the command
-										#execute the command with passed variables
+
+					#define passedvariables (dictionary that contains additional objects)
 					passedvariables = {
 						"client":client,
 						"message":message,
@@ -220,6 +232,7 @@ async def on_message(message):
 						"userData":userData,
 						"core_files_foldername":core_files_foldername
 					}
+					#execute the command
 					await action(passedvariables)
 			else:
 				#if none of the above worked, report unknown command.
