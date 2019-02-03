@@ -21,43 +21,54 @@ In a word, no. The hack was entirely the result of my error and I take full resp
 ## Commands
 Below is a copy of the bot help, containing a list of commands.
 
-User Commands
+General Commands
 ```
-These commands are accessible to all users.
-Display this help.
+	These commands do not have a classification.
+	Display this help.
 	>help
-Tests if the bot is working.
+	Tests if the bot is working.
 	>test
-Rolls a dice with an optional minimum and maximum limits.
-	>dice [minimum [maximum]
-Gives advice on where to find oxygen. In other words, the perfect command.
+	Rolls a dice with an optional minimum and maximum limits.
+	>dice [minimum] [maximum]
+	Gives advice on where to find oxygen. In other words, the perfect command.
 	>oxygen
-Tosses a coin. That's it.
+	Tosses a coin. That's it.
 	>coin_toss
-Reverses the given text.
+	Reverses the given text.
 	>reverse <text>
-Gets information about a mentioned user.
+	Gets information about a mentioned user.
 	>info <mention>
-Gets the avatar of a mentioned user.
+	Gets the avatar of a mentioned user.
 	>avatar <mention>
-Play a game of rock paper scissors with the bot. (I promise it doesn't cheat)
+	Play a game of rock paper scissors with the bot. (I promise it doesn't cheat)
 	>rps <rock/paper/scissors>
-Gets the bot to repeat the input text. The bot will then try and delete your message to make it look real.
+	Gets the bot to repeat the input text. The bot will then try and delete your message to make it look real.
 	>say <text>
-Gets the number of times the mentioned user has "meeped".
+	Gets the number of times the mentioned user has "meeped".
 	>list_meeps <mention>
-Generates a minecraft achievement with a random icon, with text based on the input.
+	Generates a minecraft achievement with a random icon, with text based on the input.
 	>mca <text>
-This command allow translation to and from Basic Shadow, which is a language invented by <@284415695050244106>.
+	This command allow translation to and from Basic Shadow, which is a language invented by <@284415695050244106>.
 	>translate <to/from> <english>
-Generates an ASCII art of the input text.
+	Generates an ASCII art of the input text.
 	>figlet <text>
+	Generates an ASCII art of the input text.
+	Deletes a certain number of messages in the same channel that the command was sent.
+	>purge <number of messages>
 ```
 
 Image manipulation commands
 ```
 	>beauty <mention>
 	>protecc <mention>
+```
+
+Voice channel commands
+```
+	Rickrolls the voice channel you are connected to.
+	>figlet <text>
+	Disconnects the bot from the connected voice channel.
+	>figlet <text>
 ```
 
 Criminality Commands
@@ -80,19 +91,19 @@ These are words that have make the bot do something if you say them.
 
 Bot Administration Commands
 ```
-These commands are strictly for the bot owners. Accessing them will send a warning to the owner.
-
-Shutdown the bot.
+These commands are intended for the bot owners. Accessing them will send a warning to the owner.
+	Shutdown the bot.
 	>shutdown
-Retrieve stored value for user attribute in database.
+	Retrieve stored value for user attribute in database.
 	>getuserdata <mention> <attribute>
-Update stored value for user attribute in database.
+	Update stored value for user attribute in database.
 	>setuserdata <mention> <attribute> <value>
-Execute a shell command on the host computer.
+	Execute a shell command on the host computer.
 	>execute <shell command>
-Reloads the bot configuration files. Useful for applying changes.
+	Reloads the bot configuration files. Useful for applying changes.
 	>reload
 ```
+
 ## Dependencies
 Run 'pip install' on all of of these packages to install them:
 - discord

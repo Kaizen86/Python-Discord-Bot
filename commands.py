@@ -52,15 +52,13 @@ from PIL import Image #mca, beauty, protecc
 from modules import shadow_translator #translate (i made this one :D)
 shadowtranslator = shadow_translator.ShadowTranslator()
 
-
 #custom error class for comedic purposes in hilariously catastrophic scenarios
 class ExcuseMeWhatTheFuckError(Exception):
     pass
-	
 def getUserId(string):
 	return re.sub("[^0-9]","",string)
 	
-		
+	
 #user commands
 async def help(passedvariables):
 	#include all the required variables
@@ -97,6 +95,7 @@ This command allow translation to and from Basic Shadow, which is a language inv
 {0}translate <to/from> <english>
 Generates an ASCII art of the input text.
 {0}figlet <text>
+Generates an ASCII art of the input text.
 Deletes a certain number of messages in the same channel that the command was sent.
 {0}purge <number of messages>
 ```""".format(commandprefix))
@@ -105,6 +104,14 @@ Image manipulation commands
 ```
 {0}beauty <mention>
 {0}protecc <mention>
+```
+
+Voice channel commands
+```
+Rickrolls the voice channel you are connected to.
+{0}figlet <text>
+Disconnects the bot from the connected voice channel.
+{0}figlet <text>
 ```
 
 Criminality Commands
@@ -465,26 +472,6 @@ async def figlet(passedvariables):
 		await message.channel.send("```"+pyfiglet.figlet_format(text)+"```")
 	except discord.errors.HTTPException:
 		await message.channel.send("Message too long.")
-async def rickroll(passedvariables):
-	#include all the required variables
-	client = passedvariables["client"]
-	core_files_foldername = passedvariables["core_files_foldername"]
-
-	### THIS IS IN ALPHA TESTING AND IS NOT COMPLETED!
-	await message.channel.send("THIS IS IN ALPHA TESTING AND IS NOT COMPLETED!")
-	
-	channel = client.get_channel(426848559426699269) #this should be replaced with either a user specified channel or the channel the user is currently in. maybe both. idk.
-	consoleOutput("Located channel.")
-	
-	audio = discord.FFmpegPCMAudio(core_files_foldername+"/audio/rickroll.mp3", executable='ffmpeg') #open file
-	audio.volume = 3 #set audio level to 3 out of... something. probably 10.
-	consoleOutput("Opened audio file.")
-	
-	voiceclient = await channel.connect() #connect to the channel
-	consoleOutput("Connected.")
-	
-	voiceclient.play(audio) #and finally, play the audio file.
-	consoleOutput("Rickrolling.")
 async def purge(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
@@ -581,6 +568,56 @@ async def protecc(passedvariables):
 	background.save(imageid) #save it...
 	await message.channel.send(file=discord.File(imageid, filename="img.png")) #then send the image.
 	delete_file(imageid) #delete the file afterwards.
+
+
+#voice channel commands
+connectedvoicechannels = {}
+async def vc_rickroll(passedvariables):
+	#include all the required variables
+	client = passedvariables["client"]
+	message = passedvariables["message"]
+	core_files_foldername = passedvariables["core_files_foldername"]
+
+	if message.guild.id in connectedvoicechannels:
+		#already playing in another voice channel; disconnect.
+		voiceclient = connectedvoicechannels[message.guild.id]
+		consoleOutput("Already playing in another voice channel; disconnecting.")
+		await voiceclient.disconnect()
+		
+	if message.author.voice:
+		channel = message.author.voice.channel
+		consoleOutput("Located channel.")
+	else:
+		await message.channel.send("You are not in a voice channel.")
+		consoleOutput("User is not in channel.")
+		return
+	
+	audio = discord.FFmpegPCMAudio(core_files_foldername+"/audio/rickroll.mp3", executable='ffmpeg') #open file
+	audio.volume = 5 #set audio level to 5 out of... something. probably 10.
+	consoleOutput("Opened audio file.")
+	
+	voiceclient = await channel.connect() #connect to the channel
+	connectedvoicechannels[message.guild.id] = voiceclient #add the voiceclient to a list for future access.
+	consoleOutput("Connected.")
+	
+	consoleOutput(str(dir(voiceclient)))
+	await voiceclient.disconnect()
+	return
+	
+	voiceclient.play(audio) #and finally, play the audio file.
+	await message.channel.send("Rickrolling.")
+	consoleOutput("Rickrolling.")
+async def vc_disconnect(passedvariables):
+	message = passedvariables["message"]
+	if message.guild.id in connectedvoicechannels:
+		#already playing in another voice channel; disconnect.
+		voiceclient = connectedvoicechannels[message.guild.id]
+		consoleOutput("Disconnecting.")
+		await voiceclient.disconnect()
+		await message.channel.send("Disconnected.")
+	else:
+		await message.channel.send("I am not in a voice channel on this server.")
+		consoleOutput("Bot is not in a voice channel on this server.")
 
 
 

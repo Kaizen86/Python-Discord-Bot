@@ -189,11 +189,13 @@ async def on_message(message):
 				"mca":commands.mca,
 				"translate":commands.translate,
 				"figlet":commands.figlet,
-				"rickroll":commands.rickroll,
 				"purge":commands.purge,
 				
 				"beauty":commands.beauty,
 				"protecc":commands.protecc,
+				
+				"rickroll":commands.vc_rickroll,
+				"disconnect":commands.vc_disconnect,
 				
 				"list_crime":commands.list_crime,
 				"set_crime":commands.set_crime,

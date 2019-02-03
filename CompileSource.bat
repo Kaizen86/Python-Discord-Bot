@@ -22,8 +22,12 @@ for %%a in (%x%) do (
 	echo - %%a
 	rmdir /s /q %%a
 )
-echo - bot.spec
-del bot.spec
+
+REM Delete  all *.spec files
+FOR %%a in (*.spec) do (
+	echo - %%a 
+	del %%a
+)
 
 echo RENAMING dist/ TO %outputfolder%/
 rename dist %outputfolder%
