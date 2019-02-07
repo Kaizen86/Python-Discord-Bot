@@ -1,5 +1,3 @@
-print("\tLoading command dependencies...")
-
 from time import localtime #file logs
 from os import listdir #folder existence checks
 from os import mkdir #make new folder if needed
@@ -12,13 +10,13 @@ def verifyFolderExistence(foldername):
 time = localtime() #get the time
 verifyFolderExistence("logs")
 logfilename = "logs\\log_"+str(time[0])+"-"+str(time[1])+"-"+str(time[2])+".txt" #determine which log file we should write to based on the date
-def consoleOutput(text): #consoleOutput is encouraged as a replacement of print as it writes everything to a log file.
-	#consoleOutputs to the console
-	print(text)
+def consoleOutput(text, *args, **kwargs): #consoleOutput is encouraged as a replacement of print as it writes everything to a log file.
 	#get time and date
 	time = localtime()
 	#format text to have timestamp
 	text = str(time[0])+"/"+str(time[1])+"/"+str(time[2])+" "+str(time[3])+":"+str(time[4])+":"+str(time[5])+": "+text
+	#prints to the console
+	print(text)
 	#write to log
 	logfile = open(logfilename,"a")
 	logfile.write(text+"\n")
@@ -29,6 +27,8 @@ from traceback import format_exc #for error handling
 
 #internal
 print("\tInternal (1/2)")
+from ast import literal_eval #playyt
+import youtube_dl #playyt
 from io import BytesIO #mca, beauty, protecc
 from typing import BinaryIO #rickroll
 from os import remove as delete_file #mca, beauty, protecc
@@ -109,9 +109,11 @@ Image manipulation commands
 Voice channel commands
 ```
 Rickrolls the voice channel you are connected to.
-{0}figlet <text>
+{0}rickroll
+Plays a youtube video either from a URL or from a search term. Please be aware THIS IS NOT STABLE!!
+{0}play <url/search term>
 Disconnects the bot from the connected voice channel.
-{0}figlet <text>
+{0}disconnect
 ```
 
 Criminality Commands
@@ -574,7 +576,6 @@ async def protecc(passedvariables):
 connectedvoicechannels = {}
 async def vc_rickroll(passedvariables):
 	#include all the required variables
-	client = passedvariables["client"]
 	message = passedvariables["message"]
 	core_files_foldername = passedvariables["core_files_foldername"]
 
@@ -600,19 +601,87 @@ async def vc_rickroll(passedvariables):
 	connectedvoicechannels[message.guild.id] = voiceclient #add the voiceclient to a list for future access.
 	consoleOutput("Connected.")
 	
-	consoleOutput(str(dir(voiceclient)))
-	await voiceclient.disconnect()
-	return
-	
 	voiceclient.play(audio) #and finally, play the audio file.
 	await message.channel.send("Rickrolling.")
 	consoleOutput("Rickrolling.")
+async def vc_playyt(passedvariables):
+	#include all the required variables
+	message = passedvariables["message"]
+	commandprefix = passedvariables["commandprefix"]
+
+	usage = commandprefix+"play <url/search term>"
+	
+	if message.guild.id in connectedvoicechannels:
+		#already playing in another voice channel; disconnect.
+		voiceclient = connectedvoicechannels[message.guild.id]
+		consoleOutput("Already playing in another voice channel; disconnecting.")
+		await voiceclient.disconnect()
+		
+	if message.author.voice:
+		channel = message.author.voice.channel
+		consoleOutput("Located channel.")
+	else:
+		await message.channel.send("You are not in a voice channel.")
+		consoleOutput("User is not in channel.")
+		return
+	
+	try:
+		url = message.content[len(commandprefix)+5:] #4 for the word, 1 more for a space.
+	except:
+		await message.channel.send("""Please provide a YouTube video URL.
+"""+usage)
+		return
+		
+	#instead of sending a message every time something happens, let's just update one message.
+	outputmsg = await message.channel.send("Gathering video metadata...")	
+	
+	#initialise youtube downloader instance with options
+	opts = {
+		"retries":"inf", #Number of attempts of connecting to stream before abandoning
+		"socket_timeout":3.0 #Number of seconds before giving up on a connection.
+	}
+	ydl = youtube_dl.YoutubeDL(opts)
+	#override information output functions with our custom log function
+	ydl.to_stdout = consoleOutput
+	ydl.to_stderr = consoleOutput
+	try:
+		data = str(ydl.extract_info(url, download=False)) #extract metadata from video 
+	except:
+		#url was not provided; rather a search term.
+		data = str(ydl.extract_info("ytsearch:"+url+"\"", download=False)["entries"][0]) #extract metadata from first video result
+		
+	url = None #reset url variable
+	data = literal_eval(data) #parse it
+	
+	#sift through the barrage of data returned 
+	for format in data["formats"]:
+		if format["ext"] == "m4a":
+			url = format["url"]
+			break
+	if not url:
+		await outputmsg.edit(content=outputmsg.content+"\nUnable to get audio from video.")
+		consoleOutput("Unable to get audio version of video. No available formats are M4A.")
+		return		
+	
+	audio = discord.FFmpegPCMAudio(url, executable='ffmpeg') #open stream
+	audio.volume = 5 #set audio level to 5 out of... something. probably 10.
+	await outputmsg.edit(content=outputmsg.content+"\nOpened audio stream.")
+	consoleOutput("Opened audio stream.")
+	
+	voiceclient = await channel.connect() #connect to the channel
+	connectedvoicechannels[message.guild.id] = voiceclient #add the voiceclient to a list for future access.
+	await outputmsg.edit(content=outputmsg.content+"\nConnected to voice channel.")
+	consoleOutput("Connected to voice channel.")
+	
+	voiceclient.play(audio) #and finally, play the audio file.
+	await outputmsg.edit(content=outputmsg.content+"\nPlaying.")
+	consoleOutput("Success.")
 async def vc_disconnect(passedvariables):
 	message = passedvariables["message"]
 	if message.guild.id in connectedvoicechannels:
 		#already playing in another voice channel; disconnect.
 		voiceclient = connectedvoicechannels[message.guild.id]
-		consoleOutput("Disconnecting.")
+		consoleOutput("Disconnecting from voice channel.")
 		await voiceclient.disconnect()
 		await message.channel.send("Disconnected.")
 	else:

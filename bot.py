@@ -13,12 +13,12 @@ time = localtime() #get the time
 verifyFolderExistence("logs")
 logfilename = "logs\\log_"+str(time[0])+"-"+str(time[1])+"-"+str(time[2])+".txt" #determine which log file we should write to based on the date
 def consoleOutput(text): #consoleOutput is encouraged as a replacement of print as it writes everything to a log file.
-	#consoleOutputs to the console
-	print(text)
 	#get time and date
 	time = localtime()
 	#format text to have timestamp
 	text = str(time[0])+"/"+str(time[1])+"/"+str(time[2])+" "+str(time[3])+":"+str(time[4])+":"+str(time[5])+": "+text
+	#prints to the console
+	print(text)
 	#write to log
 	logfile = open(logfilename,"a")
 	logfile.write(text+"\n")
@@ -195,6 +195,7 @@ async def on_message(message):
 				"protecc":commands.protecc,
 				
 				"rickroll":commands.vc_rickroll,
+				"play":commands.vc_playyt,
 				"disconnect":commands.vc_disconnect,
 				
 				"list_crime":commands.list_crime,

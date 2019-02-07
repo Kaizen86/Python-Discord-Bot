@@ -66,9 +66,11 @@ Image manipulation commands
 Voice channel commands
 ```
 	Rickrolls the voice channel you are connected to.
-	>figlet <text>
+	>rickroll
+	Plays a youtube video either from a URL or from a search term. Please be aware THIS IS NOT STABLE!!
+	>play <url/search term>
 	Disconnects the bot from the connected voice channel.
-	>figlet <text>
+	>disconnect
 ```
 
 Criminality Commands
@@ -106,8 +108,9 @@ These commands are intended for the bot owners. Accessing them will send a warni
 
 ## Dependencies
 Run 'pip install' on all of of these packages to install them:
-- discord
+- discord (the rewrite branch)
 - asyncio
 - Pillow
 - requests
 - pyfiglet
+- youtube-dl
