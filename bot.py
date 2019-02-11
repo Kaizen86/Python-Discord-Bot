@@ -8,7 +8,7 @@ def verifyFolderExistence(foldername):
 	if foldername not in listdir():
 		print("Making '"+foldername+"' folder.")
 		mkdir(foldername)
-		
+
 time = localtime() #get the time
 verifyFolderExistence("logs")
 logfilename = "logs\\log_"+str(time[0])+"-"+str(time[1])+"-"+str(time[2])+".txt" #determine which log file we should write to based on the date
@@ -46,7 +46,7 @@ from time import sleep #bot loop
 
 consoleOutput("Modules loaded. Loading configs...")
 
-#get ids of bot admins from admins.config. 
+#get ids of bot admins from admins.config.
 #used for exclusive management commands and access denied reporting.
 #custom error class for comedic purposes in hilariously catastrophic scenarios
 class EmptyConfigFileError(Exception):
@@ -82,7 +82,7 @@ class ConfigLoader():
 				return config
 		except:
 			raise ConfigFileError("Unable to open commands.config")
-			
+
 async def reloadConfigs(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
@@ -110,7 +110,7 @@ async def reloadConfigs(passedvariables):
 		error = format_exc()
 		if "FileNotFound" in error:
 			await message.channel.send("ERROR! 'commands.config' is missing.")
-	
+
 	await message.channel.send("Reloaded configuration files.")
 	consoleOutput("Reloaded configuration files.")
 
@@ -131,7 +131,7 @@ except:
 	error = format_exc()
 	consoleOutput("ERROR LOADING OPUS LIBRARY!")
 	consoleOutput("Commands that utilise voice channels will not work.")
-		
+
 #custom error class for comedic purposes in hilariously catastrophic scenarios
 class ExcuseMeWhatTheFuckError(Exception):
     pass
@@ -143,14 +143,14 @@ def isAdmin(userid):
 		if entry == userid:
 			return True
 	return False
-	
+
 @client.event
 async def on_ready():
 	consoleOutput("Logged on as " + client.user.name + " with the ID " + str(client.user.id) + ".")
 	consoleOutput("------")
 	#await client.change_presence(activity=discord.Game(name="DEBUG MODE, BOT NON-FUNCTIONAL"))
 	await client.change_presence(activity=discord.Game(name=commandprefix+"help"))
-		
+
 @client.event
 async def on_message(message):
 	try:
@@ -160,7 +160,7 @@ async def on_message(message):
 
 		#convert any unicode in author name to ascii. quick and dirty way to prevent codec errors
 		author_name = message.author.name.encode('ascii','ignore').decode('ascii','ignore')
-		
+
 		try:
 			command = message.content.lower().split()[0][len(commandprefix):]
 		except:
@@ -189,26 +189,27 @@ async def on_message(message):
 				"mca":commands.mca,
 				"translate":commands.translate,
 				"figlet":commands.figlet,
+				"wikipedia":commands.wikipedia,
 				"purge":commands.purge,
-				
+
 				"beauty":commands.beauty,
 				"protecc":commands.protecc,
-				
+
 				"rickroll":commands.vc_rickroll,
 				"play":commands.vc_playyt,
 				"disconnect":commands.vc_disconnect,
-				
+
 				"list_crime":commands.list_crime,
 				"set_crime":commands.set_crime,
 				"change_crime":commands.change_crime,
-				
+
 				"shutdown":commands.shutdown,
 				"getuserdata":commands.getuserdata,
 				"setuserdata":commands.setuserdata,
 				"execute":commands.execute,
 				"reload":reloadConfigs
 			}
-			
+
 			if command in command_set and command in command_perms:
 				can_do_command = True
 				if command_perms[command]["enabled"]:
@@ -222,7 +223,7 @@ async def on_message(message):
 					can_do_command = False
 					await message.channel.send("This command has been disabled.")
 					consoleOutput("Command has been disabled.")
-				
+
 				if can_do_command:
 					#find the command being referenced
 					action = command_set[command]
@@ -269,7 +270,7 @@ Economy
 		await message.channel.send("""Internal error while running command! Error traceback:
 `"""+error+"`")
 		consoleOutput(error)
-			
+
 #get the bot token from the external file
 for line in open("api_secret.token").readlines():
 	if not line.startswith("#") or line.split() == []: #ignores comments and blank lines in the token file
