@@ -6,7 +6,7 @@ def verifyFolderExistence(foldername):
 	if foldername not in listdir():
 		print("Making '"+foldername+"' folder.")
 		mkdir(foldername)
-		
+
 time = localtime() #get the time
 verifyFolderExistence("logs")
 logfilename = "logs\\log_"+str(time[0])+"-"+str(time[1])+"-"+str(time[2])+".txt" #determine which log file we should write to based on the date
@@ -21,14 +21,13 @@ def consoleOutput(text, *args, **kwargs): #consoleOutput is encouraged as a repl
 	logfile = open(logfilename,"a")
 	logfile.write(text+"\n")
 	logfile.close()
-	
+
 import discord
 from traceback import format_exc #for error handling
 
-#internal
+#internal (comes with python)
 print("\tInternal (1/2)")
 from ast import literal_eval #playyt
-import youtube_dl #playyt
 from io import BytesIO #mca, beauty, protecc
 from typing import BinaryIO #rickroll
 from os import remove as delete_file #mca, beauty, protecc
@@ -48,6 +47,8 @@ from discord import FFmpegPCMAudio #rickroll
 from discord import PCMVolumeTransformer #rickroll
 import pyfiglet #figlet
 import nacl #rickroll
+import youtube_dl #playyt
+import wikipedia as wiki #wikipedia
 from PIL import Image #mca, beauty, protecc
 from modules import shadow_translator #translate (i made this one :D)
 shadowtranslator = shadow_translator.ShadowTranslator()
@@ -57,8 +58,8 @@ class ExcuseMeWhatTheFuckError(Exception):
     pass
 def getUserId(string):
 	return re.sub("[^0-9]","",string)
-	
-	
+
+
 #user commands
 async def help(passedvariables):
 	#include all the required variables
@@ -92,10 +93,11 @@ Gets the number of times the mentioned user has "meeped".
 Generates a minecraft achievement with a random icon, with text based on the input.
 {0}mca <text>
 This command allow translation to and from Basic Shadow, which is a language invented by <@284415695050244106>.
-{0}translate <to/from> <english>
+{0}translate <to/from> <English>
 Generates an ASCII art of the input text.
 {0}figlet <text>
-Generates an ASCII art of the input text.
+Gets a Wikipedia page on a topic.
+{0}wikipedia <topic>
 Deletes a certain number of messages in the same channel that the command was sent.
 {0}purge <number of messages>
 ```""".format(commandprefix))
@@ -137,7 +139,6 @@ These are words that have make the bot do something if you say them.
 Bot Administration Commands
 ```
 These commands are intended for the bot owners. Accessing them will send a warning to the owner.
-
 Shutdown the bot.
 {0}shutdown
 Retrieve stored value for user attribute in database.
@@ -160,7 +161,7 @@ async def dice(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
-	
+
 	usage = "Usage: "+commandprefix+"dice [minimum] [maximum]"
 	#get command parameters and allocate into appropriate variables.
 	array = message.content.split()
@@ -209,7 +210,7 @@ async def reverse(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
-	
+
 	usage = "Usage: "+commandprefix+"reverse <text>"
 	try:
 		#remove command prefix from string we want
@@ -229,7 +230,7 @@ async def info(passedvariables):
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
 	client = passedvariables["client"]
-	
+
 	usage = "Usage: "+commandprefix+"info <mention>"
 	array = message.content.split()
 	try:
@@ -265,7 +266,7 @@ async def avatar(passedvariables):
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
 	client = passedvariables["client"]
-	
+
 	usage = "Usage: "+commandprefix+"avatar <mention>"
 	array = message.content.split()
 	try:
@@ -300,7 +301,7 @@ async def rps(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
-	
+
 	usage = "Usage: "+commandprefix+"rps <rock/paper/scissors>"
 	array = message.content.split()
 	try:
@@ -309,7 +310,7 @@ async def rps(passedvariables):
 		error = format_exc()
 		if "IndexError" in error:
 			await message.channel.send(usage)
-			
+
 		else:
 			await message.channel.send("""Error while reading parameter.
 `"""+error+"`")
@@ -330,7 +331,7 @@ async def rps(passedvariables):
 	if cpuchoice == userchoice:
 		await message.channel.send("You chose "+userchoice+". I chose "+cpuchoice+". Tie!")
 		return
-		
+
 	#user wins
 	if userchoice == "rock" and cpuchoice == "scissors": result="You won!"
 	elif userchoice == "paper" and cpuchoice == "rock": result="You won!"
@@ -353,7 +354,7 @@ async def say(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
-	
+
 	usage = "Usage: "+commandprefix+"say <text>"
 	try:
 		#remove command prefix from string we want
@@ -374,7 +375,7 @@ async def list_meeps(passedvariables):
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
 	userData = passedvariables["userData"]
-	
+
 	usage = "Usage: "+commandprefix+"list_meeps <mention>"
 	array = message.content.split()
 	try:
@@ -394,7 +395,7 @@ async def mca(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
-	
+
 	usage = "Usage: "+commandprefix+"mca <text>"
 	try:
 		#remove command prefix from string we want
@@ -421,7 +422,7 @@ async def translate(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
-	
+
 	usage = "Usage: "+commandprefix+"translate <to/from> <text>"
 	#get command parameters and allocate into appropriate variables.
 	array = message.content.split()
@@ -458,27 +459,57 @@ async def figlet(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
-	
+
 	usage = "Usage: "+commandprefix+"figlet <text>"
-	
+
 	#find length of input text, then isolate it from the command.
 	length = len("figlet")+2 #length of command then 2 for the space
-	text = message.content[length::].upper().replace(" ","\n") #separate it then capitalize, then replace spaces with newlines
-				
+	text = message.content[length::].replace(" ","\n") #separate it then replace spaces with newlines
+
 	#check if the input text is empty. if it is, show the usage.
 	if text.split() == []:
 		await message.channel.send(usage)
 		return
-				
+
 	try:
 		await message.channel.send("```"+pyfiglet.figlet_format(text)+"```")
 	except discord.errors.HTTPException:
 		await message.channel.send("Message too long.")
+async def wikipedia(passedvariables):
+	#include all the required variables
+	message = passedvariables["message"]
+	commandprefix = passedvariables["commandprefix"]
+
+	usage = "Usage: "+commandprefix+"wikipedia <topic>"
+
+	#find length of input text, then isolate it from the command.
+	length = len(commandprefix+"wikipedia")+1 #length of command then 1 for the space
+	searchterm = message.content[length::] #separate search term from command
+
+	#check if the input text is empty. if it is, show the usage.
+	if searchterm.split() == []:
+		await message.channel.send(usage)
+		return
+
+	try:
+		page = wiki.page(searchterm) #get the wikipedia page for that topic
+		summary = page.summary[:1995] #get the first 2000 or so characters. this max limit is imposed by Discord message length limits.
+		await message.channel.send("```"+summary+"```") #send the summary
+	except wiki.requests.exceptions.ConnectionError:
+		await message.channel.send("Unable to connect to Wikipedia.")
+	except wiki.exceptions.PageError:
+		await message.channel.send("Wikipedia page does not exist.")
+	except wiki.exceptions.DisambiguationError:
+		error = format_exc() #get the traceback
+		removeterm = "DisambiguationError: "
+		error = error[error.find(removeterm)+len(removeterm):] #remove everything up to the end of the substring "DisambiguationError"
+		await message.channel.send(error) #return what is left
+
 async def purge(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
-	
+
 	usage = "Usage: "+commandprefix+"purge <number of messages>"
 	array = message.content.split()
 	try:
@@ -494,9 +525,9 @@ async def purge(passedvariables):
 		return #end command
 	deletedmsgs = await message.channel.purge(limit=msgcount) #returns a list of information about the deleted messages.
 	await message.channel.send("Deleted "+str(len(deletedmsgs))+" messages.")
-	
-	
-	
+
+
+
 #image manipulation commands
 async def beauty(passedvariables):
 	#include all the required variables
@@ -504,7 +535,7 @@ async def beauty(passedvariables):
 	commandprefix = passedvariables["commandprefix"]
 	client = passedvariables["client"]
 	core_files_foldername = passedvariables["core_files_foldername"]
-	
+
 	usage = "Usage: "+commandprefix+"beauty <mention>"
 	array = message.content.split()
 	try:
@@ -541,7 +572,7 @@ async def protecc(passedvariables):
 	commandprefix = passedvariables["commandprefix"]
 	client = passedvariables["client"]
 	core_files_foldername = passedvariables["core_files_foldername"]
-	
+
 	usage = "Usage: "+commandprefix+"protecc <mention>"
 	array = message.content.split()
 	try:
@@ -573,7 +604,7 @@ async def protecc(passedvariables):
 
 
 #voice channel commands
-connectedvoicechannels = {}
+connectedvoicechannels = {} #list of active voice clients to be referenced by commands.
 async def vc_rickroll(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
@@ -584,7 +615,7 @@ async def vc_rickroll(passedvariables):
 		voiceclient = connectedvoicechannels[message.guild.id]
 		consoleOutput("Already playing in another voice channel; disconnecting.")
 		await voiceclient.disconnect()
-		
+
 	if message.author.voice:
 		channel = message.author.voice.channel
 		consoleOutput("Located channel.")
@@ -592,15 +623,15 @@ async def vc_rickroll(passedvariables):
 		await message.channel.send("You are not in a voice channel.")
 		consoleOutput("User is not in channel.")
 		return
-	
+
 	audio = discord.FFmpegPCMAudio(core_files_foldername+"/audio/rickroll.mp3", executable='ffmpeg') #open file
 	audio.volume = 5 #set audio level to 5 out of... something. probably 10.
 	consoleOutput("Opened audio file.")
-	
+
 	voiceclient = await channel.connect() #connect to the channel
 	connectedvoicechannels[message.guild.id] = voiceclient #add the voiceclient to a list for future access.
 	consoleOutput("Connected.")
-	
+
 	voiceclient.play(audio) #and finally, play the audio file.
 	await message.channel.send("Rickrolling.")
 	consoleOutput("Rickrolling.")
@@ -610,13 +641,13 @@ async def vc_playyt(passedvariables):
 	commandprefix = passedvariables["commandprefix"]
 
 	usage = commandprefix+"play <url/search term>"
-	
+
 	if message.guild.id in connectedvoicechannels:
 		#already playing in another voice channel; disconnect.
 		voiceclient = connectedvoicechannels[message.guild.id]
 		consoleOutput("Already playing in another voice channel; disconnecting.")
 		await voiceclient.disconnect()
-		
+
 	if message.author.voice:
 		channel = message.author.voice.channel
 		consoleOutput("Located channel.")
@@ -624,17 +655,17 @@ async def vc_playyt(passedvariables):
 		await message.channel.send("You are not in a voice channel.")
 		consoleOutput("User is not in channel.")
 		return
-	
+
 	try:
 		url = message.content[len(commandprefix)+5:] #4 for the word, 1 more for a space.
 	except:
 		await message.channel.send("""Please provide a YouTube video URL.
 """+usage)
 		return
-		
+
 	#instead of sending a message every time something happens, let's just update one message.
-	outputmsg = await message.channel.send("Gathering video metadata...")	
-	
+	outputmsg = await message.channel.send("Gathering video metadata...")
+
 	#initialise youtube downloader instance with options
 	opts = {
 		"retries":"inf", #Number of attempts of connecting to stream before abandoning
@@ -645,15 +676,15 @@ async def vc_playyt(passedvariables):
 	ydl.to_stdout = consoleOutput
 	ydl.to_stderr = consoleOutput
 	try:
-		data = str(ydl.extract_info(url, download=False)) #extract metadata from video 
+		data = str(ydl.extract_info(url, download=False)) #extract metadata from video
 	except:
 		#url was not provided; rather a search term.
 		data = str(ydl.extract_info("ytsearch:"+url+"\"", download=False)["entries"][0]) #extract metadata from first video result
-		
+
 	url = None #reset url variable
 	data = literal_eval(data) #parse it
-	
-	#sift through the barrage of data returned 
+
+	#sift through the barrage of data returned
 	for format in data["formats"]:
 		if format["ext"] == "m4a":
 			url = format["url"]
@@ -661,18 +692,18 @@ async def vc_playyt(passedvariables):
 	if not url:
 		await outputmsg.edit(content=outputmsg.content+"\nUnable to get audio from video.")
 		consoleOutput("Unable to get audio version of video. No available formats are M4A.")
-		return		
-	
+		return
+
 	audio = discord.FFmpegPCMAudio(url, executable='ffmpeg') #open stream
 	audio.volume = 5 #set audio level to 5 out of... something. probably 10.
 	await outputmsg.edit(content=outputmsg.content+"\nOpened audio stream.")
 	consoleOutput("Opened audio stream.")
-	
+
 	voiceclient = await channel.connect() #connect to the channel
 	connectedvoicechannels[message.guild.id] = voiceclient #add the voiceclient to a list for future access.
 	await outputmsg.edit(content=outputmsg.content+"\nConnected to voice channel.")
 	consoleOutput("Connected to voice channel.")
-	
+
 	voiceclient.play(audio) #and finally, play the audio file.
 	await outputmsg.edit(content=outputmsg.content+"\nPlaying.")
 	consoleOutput("Success.")
@@ -696,7 +727,7 @@ async def list_crime(passedvariables):
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
 	userData = passedvariables["userData"]
-	
+
 	usage = "Usage: "+commandprefix+"list_crime <mention>"
 	array = message.content.split()
 	try:
@@ -723,7 +754,7 @@ async def set_crime(passedvariables):
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
 	userData = passedvariables["userData"]
-	
+
 	usage = "Usage: "+commandprefix+"set_crime <mention> <value>"
 	array = message.content.split()
 	try:
@@ -750,7 +781,7 @@ async def change_crime(passedvariables):
 	message = passedvariables["message"]
 	commandprefix = passedvariables["commandprefix"]
 	userData = passedvariables["userData"]
-	
+
 	usage = "Usage: "+commandprefix+"change_crime <mention> <value>"
 	array = message.content.split()
 	try:
@@ -791,7 +822,7 @@ async def shutdown(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
 	client = passedvariables["client"]
-	
+
 	await message.channel.send("Shutting down bot...")
 	await client.change_presence(status=discord.Status.invisible)
 	sleep(2)
@@ -800,7 +831,7 @@ async def getuserdata(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
 	userData = passedvariables["userData"]
-	
+
 	array = message.content.split()
 	userid = getUserId(array[1])
 	await message.channel.send("Access granted.")
@@ -812,7 +843,7 @@ async def setuserdata(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
 	userData = passedvariables["userData"]
-	
+
 	array = message.content.split()
 	userid = getUserId(array[1])
 	await message.channel.send("Access granted. Setting user data for <@"+userid+">.")

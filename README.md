@@ -16,14 +16,14 @@ Let me tell a story when I accidentally leaked the API token back in 2018.
 You see, when I uploaded the source code, I forgot to remove the hard coded bot token. I also did not know that people make web crawlers specifically to find these tokens that unsuspecting developers leak. I was on Discord on my phone at the time and I was startled when the channel I was scrolling on just disappeared. On the left hand side the list of channels rapidly shrank. The server was being deleted. The first thing I thought was: `"That can't be good"`. The next few minutes were total chaos as every channel in every server Wheatley was in was being nuked. My phone rung as my friend had also realised what was happening. On the phone he was panicked and confused, as was I. I had to explain to him that Wheatley had indeed been hacked. At some shortly point after that I tried to revoke the token to stop the firehose of delete commands. I was too late.
 
 #### Wait, so is this unsafe??
-In a word, no. The hack was entirely the result of my error and I take full responsibility. It was also over 7 months ago so this is in the past. Wheatley now reads the API token from an external file which is not in the repository. While there is a possibility of a security bug elsewhere, I have scrutized the code and I haven't found anything. **If you find a security bug please contact me about it directly.**
+In a word, no. The hack was entirely the result of my error and I take full responsibility. It was also over 7 months ago so this is in the past. Wheatley now reads the API token from an external file which is not in the repository. While there is a possibility of a security bug elsewhere, I have scrutinized the code and I haven't found anything. **If you find a security bug please contact me about it directly.**
 
 ## Commands
 Below is a copy of the bot help, containing a list of commands.
 
 General Commands
 ```
-	These commands do not have a classification.
+These commands do not have a classification.
 	Display this help.
 	>help
 	Tests if the bot is working.
@@ -49,10 +49,11 @@ General Commands
 	Generates a minecraft achievement with a random icon, with text based on the input.
 	>mca <text>
 	This command allow translation to and from Basic Shadow, which is a language invented by <@284415695050244106>.
-	>translate <to/from> <english>
+	>translate <to/from> <English>
 	Generates an ASCII art of the input text.
 	>figlet <text>
-	Generates an ASCII art of the input text.
+	Gets a Wikipedia page on a topic.
+	>wikipedia <topic>
 	Deletes a certain number of messages in the same channel that the command was sent.
 	>purge <number of messages>
 ```
@@ -65,7 +66,7 @@ Image manipulation commands
 
 Voice channel commands
 ```
-	Rickrolls the voice channel you are connected to.
+Rickrolls the voice channel you are connected to.
 	>rickroll
 	Plays a youtube video either from a URL or from a search term. Please be aware THIS IS NOT STABLE!!
 	>play <url/search term>
@@ -107,10 +108,13 @@ These commands are intended for the bot owners. Accessing them will send a warni
 ```
 
 ## Dependencies
-Run 'pip install' on all of of these packages to install them:
+Run 'pip install' on all of these packages to install them:
 - discord (the rewrite branch)
 - asyncio
 - Pillow
 - requests
 - pyfiglet
 - youtube-dl
+- wikipedia
+
+Compiling using the batch file will require PyInstaller.
