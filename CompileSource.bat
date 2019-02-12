@@ -6,22 +6,20 @@ REM A list of bot config files to be included
 set configfiles=admins.config bot.config commands.config
 REM What directory should the compiled bot be placed?
 set /p botversion=Enter bot version: 
-set outputfolder=Wheatley %botversion%
+set outputfolder=Wheatley V%botversion%
 REM What file should PyInstaller attempt to package? (string must end in '.py')
 set compiletarget=bot.py
 
 echo COMPILING BOT...
 pyinstaller %compiletarget%
 
-echo RENAMING dist/ TO %outputfolder%/
-rename dist %outputfolder%
+echo RENAMING dist TO %outputfolder%
+ren dist "%outputfolder%"
 
 echo RENAMING SUBFOLDER...
 set subfolder=!compiletarget:~0,-3!
-echo %subfolder%
-
-cd %outputfolder%
-rename %subfolder% %subfolder%_files
+cd "%outputfolder%"
+ren %subfolder% %subfolder%_files
 cd ..
 set subfolder=%subfolder%_files
 
@@ -34,19 +32,19 @@ for %%a in (%x%) do (
 
 REM Delete  all *.spec files
 FOR %%a in (*.spec) do (
-	echo - %%a 
+	echo - %%a
 	del %%a
 )
 
 echo COPYING CONFIG FILES...
 for %%a in (%configfiles%) do (
-	copy %%a %outputfolder%
+	copy %%a "%outputfolder%"
 )
 
 echo COPYING ADDITIONAL BOT RESOURCES...
 
-xcopy /e bot_files %outputfolder%\%subfolder%\
-xcopy /e Post_Compile %outputfolder%\
+xcopy /e bot_files "%outputfolder%\%subfolder%\"
+xcopy /e Post_Compile "%outputfolder%\"
 
 echo DONE!
 pause
