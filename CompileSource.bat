@@ -6,7 +6,11 @@ REM A list of bot config files to be included
 set configfiles=admins.config bot.config commands.config
 REM What directory should the compiled bot be placed?
 set /p botversion=Enter bot version: 
+<<<<<<< HEAD
 set outputfolder=Wheatley V%botversion%
+=======
+set outputfolder=Wheatley %botversion%
+>>>>>>> 531c51ac112e1f04034187f9e32b6369a209731c
 REM What file should PyInstaller attempt to package? (string must end in '.py')
 set compiletarget=bot.py
 
