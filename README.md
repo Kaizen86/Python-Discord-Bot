@@ -13,10 +13,14 @@ Over time the number of commands grew and grew, and Wheatley was on several serv
 #### 12th June 2018, 15:27-15:41: 'The Hack'
 Let me tell a story when I accidentally leaked the API token back in 2018.
 
-You see, when I uploaded the source code, I forgot to remove the hard coded bot token. I also did not know that people make web crawlers specifically to find these tokens that unsuspecting developers leak. I was on Discord on my phone at the time and I was startled when the channel I was scrolling on just disappeared. On the left hand side the list of channels rapidly shrank. The server was being deleted. The first thing I thought was: `"That can't be good"`. The next few minutes were total chaos as every channel in every server Wheatley was in was being nuked. My phone rung as my friend had also realised what was happening. On the phone he was panicked and confused, as was I. I had to explain to him that Wheatley had indeed been hacked. At some shortly point after that I tried to revoke the token to stop the firehose of delete commands. I was too late.
+You see, when I uploaded the source code, I forgot to remove the hard coded bot token. I also did not know that people make web crawlers specifically to find these tokens that unsuspecting developers leak. I was on Discord on my phone at the time and I was startled when the channel I was scrolling on just disappeared. On the left hand side the list of channels rapidly shrank. The server was being deleted. The first thing I thought was: `"That can't be good"`. The next few minutes were total chaos as every channel in every server Wheatley was in was being nuked. My phone rung as my friend had also realised what was happening. On the phone he was panicked and confused, as was I. I had to explain to him that Wheatley had indeed been hacked. I tried to revoke the token to stop the firehose of delete commands. I was too late.
 
-#### Wait, so is this unsafe??
-In a word, no. The hack was entirely the result of my error and I take full responsibility. It was also over 7 months ago so this is in the past. Wheatley now reads the API token from an external file which is not in the repository. While there is a possibility of a security bug elsewhere, I have scrutinized the code and I haven't found anything. **If you find a security bug please contact me about it directly.**
+I have since added several preventative measures to stop this from ever happening again:
+* Using an external file to hold the token instead of a string in the main script.
+* Because of this external file, I would need to run `git add api_secret.token` to add the file to a commit.
+* Using a throwaway test bot account and dedicated server to make a leak of the token an insignificant event.
+
+**If you find a security buga anywhere please contact me about it directly.**
 
 ## Commands
 Below is a copy of the bot help, containing a list of commands.
