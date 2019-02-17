@@ -20,7 +20,7 @@ I have since added several preventative measures to stop this from ever happenin
 * Because of this external file, I would need to run `git add api_secret.token` to add the file to a commit.
 * Using a throwaway test bot account and dedicated server to make a leak of the token an insignificant event.
 
-**If you find a security buga anywhere please contact me about it directly.**
+**If you find a security bugs anywhere please contact me about it directly.**
 
 ## Commands
 Below is a copy of the bot help, containing a list of commands.
@@ -50,7 +50,7 @@ These commands do not have a classification.
 	>say <text>
 	Gets the number of times the mentioned user has "meeped".
 	>list_meeps <mention>
-	Generates a minecraft achievement with a random icon, with text based on the input.
+	Generates a Minecraft achievement with a random icon, with text based on the input.
 	>mca <text>
 	This command allow translation to and from Basic Shadow, which is a language invented by <@284415695050244106>.
 	>translate <to/from> <English>
