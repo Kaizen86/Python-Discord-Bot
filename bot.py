@@ -129,7 +129,7 @@ try:
 	discord.opus.load_opus(core_files_foldername+"\\libopus-0.x86.dll")
 except:
 	error = format_exc()
-	consoleOutput("ERROR LOADING OPUS LIBRARY!")
+	consoleOutput("!!ERROR LOADING OPUS LIBRARY!!")
 	consoleOutput("Commands that utilise voice channels will not work.")
 
 #custom error class for comedic purposes in hilariously catastrophic scenarios
@@ -143,6 +143,8 @@ def isAdmin(userid):
 		if entry == userid:
 			return True
 	return False
+
+sent_images = {} #initialize dictionary of received images
 
 @client.event
 async def on_ready():
@@ -161,10 +163,17 @@ async def on_message(message):
 		#convert any unicode in author name to ascii. quick and dirty way to prevent codec errors
 		author_name = message.author.name.encode('ascii','ignore').decode('ascii','ignore')
 
+		#if the message contains an image, keep track of it so a command can use it.
+		if len(message.attachments) >= 1: #check for attachment
+			if message.attachments[0].width: #detect if an image was sent by measuring the width of the image.
+				if not message.guild.id in sent_images.keys(): #check if the server doesn't already exist in our list
+					sent_images[message.guild.id] = {} #the sub-dictionary for different channels within a server.
+				sent_images[message.guild.id][message.channel.id] = message.attachments[0] #add the image to the list.
+
 		try:
 			command = message.content.lower().split()[0][len(commandprefix):]
 		except:
-			#bot joins / emoji throws an exception, so this ignores that.
+			#bot joins / emoji throws an exception because we use ASCII, so this ignores messages that contain unhandleable characters.
 			return
 
 		#log command usage
@@ -194,6 +203,7 @@ async def on_message(message):
 
 				"beauty":commands.beauty,
 				"protecc":commands.protecc,
+				"deepfry":commands.deepfry,
 
 				"rickroll":commands.vc_rickroll,
 				"play":commands.vc_playyt,
@@ -228,13 +238,20 @@ async def on_message(message):
 					#find the command being referenced
 					action = command_set[command]
 
+					#get the last image sent in the channel from our list for a command to use
+					try:
+						previous_img = sent_images[message.guild.id][message.channel.id]
+					except:
+						previous_img = None #no image to pass to command.
+
 					#define passedvariables (dictionary that contains additional objects)
 					passedvariables = {
-						"client":client,
-						"message":message,
-						"commandprefix":commandprefix,
-						"userData":userData,
-						"core_files_foldername":core_files_foldername
+						"client":client, #client object
+						"message":message, #message object
+						"commandprefix":commandprefix, #configured prefix for commands
+						"userData":userData, #user information database
+						"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
+						"previous_img":previous_img #last image sent in the channel
 					}
 					#execute the command
 					await action(passedvariables)

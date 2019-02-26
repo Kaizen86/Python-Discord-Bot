@@ -30,7 +30,7 @@ print("\tInternal (1/2)")
 from ast import literal_eval #playyt
 from io import BytesIO #mca, beauty, protecc
 from typing import BinaryIO #rickroll
-from os import remove as delete_file #mca, beauty, protecc
+from os import remove as delete_file #mca, uploadImageFromObject()
 from os import listdir #help
 from os import _exit as force_exit #shutdown
 from random import randint #dice, coin_toss, rps, mca, beauty, protecc
@@ -49,16 +49,21 @@ import pyfiglet #figlet
 import nacl #rickroll
 import youtube_dl #playyt
 import wikipedia as wiki #wikipedia
-from PIL import Image #mca, beauty, protecc
+from PIL import Image, ImageOps, ImageEnhance #mca, beauty, protecc, deepfry
 from modules import shadow_translator #translate (i made this one :D)
 shadowtranslator = shadow_translator.ShadowTranslator()
 
 #custom error class for comedic purposes in hilariously catastrophic scenarios
 class ExcuseMeWhatTheFuckError(Exception):
-    pass
+	pass
 def getUserId(string):
 	return re.sub("[^0-9]","",string)
-
+async def uploadImageFromObject(image,message):
+	#unfortunately you cannot send a pillow object using discord.py directly. it must be loaded from a file.
+	imageid = str(randint(1,99999999))+".png"  #just to make sure nothing is overwritten in heavy loads.
+	image.save(imageid) #save it...
+	await message.channel.send(file=discord.File(imageid, filename="img.png")) #then send the image.
+	delete_file(imageid) #delete the file afterwards.
 
 #user commands
 async def help(passedvariables):
@@ -504,7 +509,6 @@ async def wikipedia(passedvariables):
 		removeterm = "DisambiguationError: "
 		error = error[error.find(removeterm)+len(removeterm):] #remove everything up to the end of the substring "DisambiguationError"
 		await message.channel.send(error) #return what is left
-
 async def purge(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
@@ -561,11 +565,7 @@ async def beauty(passedvariables):
 	resized = foreground.resize((128,154)) #make foreground the correct size for the target area
 	background.paste(resized, (389, 338), resized) #move the foreground into the correct area for the second target area
 
-	#unfortunately you cannot send a pillow object using discord.py directly. it must be loaded from a file.
-	imageid = str(randint(1,99999999))+".png"  #just to make sure nothing is overwritten in heavy loads.
-	background.save(imageid) #save it...
-	await message.channel.send(file=discord.File(imageid, filename="img.png")) #then send the image.
-	delete_file(imageid) #delete the file afterwards.
+	await uploadImageFromObject(background,message)
 async def protecc(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
@@ -596,12 +596,53 @@ async def protecc(passedvariables):
 	foreground = foreground.resize((124,170)).rotate(-24, expand=1) #rotate foreground and make the correct size for the target area
 	background.paste(foreground, (382, 129), foreground) #move the foreground into the correct area for the target area
 
-	#unfortunately you cannot send a pillow object using discord.py directly. it must be loaded from a file.
-	imageid = str(randint(1,99999999))+".png"  #just to make sure nothing is overwritten in heavy loads.
-	background.save(imageid) #save it...
-	await message.channel.send(file=discord.File(imageid, filename="img.png")) #then send the image.
-	delete_file(imageid) #delete the file afterwards.
+	await uploadImageFromObject(background,message)
+async def deepfry(passedvariables):
+	#include all the required variables
+	message = passedvariables["message"]
+	commandprefix = passedvariables["commandprefix"]
+	client = passedvariables["client"]
+	core_files_foldername = passedvariables["core_files_foldername"]
+	img = passedvariables["previous_img"]
 
+	if not img:
+		await message.channel.send("Please post an image in the channel for me to deepfry.")
+		consoleOutput("No image has been posted. Aborting.")
+		return
+
+	await message.channel.send("Frying the image. This may take a second...")
+
+	#save image from Discord
+	extension = img.filename[img.filename.rfind("."):] #get extension from filename
+	filename = str(randint(1,99999999))+extension #generate unique id with the extension
+	await img.save(filename, seek_begin=True) #save under unique filename to disk
+	consoleOutput(filename)
+	#and then load it again!
+	img = Image.open(filename)
+
+	#https://github.com/Ovyerus/deeppyer/blob/master/deeppyer.py  lines 83-104 (modified)
+	# Crush image to hell and back
+	img = img.convert('RGB')
+	width, height = img.width, img.height
+	img = img.resize((int(width ** .75), int(height ** .75)), resample=Image.LANCZOS)
+	img = img.resize((int(width ** .88), int(height ** .88)), resample=Image.BILINEAR)
+	img = img.resize((int(width ** .9), int(height ** .9)), resample=Image.BICUBIC)
+	img = img.resize((width, height), resample=Image.BICUBIC)
+	img = ImageOps.posterize(img, 4)
+	# Generate red and yellow overlay for classic deepfry effect
+	r = img.split()[0]
+	r = ImageEnhance.Contrast(r).enhance(2.0)
+	r = ImageEnhance.Brightness(r).enhance(1.5)
+	RED = (254, 0, 2)
+	YELLOW = (255, 255, 15)
+	r = ImageOps.colorize(r, RED, YELLOW)
+	# Overlay red and yellow onto main image and sharpen the hell out of it
+	img = Image.blend(img, r, 0.75)
+	img = ImageEnhance.Sharpness(img).enhance(100.0)
+
+	#upload finished image
+	await uploadImageFromObject(img,message)
+	delete_file(filename)
 
 #voice channel commands
 connectedvoicechannels = {} #list of active voice clients to be referenced by commands.
