@@ -89,10 +89,12 @@ async def reloadConfigs(passedvariables):
 	global core_files_foldername
 	global admins
 	global command_perms
+	global token_filename
 
 	try:
 		commandprefix = ConfigLoader.loadGeneralConfig("commandprefix")
 		core_files_foldername = ConfigLoader.loadGeneralConfig("core_files_foldername")
+		token_filename = ConfigLoader.loadGeneralConfig("api_secret_filename")
 	except:
 		error = format_exc()
 		if "FileNotFound" in error:
@@ -119,6 +121,7 @@ async def reloadConfigs(passedvariables):
 
 commandprefix = ConfigLoader.loadGeneralConfig("commandprefix") #sets the command prefix.
 core_files_foldername = ConfigLoader.loadGeneralConfig("core_files_foldername") #folder in which the bot looks for its resources
+token_filename = ConfigLoader.loadGeneralConfig("api_secret_filename") #file that contains the api token
 admins = ConfigLoader.loadAdmins()
 command_perms = ConfigLoader.loadCommandPerms()
 
@@ -291,8 +294,14 @@ Economy
 `"""+error+"`")
 		consoleOutput(error)
 
+try:
+	tokenfile = open(token_filename,"r")
+except:
+	consoleOutput("API token file ("+token_filename+") is missing.")
+	exit()
+
 #get the bot token from the external file
-for line in open("api_secret.token").readlines():
+for line in tokenfile.readlines():
 	if not line.startswith("#") or line.split() == []: #ignores comments and blank lines in the token file
 		token = line.rstrip()
 if not len(token): #check if there was a gleanable token from the file. if not, raise an error.
@@ -322,5 +331,4 @@ while True:
 			#it now store logs in separate files. on bot restarts, we should re-evaluate which log file to write to.
 			time = localtime() #get the time
 			logfilename = "logs\\log_"+str(time[0])+"-"+str(time[1])+"-"+str(time[2])+".txt" #determine which log file we should write to based on the date
-
 			continue
