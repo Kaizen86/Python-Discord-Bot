@@ -42,9 +42,22 @@ for %%a in (%configfiles%) do (
 )
 
 echo COPYING ADDITIONAL BOT RESOURCES...
-
 xcopy /e bot_files "%outputfolder%\%subfolder%\"
 xcopy /e Post_Compile "%outputfolder%\"
+
+echo ATTEMPTING TO ZIP FOLDER...
+REM We first need to check if 'zip' is even a valid command.
+zip > nul
+if not %errorlevel%==0 (
+	REM Nope - do not attempt.
+	echo Zip command nonexistent - aborting.
+) else (
+	REM It is - zip the output folder!
+	zip -r "%outputfolder%".zip "%outputfolder%"
+	REM Remove the output folder as we don't need it anymore.
+	echo Removing output folder...
+	rmdir /s /q "%outputfolder%"
+)
 
 echo DONE!
 pause
