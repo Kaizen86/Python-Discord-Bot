@@ -66,6 +66,7 @@ Image manipulation commands
 ```
 	>beauty <mention>
 	>protecc <mention>
+	>deepfry
 ```
 
 Voice channel commands
