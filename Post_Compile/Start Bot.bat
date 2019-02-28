@@ -1,7 +1,7 @@
 @echo off
 color a
-title Wheatley Discord Bot
+title Bot Bootloader
 cls
 
-bot_files\bot.exe
-pause
+echo Starting...
+start "Wheatley Discord Bot" /d "%~dp0" "%~dp0\bot_files\bot.exe"
