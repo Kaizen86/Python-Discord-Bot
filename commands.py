@@ -61,14 +61,20 @@ def getUserId(string):
 async def uploadImageFromObject(image,message):
 	#unfortunately you cannot send a pillow object using discord.py directly. it must be loaded from a file.
 	imageid = str(randint(1,99999999))+".png"  #just to make sure nothing is overwritten in heavy loads.
-	image.save(imageid) #save it...
-	await message.channel.send(file=discord.File(imageid, filename="img.png")) #then send the image.
-	delete_file(imageid) #delete the file afterwards.
+	try:
+		image.save(imageid) #save it...
+		await message.channel.send(file=discord.File(imageid, filename="img.png")) #then send the image.
+	except:
+		await message.channel.send("Error while trying to send image.")
+		consoleOutput(format_exc())
+	finally:
+		delete_file(imageid) #delete the file afterwards.
 
 #user commands
 async def help(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
+	commandprefix = passedvariables["commandprefix"]
 	#send help message to dm of user
 	await message.author.send("""General Commands
 ```
@@ -95,10 +101,10 @@ Gets the bot to repeat the input text. The bot will then try and delete your mes
 {0}say <text>
 Gets the number of times the mentioned user has "meeped".
 {0}list_meeps <mention>
-Generates a minecraft achievement with a random icon, with text based on the input.
+Generates a Minecraft achievement with a random icon, with text based on the input.
 {0}mca <text>
-This command allow translation to and from Basic Shadow, which is a language invented by <@284415695050244106>.
-{0}translate <to/from> <English>
+This command allow translation to and from Basic Shadow, which is a language invented by <@284415695050244106{0}.
+{0}translate <to/from> <input>
 Generates an ASCII art of the input text.
 {0}figlet <text>
 Gets a Wikipedia page on a topic.
@@ -111,6 +117,7 @@ Image manipulation commands
 ```
 {0}beauty <mention>
 {0}protecc <mention>
+{0}deepfry
 ```
 
 Voice channel commands
@@ -372,7 +379,10 @@ async def say(passedvariables):
 		return #end command
 	if not text.replace(" ","") == "":
 		await message.channel.send(text) #send the message that the user wanted
-		await message.delete() #cover their tracks for them
+		try:
+			await message.delete() #cover their tracks for them
+		except:
+			pass #ignore errors that arise from insufficient permissions
 	else:
 		await message.channel.send(usage)
 async def list_meeps(passedvariables):

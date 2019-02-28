@@ -96,7 +96,8 @@ async def reloadConfigs(passedvariables):
 	except:
 		error = format_exc()
 		if "FileNotFound" in error:
-			await message.channel.send("ERROR! 'commands.config' is missing.")
+			await message.channel.send("ERROR! 'bot.config' is missing.")
+			consoleOutput("ERROR! 'bot.config' is missing.")
 
 	try:
 		admins = ConfigLoader.loadAdmins()
@@ -104,12 +105,14 @@ async def reloadConfigs(passedvariables):
 		error = format_exc()
 		if "FileNotFound" in error:
 			await message.channel.send("ERROR! 'admins.config' is missing.")
+			consoleOutput("ERROR! 'admins.config' is missing.")
 	try:
 		command_perms = ConfigLoader.loadCommandPerms()
 	except:
 		error = format_exc()
 		if "FileNotFound" in error:
 			await message.channel.send("ERROR! 'commands.config' is missing.")
+			consoleOutput("ERROR! 'commands.config' is missing.")
 
 	await message.channel.send("Reloaded configuration files.")
 	consoleOutput("Reloaded configuration files.")
