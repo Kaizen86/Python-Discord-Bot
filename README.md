@@ -121,5 +121,7 @@ Run 'pip install' on all of these packages to install them:
 - pyfiglet
 - youtube-dl
 - wikipedia
+- bidict
+- html2text
 
 Compiling using the batch file will require PyInstaller.
