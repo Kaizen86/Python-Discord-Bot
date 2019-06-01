@@ -206,6 +206,7 @@ async def on_message(message):
 				"figlet":commands.figlet,
 				"wikipedia":commands.wikipedia,
 				"purge":commands.purge,
+				"scp":commands.scp_read,
 
 				"beauty":commands.beauty,
 				"protecc":commands.protecc,

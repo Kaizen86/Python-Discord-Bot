@@ -35,12 +35,13 @@ from os import listdir #help
 from os import _exit as force_exit #shutdown
 from random import randint #dice, coin_toss, rps, mca, beauty, protecc
 import re #used to remove non-numbers from mentions to extract the user id
-from requests import get #mca, beauty, protecc
+from requests import get as get_request #mca, scp_read, beauty, protecc
 from subprocess import PIPE as SUB_PIPE #execute
 from subprocess import Popen as shell_exec #execute
 import shlex #execute
 from sys import version_info as python_info #help
 from time import sleep #shutdown
+
 #external (3rd party)
 print("\tExternal (2/2)")
 from discord import FFmpegPCMAudio #rickroll
@@ -49,15 +50,15 @@ import pyfiglet #figlet
 import nacl #rickroll
 import youtube_dl #playyt
 import wikipedia as wiki #wikipedia
+from html2text import html2text #scp_read
 from PIL import Image, ImageOps, ImageEnhance #mca, beauty, protecc, deepfry
 from modules import shadow_translator #translate (i made this one :D)
 shadowtranslator = shadow_translator.ShadowTranslator()
 
 #custom error class for comedic purposes in hilariously catastrophic scenarios
-class ExcuseMeWhatTheFuckError(Exception):
-	pass
-def getUserId(string):
-	return re.sub("[^0-9]","",string)
+class ExcuseMeWhatTheFuckError(Exception): pass
+#extract a user id from a string
+def getUserId(string): return re.sub("[^0-9]","",string)
 async def uploadImageFromObject(image,message):
 	#unfortunately you cannot send a pillow object using discord.py directly. it must be loaded from a file.
 	imageid = str(randint(1,99999999))+".png"  #just to make sure nothing is overwritten in heavy loads.
@@ -111,6 +112,8 @@ Gets a Wikipedia page on a topic.
 {0}wikipedia <topic>
 Deletes a certain number of messages in the same channel that the command was sent.
 {0}purge <number of messages>
+Retrieves an SCP document for any SCP.
+{0}scp <scp id>
 ```""".format(commandprefix))
 	await message.author.send("""
 Image manipulation commands
@@ -423,7 +426,7 @@ async def mca(passedvariables):
 		return #end command
 	if not text.replace(" ","") == "":
 		iconid = randint(1,39)
-		response = get('https://www.minecraftskinstealer.com/achievement/a.php?i=%s&h=%s&t=%s' % (iconid, "Achievement get!", text))
+		response = get_request('https://www.minecraftskinstealer.com/achievement/a.php?i=%s&h=%s&t=%s' % (iconid, "Achievement get!", text))
 		img = Image.open(BytesIO(response.content))
 
 		#unfortunately you cannot send a pillow object using discord.py directly. it must be loaded from a file.
@@ -530,7 +533,7 @@ async def purge(passedvariables):
 		msgcount = int(array[1])
 	except:
 		error = format_exc()
-		if "ValueError" in error:
+		if "ValueError" in error or "IndexError" in error:
 			await message.channel.send(usage)
 		else:
 			await message.channel.send("""Unknown error while parsing arguments.
@@ -539,7 +542,80 @@ async def purge(passedvariables):
 		return #end command
 	deletedmsgs = await message.channel.purge(limit=msgcount) #returns a list of information about the deleted messages.
 	await message.channel.send("Deleted "+str(len(deletedmsgs))+" messages.")
+async def scp_read(passedvariables):
+		#include all the required variables
+		message = passedvariables["message"]
+		commandprefix = passedvariables["commandprefix"]
 
+		usage = "Usage: "+commandprefix+"scp <scp id>"
+		array = message.content.split()
+		try:
+			scp_id = int(array[1]) #get the scp document id
+		except:
+			error = format_exc()
+			if "ValueError" in error or "IndexError" in error:
+				await message.channel.send(usage)
+			else:
+				await message.channel.send("""Unknown error while parsing arguments.
+	`"""+error+"`")
+				consoleOutput(error)
+			return #end command
+
+		#simple check to ensure the id is not smaller than 0.
+		if scp_id < 0:
+			await message.channel.send("Id is smaller than 0.")
+			return
+
+		await message.channel.send("Accessing restricted document SCP-{0}...".format(scp_id)) #notification that the request of the document was understood.
+		
+		#download the page and get the html from the request.
+		url = 'http://www.scp-wiki.net/scp-'+str(scp_id)
+		try:
+			response = get_request(url).text
+		except Exception as err:
+			await message.channel.send("Internal error while loading document: "+err)
+			return
+		text = html2text(response) #extract all the text from the html with minimal formatting
+		if len(text) < 5: #check to ensure the server actually returned something.
+			await message.channel.send("Internal error loading document: No HTML was returned. Status code is "+str(response.status_code))
+			return
+		
+		await message.channel.send("Received {0} bytes of data. Decrypting...".format(len(text))) # notification that the download suceeded.
+		#this isn't actually decryption, of course. it just says that to make it seem like you are accessing something you shouldn't, to align with the canon of the universe.
+		text_copy = text #just in case we cant extract the document, we will need to revert afterwards.
+		text = text[text.find("**Item #:**"):]#strip everything behind the SCP ID
+		text = text[:text.rfind("« ")] #strip everything past this designated end string, which is where the document ends.
+		
+		#occasionally, the previous code fails to detect the document due to the non-consistent nature of the documents.
+		#this second attempt triggers if that has happened.
+		if len(text) < 5:
+			await message.channel.send("Standard decryption method failed. Retrying with alternate method.")
+			text = text_copy
+			text = text[text.find("SCP-"+str(scp_id)):]#strip everything behind the SCP ID
+			text = text[:text.rfind("« ")] #strip everything past this designated end string, which is where the document ends.
+			if len(text) < 5: #if it still didn't work, just give them a link to the article. we tried our best.
+				await message.channel.send("Alternate decryption method failed. Apologies. "+url)
+				return #end the command here.
+				
+		#Split the text up into 'snippets', each a maximum of 1980 characters. A snippet should never cut through a word halfway.
+		desired_snippet_length = 1980 #if a word exceeds this length, it wont split properly and snippets tend to be duplicated. However, such a scenario is VERY unlikely.
+		snippets = []
+		i = 0
+		offset = 0
+		last_known_space = 0
+		while i < len(text): #loop over the text
+			if text[i] == " ": last_known_space = i #scan for spaces.
+			if i-offset >= desired_snippet_length: #if we exceed the desired length...
+				#print everything behind that space to where we last printed.
+				snippets.append(text[offset:][:last_known_space-offset])
+				offset = last_known_space + 1 #begin a new snippet.
+			i += 1 #increment our 'cursor'
+		snippets.append(text[offset:][:len(text)]) #the last snippet should have any leftover text.
+
+		#finally, send all of the snippets back.
+		for snippet in snippets: await message.channel.send("```"+snippet+" ```")
+		
+		await message.channel.send("[DOCUMENT END]")
 
 
 #image manipulation commands
@@ -567,7 +643,7 @@ async def beauty(passedvariables):
 	background = Image.open(core_files_foldername+"\\images\\beauty.jpg").convert("RGBA") #original meme image
 
 	userdata = await client.get_user_info(userid) #retrieve information of user
-	response = get(userdata.avatar_url) #get the image data from the avatar_url and store that into response.
+	response = get_request(userdata.avatar_url) #get the image data from the avatar_url and store that into response.
 	foreground = Image.open(BytesIO(response.content)).convert("RGBA") #parse response into Image object. This contains the pfp.
 
 	resized = foreground.resize((131,152)) #make foreground the correct size for the target area
@@ -600,7 +676,7 @@ async def protecc(passedvariables):
 	background = Image.open(core_files_foldername+"\\images\\protecc.png").convert("RGBA") #original meme image
 
 	userdata = await client.get_user_info(userid) #retrieve information of user
-	response = get(userdata.avatar_url) #get the image data from the avatar_url and store that into response.
+	response = get_request(userdata.avatar_url) #get the image data from the avatar_url and store that into response.
 	foreground = Image.open(BytesIO(response.content)).convert("RGBA") #parse response into Image object. This contains the pfp.
 
 	foreground = foreground.resize((124,170)).rotate(-24, expand=1) #rotate foreground and make the correct size for the target area
@@ -653,6 +729,8 @@ async def deepfry(passedvariables):
 	#upload finished image
 	await uploadImageFromObject(img,message)
 	delete_file(filename)
+
+
 
 #voice channel commands
 connectedvoicechannels = {} #list of active voice clients to be referenced by commands.
