@@ -1,5 +1,5 @@
 # Wheatley Discord Bot
-This is a Discord bot I made in Python. It is based of the discord.py library and was created more or less for fun and to add moderation utilities that me or my friends find useful in our servers. It is named after and has the icon of the Wheatley Core from Portal 2. I did that because I thought it was funny, to be honest.
+This is a Discord bot I made in Python. It is based off the discord.py rewrite library and was created more or less for fun and to add moderation utilities that me or my friends find useful in our servers. It is named after and has the icon of the Wheatley Core from Portal 2. I did that because I thought it was funny, to be honest.
 
 
 Please be aware that this is intended to be compiled with PyInstaller.
@@ -114,7 +114,7 @@ These commands are intended for the bot owners. Accessing them will send a warni
 
 ## Dependencies
 Run 'pip install' on all of these packages to install them:
-- discord (the rewrite branch)
+- discord (the [rewrite branch](https://github.com/Rapptz/discord.py))
 - asyncio
 - Pillow
 - requests
