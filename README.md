@@ -60,6 +60,8 @@ These commands do not have a classification.
 	>wikipedia <topic>
 	Deletes a certain number of messages in the same channel that the command was sent.
 	>purge <number of messages>
+	Retrieves an SCP document from the SCP Wiki and posts it into the chat.
+	>scp <id>
 ```
 
 Image manipulation commands
