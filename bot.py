@@ -130,14 +130,6 @@ client = discord.Client()
 verifyFolderExistence("databases")
 userData = database.Database("databases\\users.json")
 
-#Load opus library. Needed for voice channel support
-try:
-	discord.opus.load_opus(core_files_foldername+"\\libopus-0.x86.dll")
-except:
-	error = format_exc()
-	consoleOutput("!!ERROR LOADING OPUS LIBRARY!!")
-	consoleOutput("Commands that utilise voice channels will not work.")
-
 #custom error class for comedic purposes in hilariously catastrophic scenarios
 class ExcuseMeWhatTheFuckError(Exception):
     pass
@@ -149,6 +141,16 @@ def isAdmin(userid):
 		if entry == userid:
 			return True
 	return False
+def isWholeWordInString(sentence,searchterm):
+	searchterms = searchterm.split()
+	found = True
+	#https://cmsdk.com/python/checking-if-a-whole-word-is-in-a-text-file-in-python-without-regex.html
+	sentence = ''.join(char for char in sentence if char.isalpha() or char.isspace()).split()
+	for searchterm in searchterms:
+		if not searchterm in sentence:
+			found = False
+			break
+	return found
 
 sent_images = {} #initialize dictionary of received images
 
@@ -267,12 +269,11 @@ async def on_message(message):
 				await message.channel.send("Unknown command '"+command+"'.")
 
 		#triggerwords
-		if "meep" in message.content.lower() and "list_" not in message.content.lower(): #prevents >list_meeps from triggering.
-				await message.channel.send("Meep")
-				userData.set_user_data(message.author.id,"meeps",int(userData.get_user_data(message.author.id,"meeps"))+1)
-		if "wheatley"  in message.content.lower() and "moron" in message.content.lower(): #message must have the words "wheatley" and "moron" to trigger.
+		msg_lowercase = message.content.lower()
+		if isWholeWordInString(msg_lowercase, "meep")
+		if isWholeWordInString(msg_lowercase, "wheatley") and isWholeWordInString(msg_lowercase, "moron"): #message must have the words "wheatley" and "moron" to trigger.
 				await message.channel.send("I AM NOT A MORON!")
-		if "pineapple" in message.content.lower():
+		if isWholeWordInString(msg_lowercase, "pineapple"):
 				await message.channel.send("""```
 Pine
 Independance
@@ -284,9 +285,9 @@ Providing
 Little
 Economy
 ```""")
-		if "no u" in message.content.lower() or "no you" in message.content.lower():
+		if isWholeWordInString(msg_lowercase, "no u") or isWholeWordInString(msg_lowercase, "no you"):
 				await message.channel.send(file=discord.File(core_files_foldername+"\\images\\no_u.jpg", filename="img.png"))
-		if "the more you know" in message.content.lower():
+		if isWholeWordInString(msg_lowercase, "the more you know"):
 				await message.channel.send(file=discord.File(core_files_foldername+"\\images\\moreyouknow.gif", filename="img.png"))
 
 	except:
@@ -300,7 +301,6 @@ try:
 except:
 	consoleOutput("API token file ("+token_filename+") is missing.")
 	exit()
-
 #get the bot token from the external file
 for line in tokenfile.readlines():
 	if not line.startswith("#") or line.split() == []: #ignores comments and blank lines in the token file
