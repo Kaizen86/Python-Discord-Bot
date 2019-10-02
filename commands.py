@@ -829,7 +829,10 @@ async def vc_playyt(passedvariables):
 	#initialise youtube downloader instance with options
 	opts = {
 		"retries":"inf", #Number of attempts of connecting to stream before abandoning
-		"socket_timeout":3.0 #Number of seconds before giving up on a connection.
+		"reconnect":1, #Attempt to reconnect to the stream
+		"reconnect_streamed":1, #Attempt to reconnect to the stream
+		"reconnect_delay_max":10, #Attempt to reconnect to the stream
+		"socket_timeout":10.0 #Number of seconds before giving up on a connection.
 	}
 	ydl = youtube_dl.YoutubeDL(opts)
 	#override information output functions with our custom log function
@@ -840,6 +843,7 @@ async def vc_playyt(passedvariables):
 	except:
 		#url was not provided; rather a search term.
 		data = str(ydl.extract_info("ytsearch:"+url+"\"", download=False)["entries"][0]) #extract metadata from first video result
+		await outputmsg.edit(content=outputmsg.content+"\nPlaying '{}'.".format(data["title"]))
 
 	url = None #reset url variable
 	data = literal_eval(data) #parse it
