@@ -130,6 +130,14 @@ client = discord.Client()
 verifyFolderExistence("databases")
 userData = database.Database("databases\\users.json")
 
+#Load opus library. Needed for voice channel support
+try:
+	discord.opus.load_opus(core_files_foldername+"\\audio\\libopus.dll")
+except:
+	error = format_exc()
+	consoleOutput("!!ERROR LOADING OPUS LIBRARY!!")
+	consoleOutput("Commands that utilise voice channels will not work.")
+
 #custom error class for comedic purposes in hilariously catastrophic scenarios
 class ExcuseMeWhatTheFuckError(Exception):
     pass
