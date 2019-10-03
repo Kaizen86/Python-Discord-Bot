@@ -137,6 +137,7 @@ except:
 	error = format_exc()
 	consoleOutput("!!ERROR LOADING OPUS LIBRARY!!")
 	consoleOutput("Commands that utilise voice channels will not work.")
+	consoleOutput("Full error: "+error)
 
 #custom error class for comedic purposes in hilariously catastrophic scenarios
 class ExcuseMeWhatTheFuckError(Exception):
