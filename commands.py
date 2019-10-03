@@ -783,7 +783,7 @@ async def vc_rickroll(passedvariables):
 		consoleOutput("User is not in channel.")
 		return
 
-	audio = discord.FFmpegPCMAudio(core_files_foldername+"/audio/rickroll.mp3", executable=core_files_foldername+'/ffmpeg.exe') #open file
+	audio = discord.FFmpegPCMAudio(core_files_foldername+"/audio/rickroll.mp3", executable=core_files_foldername+'/audio/ffmpeg.exe') #open file
 	audio.volume = 5 #set audio level to 5 out of... something. probably 10.
 	consoleOutput("Opened audio file.")
 
@@ -858,7 +858,7 @@ async def vc_playyt(passedvariables):
 		consoleOutput("Unable to get audio version of video. No available formats are M4A.")
 		return
 
-	audio = discord.FFmpegPCMAudio(url, executable=core_files_foldername+'/ffmpeg.exe') #open stream
+	audio = discord.FFmpegPCMAudio(url, executable=core_files_foldername+'/audio/ffmpeg.exe') #open stream
 	audio.volume = 5 #set audio level to 5 out of... something. probably 10.
 	await outputmsg.edit(content=outputmsg.content+"\nOpened audio stream.")
 	consoleOutput("Opened audio stream.")
