@@ -52,6 +52,7 @@ import youtube_dl #playyt
 import wikipedia as wiki #wikipedia
 from html2text import html2text #scp_read
 from PIL import Image, ImageOps, ImageEnhance #mca, beauty, protecc, deepfry
+import gtts
 from modules import shadow_translator #translate (i made this one :D)
 shadowtranslator = shadow_translator.ShadowTranslator()
 
@@ -805,8 +806,6 @@ async def vc_playyt(passedvariables):
 	if message.guild.id in connectedvoicechannels:
 		#already playing in another voice channel; disconnect.
 		voiceclient = connectedvoicechannels[message.guild.id]
-		consoleOutput("Already playing in another voice channel; disconnecting.")
-		await voiceclient.disconnect()
 
 	if message.author.voice:
 		channel = message.author.voice.channel
@@ -828,7 +827,7 @@ async def vc_playyt(passedvariables):
 
 	#initialise youtube downloader instance with options
 	opts = {
-		"retries":"inf", #Number of attempts of connecting to stream before abandoning
+		"retries":50, #Number of attempts of connecting to stream before abandoning
 		"reconnect":1, #Attempt to reconnect to the stream
 		"reconnect_streamed":1, #Attempt to reconnect to the stream
 		"reconnect_delay_max":10, #Attempt to reconnect to the stream
@@ -839,16 +838,14 @@ async def vc_playyt(passedvariables):
 	ydl.to_stdout = consoleOutput
 	ydl.to_stderr = consoleOutput
 	try:
-		data = str(ydl.extract_info(url, download=False)) #extract metadata from video
+		data = ydl.extract_info(url, download=False) #extract metadata from video
 	except:
 		#url was not provided; rather a search term.
-		data = str(ydl.extract_info("ytsearch:"+url+"\"", download=False)["entries"][0]) #extract metadata from first video result
+		data = ydl.extract_info("ytsearch:"+url, download=False)["entries"][0] #extract metadata from first video result
 		await outputmsg.edit(content=outputmsg.content+"\nPlaying '{}'.".format(data["title"]))
 
-	url = None #reset url variable
-	data = literal_eval(data) #parse it
-
 	#sift through the barrage of data returned
+	url = None #reset url variable
 	for format in data["formats"]:
 		if format["ext"] == "m4a":
 			url = format["url"]
@@ -863,14 +860,59 @@ async def vc_playyt(passedvariables):
 	await outputmsg.edit(content=outputmsg.content+"\nOpened audio stream.")
 	consoleOutput("Opened audio stream.")
 
-	voiceclient = await channel.connect() #connect to the channel
-	connectedvoicechannels[message.guild.id] = voiceclient #add the voiceclient to a list for future access.
-	await outputmsg.edit(content=outputmsg.content+"\nConnected to voice channel.")
-	consoleOutput("Connected to voice channel.")
+	if not "voiceclient" in locals(): #is voiceclient already defined?
+		voiceclient = await channel.connect() #connect to the channel
+		connectedvoicechannels[message.guild.id] = voiceclient #add the voiceclient to a list for future access.
+		consoleOutput("Connected.")
+		await outputmsg.edit(content=outputmsg.content+"\nConnected to voice channel.")
+		consoleOutput("Connected to voice channel.")
 
 	voiceclient.play(audio) #and finally, play the audio file.
 	await outputmsg.edit(content=outputmsg.content+"\nPlaying.")
 	consoleOutput("Success.")
+async def vc_speak(passedvariables):
+	#include all the required variables
+	message = passedvariables["message"]
+	commandprefix = passedvariables["commandprefix"]
+	core_files_foldername = passedvariables["core_files_foldername"]
+
+	usage = commandprefix+"speak <text>"
+
+	if message.guild.id in connectedvoicechannels:
+		#already playing in another voice channel; disconnect.
+		voiceclient = connectedvoicechannels[message.guild.id]
+
+	if message.author.voice:
+		channel = message.author.voice.channel
+		consoleOutput("Located channel.")
+	else:
+		await message.channel.send("You are not in a voice channel.")
+		consoleOutput("User is not in channel.")
+		return
+
+	text = message.content[len(commandprefix)+6:] #5 for the word, 1 more for a space.
+	await message.delete() #we can now remove the message for stealth purposes.
+	randomid = randint(0,99999999)
+	gtts.gTTS(text, lang="en-uk", slow=False).save(str(randomid)+".mp3")
+
+	audio = discord.FFmpegPCMAudio(str(randomid)+".mp3", executable=core_files_foldername+'/audio/ffmpeg.exe') #open file
+	audio.volume = 5 #set audio level to 5 out of... something. probably 10.
+	consoleOutput("Opened audio file.")
+
+	if not "voiceclient" in locals(): #is voiceclient already defined?
+		voiceclient = await channel.connect() #connect to the channel
+		connectedvoicechannels[message.guild.id] = voiceclient #add the voiceclient to a list for future access.
+		consoleOutput("Connected.")
+
+	voiceclient.play(audio) #and finally, play the audio file.
+	consoleOutput("Playing audio.")
+	for i in range(1000): #since we cant know when it's done with the file, repeatedly try to delete it until it works. this is a massive bodge, but it works. capped at 1000 attempts just in case.
+		sleep(1)
+		try:
+			delete_file(str(randomid)+".mp3")
+			consoleOutput(F"Deleted temporary audio file '{randomid}.mp3' after {i} seconds.")
+			break #stop trying
+		except Exception as err: pass #ignore errors and keep trying.
 async def vc_disconnect(passedvariables):
 	message = passedvariables["message"]
 	if message.guild.id in connectedvoicechannels:
@@ -988,6 +1030,15 @@ async def shutdown(passedvariables):
 	client = passedvariables["client"]
 
 	await message.channel.send("Shutting down bot...")
+	consoleOutput("Closing all voice clients...")
+	i=1
+	for id in connectedvoicechannels: #try to disconnect all the voice channels
+		try:
+			await connectedvoicechannels[id].disconnect()
+			consoleOutput(F"Closed {i}/{len(connectedvoicechannels)} voice clients.")
+			i+=1
+		except Exception as err: consoleOutput("Error: "+str(err))
+	consoleOutput("Shutting down.")
 	await client.change_presence(status=discord.Status.invisible)
 	sleep(2)
 	force_exit(0)
