@@ -129,3 +129,4 @@ Run 'pip install' on all of these packages to install them:
 - bidict
 - html2text
 - gtts
+Voice commands also require ffmpeg to be installed.
