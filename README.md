@@ -1,5 +1,5 @@
 # Wheatley Discord Bot
-This is a Discord bot I made in Python. It is based off the discord.py rewrite library and was created more or less for fun and to add moderation utilities that me or my friends find useful in our servers. It is named after and has the icon of the Wheatley Core from Portal 2. I did that because I thought it was funny, to be honest.
+This is a Discord bot I made in Python. The bot is designed to run on Linux and won't work properly on Windows. It is based off the discord.py rewrite library and was created more or less for fun and to add moderation utilities that me or my friends find useful in our servers. It is named after and has the icon of the Wheatley Core from Portal 2. I did that because I thought it was funny, to be honest.
 
 
 Please be aware that this is intended to be compiled with PyInstaller.
@@ -56,7 +56,7 @@ These commands do not have a classification.
 	>translate <to/from> <English>
 	Generates an ASCII art of the input text.
 	>figlet <text>
-	Gets a Wikipedia page on a topic.
+	Gets a Wikipedia page on a topic. If the topic name includes spaces, wrap it in quotation marks.
 	>wikipedia <topic>
 	Deletes a certain number of messages in the same channel that the command was sent.
 	>purge <number of messages>
@@ -73,10 +73,12 @@ Image manipulation commands
 
 Voice channel commands
 ```
-Rickrolls the voice channel you are connected to.
+	Rickrolls the voice channel you are connected to.
 	>rickroll
 	Plays a youtube video either from a URL or from a search term. Please be aware THIS IS NOT STABLE!!
 	>play <url/search term>
+	Runs the input text through text to speech and speaks it.
+	>speak <text>
 	Disconnects the bot from the connected voice channel.
 	>disconnect
 ```
@@ -122,8 +124,8 @@ Run 'pip install' on all of these packages to install them:
 - requests
 - pyfiglet
 - youtube-dl
+- pynacl
 - wikipedia
 - bidict
 - html2text
-
-Compiling using the batch file will require PyInstaller.
+- gtts

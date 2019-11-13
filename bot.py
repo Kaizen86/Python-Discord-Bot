@@ -11,7 +11,7 @@ def verifyFolderExistence(foldername):
 
 time = localtime() #get the time
 verifyFolderExistence("logs")
-logfilename = "logs\\log_"+str(time[0])+"-"+str(time[1])+"-"+str(time[2])+".txt" #determine which log file we should write to based on the date
+logfilename = "logs/log_"+str(time[0])+"-"+str(time[1])+"-"+str(time[2])+".txt" #determine which log file we should write to based on the date
 def consoleOutput(text): #consoleOutput is encouraged as a replacement of print as it writes everything to a log file.
 	#get time and date
 	time = localtime()
@@ -128,7 +128,7 @@ command_perms = ConfigLoader.loadCommandPerms()
 #initialize client and databases
 client = discord.Client()
 verifyFolderExistence("databases")
-userData = database.Database("databases\\users.json")
+userData = database.Database("databases/users.json")
 
 #custom error class for comedic purposes in hilariously catastrophic scenarios
 class ExcuseMeWhatTheFuckError(Exception):
@@ -289,9 +289,9 @@ Little
 Economy
 ```""")
 		if isWholeWordInString(msg_lowercase, "no u") or isWholeWordInString(msg_lowercase, "no you"):
-				await message.channel.send(file=discord.File(core_files_foldername+"\\images\\no_u.jpg", filename="img.png"))
+				await message.channel.send(file=discord.File(core_files_foldername+"/images/no_u.jpg", filename="img.png"))
 		if isWholeWordInString(msg_lowercase, "the more you know"):
-				await message.channel.send(file=discord.File(core_files_foldername+"\\images\\moreyouknow.gif", filename="img.png"))
+				await message.channel.send(file=discord.File(core_files_foldername+"/images/moreyouknow.gif", filename="img.png"))
 
 	except:
 		error = format_exc()
@@ -334,5 +334,5 @@ while True:
 			#following "The Great Disconnect" (the Pi disconnected from WiFi and filled the disk with 18GB of errors),
 			#it now store logs in separate files. on bot restarts, we should re-evaluate which log file to write to.
 			time = localtime() #get the time
-			logfilename = "logs\\log_"+str(time[0])+"-"+str(time[1])+"-"+str(time[2])+".txt" #determine which log file we should write to based on the date
+			logfilename = "logs/log_"+str(time[0])+"-"+str(time[1])+"-"+str(time[2])+".txt" #determine which log file we should write to based on the date
 			continue

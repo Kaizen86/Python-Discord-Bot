@@ -9,7 +9,7 @@ def verifyFolderExistence(foldername):
 
 time = localtime() #get the time
 verifyFolderExistence("logs")
-logfilename = "logs\\log_"+str(time[0])+"-"+str(time[1])+"-"+str(time[2])+".txt" #determine which log file we should write to based on the date
+logfilename = "logs/log_"+str(time[0])+"-"+str(time[1])+"-"+str(time[2])+".txt" #determine which log file we should write to based on the date
 def consoleOutput(text, *args, **kwargs): #consoleOutput is encouraged as a replacement of print as it writes everything to a log file.
 	#get time and date
 	time = localtime()
@@ -109,7 +109,7 @@ This command allow translation to and from Basic Shadow, which is a language inv
 {0}translate <to/from> <input>
 Generates an ASCII art of the input text.
 {0}figlet <text>
-Gets a Wikipedia page on a topic.
+Gets a Wikipedia page on a topic. If the topic name includes spaces, wrap it in quotation marks.
 {0}wikipedia <topic>
 Deletes a certain number of messages in the same channel that the command was sent.
 {0}purge <number of messages>
@@ -130,7 +130,9 @@ Rickrolls the voice channel you are connected to.
 {0}rickroll
 Plays a youtube video either from a URL or from a search term. Please be aware THIS IS NOT STABLE!!
 {0}play <url/search term>
-Disconnects the bot from the connected voice channel.
+Runs the input text through text to speech and speaks it.
+{0}speak <text>
+Disconnects the bot from the current voice channel.
 {0}disconnect
 ```
 
@@ -572,6 +574,11 @@ async def scp_read(passedvariables):
 			await message.channel.send("Id is smaller than 0.")
 			return
 
+		#another check to make sure that the id fits the format.
+		#example: scp_id 55 should be 055
+		scp_id = str(scp_id)
+		while len(scp_id) < 3: scp_id = "0"+scp_id
+
 		await message.channel.send("Accessing restricted document SCP-{0}...".format(scp_id)) #notification that the request of the document was understood.
 
 		#download the page and get the html from the request.
@@ -604,7 +611,7 @@ async def scp_read(passedvariables):
 				return #end the command here.
 
 		#Split the text up into 'snippets', each a maximum of 1980 characters. A snippet should never cut through a word halfway.
-		desired_snippet_length = 1980 #if a word exceeds this length, it wont split properly and snippets tend to be duplicated. However, such a scenario is VERY unlikely.
+		desired_snippet_length = 1980 #if a word exceeds this length, it wont split properly and snippets tend to be duplicated. However, such a word does not exist in any SCP.
 		snippets = []
 		i = 0
 		offset = 0
@@ -646,7 +653,7 @@ async def beauty(passedvariables):
 `"""+error+"`")
 				consoleOutput(error)
 				return
-	background = Image.open(core_files_foldername+"\\images\\beauty.jpg").convert("RGBA") #original meme image
+	background = Image.open(core_files_foldername+"/images/beauty.jpg").convert("RGBA") #original meme image
 
 	try:
 		user = await client.fetch_user(userid) #retrieve information of user
@@ -692,7 +699,7 @@ async def protecc(passedvariables):
 `"""+error+"`")
 			consoleOutput(error)
 			return
-	background = Image.open(core_files_foldername+"\\images\\protecc.png").convert("RGBA") #original meme image
+	background = Image.open(core_files_foldername+"/images/protecc.png").convert("RGBA") #original meme image
 
 	try:
 		user = await client.fetch_user(userid) #retrieve information of user
@@ -771,10 +778,9 @@ async def vc_rickroll(passedvariables):
 	core_files_foldername = passedvariables["core_files_foldername"]
 
 	if message.guild.id in connectedvoicechannels:
-		#already playing in another voice channel; disconnect.
+		#already playing in another voice channel, don't reconnect
 		voiceclient = connectedvoicechannels[message.guild.id]
-		consoleOutput("Already playing in another voice channel; disconnecting.")
-		await voiceclient.disconnect()
+		consoleOutput("Restored existing voice client.")
 
 	if message.author.voice:
 		channel = message.author.voice.channel
@@ -784,7 +790,7 @@ async def vc_rickroll(passedvariables):
 		consoleOutput("User is not in channel.")
 		return
 
-	audio = discord.FFmpegPCMAudio(core_files_foldername+"/audio/rickroll.mp3", executable=core_files_foldername+'/audio/ffmpeg.exe') #open file
+	audio = discord.FFmpegPCMAudio(core_files_foldername+"/audio/rickroll.mp3", executable='ffmpeg') #open file
 	audio.volume = 5 #set audio level to 5 out of... something. probably 10.
 	consoleOutput("Opened audio file.")
 
@@ -804,8 +810,9 @@ async def vc_playyt(passedvariables):
 	usage = commandprefix+"play <url/search term>"
 
 	if message.guild.id in connectedvoicechannels:
-		#already playing in another voice channel; disconnect.
+		#already playing in another voice channel, don't reconnect
 		voiceclient = connectedvoicechannels[message.guild.id]
+		consoleOutput("Restored existing voice client.")
 
 	if message.author.voice:
 		channel = message.author.voice.channel
@@ -855,7 +862,7 @@ async def vc_playyt(passedvariables):
 		consoleOutput("Unable to get audio version of video. No available formats are M4A.")
 		return
 
-	audio = discord.FFmpegPCMAudio(url, executable=core_files_foldername+'/audio/ffmpeg.exe') #open stream
+	audio = discord.FFmpegPCMAudio(url, executable='ffmpeg') #open stream
 	audio.volume = 5 #set audio level to 5 out of... something. probably 10.
 	await outputmsg.edit(content=outputmsg.content+"\nOpened audio stream.")
 	consoleOutput("Opened audio stream.")
@@ -863,7 +870,6 @@ async def vc_playyt(passedvariables):
 	if not "voiceclient" in locals(): #is voiceclient already defined?
 		voiceclient = await channel.connect() #connect to the channel
 		connectedvoicechannels[message.guild.id] = voiceclient #add the voiceclient to a list for future access.
-		consoleOutput("Connected.")
 		await outputmsg.edit(content=outputmsg.content+"\nConnected to voice channel.")
 		consoleOutput("Connected to voice channel.")
 
@@ -879,8 +885,9 @@ async def vc_speak(passedvariables):
 	usage = commandprefix+"speak <text>"
 
 	if message.guild.id in connectedvoicechannels:
-		#already playing in another voice channel; disconnect.
+		#already playing in another voice channel, don't reconnect
 		voiceclient = connectedvoicechannels[message.guild.id]
+		consoleOutput("Restored existing voice client.")
 
 	if message.author.voice:
 		channel = message.author.voice.channel
@@ -895,7 +902,7 @@ async def vc_speak(passedvariables):
 	randomid = randint(0,99999999)
 	gtts.gTTS(text, lang="en-uk", slow=False).save(str(randomid)+".mp3")
 
-	audio = discord.FFmpegPCMAudio(str(randomid)+".mp3", executable=core_files_foldername+'/audio/ffmpeg.exe') #open file
+	audio = discord.FFmpegPCMAudio(str(randomid)+".mp3", executable='ffmpeg') #open file
 	audio.volume = 5 #set audio level to 5 out of... something. probably 10.
 	consoleOutput("Opened audio file.")
 
