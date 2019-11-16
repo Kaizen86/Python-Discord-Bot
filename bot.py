@@ -1,31 +1,11 @@
 print("Program is now executing.")
 
-from time import localtime #file logs
-from os import listdir #folder existence checks
-from os import mkdir #make new folder if needed
-
-def verifyFolderExistence(foldername):
-	if foldername not in listdir():
-		print("Making '"+foldername+"' folder.")
-		mkdir(foldername)
-
-time = localtime() #get the time
-verifyFolderExistence("logs")
-logfilename = "logs/log_"+str(time[0])+"-"+str(time[1])+"-"+str(time[2])+".txt" #determine which log file we should write to based on the date
-def consoleOutput(text): #consoleOutput is encouraged as a replacement of print as it writes everything to a log file.
-	#get time and date
-	time = localtime()
-	#format text to have timestamp
-	text = str(time[0])+"/"+str(time[1])+"/"+str(time[2])+" "+str(time[3])+":"+str(time[4])+":"+str(time[5])+": "+text
-	#prints to the console
-	print(text)
-	#write to log
-	logfile = open(logfilename,"a")
-	logfile.write(text+"\n")
-	logfile.close()
+#load common functions used in this file
+from commands.modules.common import consoleOutput, verifyFolderExistence, generateLogfileName, ExcuseMeWhatTheFuckError
 
 #write newline to log file to separate bot startups.
-logfile = open(logfilename,"a")
+verifyFolderExistence("logs")
+logfile = open(generateLogfileName(),"a")
 logfile.write("\n")
 logfile.close()
 logfile = None
@@ -37,102 +17,27 @@ import asyncio
 print("Loading sub-vital...")
 #sub-vital
 from traceback import format_exc #for error handling
-from modules import database #for all database controls
-import json #for parsing command permission configs
+from commands.modules import database #for all database controls
 
 consoleOutput("Loading commands and their libraries...")
-import commands #Load all the commands and their code from the commands.py file
+import commands.commands as commands #Load all the commands and their code from the commands.py file
 from time import sleep #bot loop
 
 consoleOutput("Modules loaded. Loading configs...")
+import commands.modules.config as config
 
-#get ids of bot admins from admins.config.
-#used for exclusive management commands and access denied reporting.
-#custom error class for comedic purposes in hilariously catastrophic scenarios
-class EmptyConfigFileError(Exception):
-    pass
-class ConfigFileError(Exception):
-    pass
-class ConfigLoader():
-	def loadGeneralConfig(key):
-		try:
-			with open('bot.config') as json_data:
-				config = json.load(json_data)
-				return config[key]
-		except:
-			raise ConfigFileError("Unable to open bot.config")
-	def loadAdmins():
-		admins = []
-		try:
-			for line in open("admins.config").readlines():
-				line = line.replace("\n","")
-				if line.split() == [] or line.startswith("#"):
-					continue
-				else:
-					admins.append(line)
-			if len(admins) == 0:
-				raise EmptyConfigFileError("ERROR! No admins are defined in admins.config! Aborting...")
-			return admins
-		except:
-			raise ConfigFileError("Unable to open admins.config")
-	def loadCommandPerms():
-		try:
-			with open('commands.config') as json_data:
-				config = json.load(json_data)
-				return config
-		except:
-			raise ConfigFileError("Unable to open commands.config")
-
-async def reloadConfigs(passedvariables):
-	#include all the required variables
-	message = passedvariables["message"]
-	global core_files_foldername
-	global admins
-	global command_perms
-	global token_filename
-
-	try:
-		commandprefix = ConfigLoader.loadGeneralConfig("commandprefix")
-		core_files_foldername = ConfigLoader.loadGeneralConfig("core_files_foldername")
-		token_filename = ConfigLoader.loadGeneralConfig("api_secret_filename")
-	except:
-		error = format_exc()
-		if "FileNotFound" in error:
-			await message.channel.send("ERROR! 'bot.config' is missing.")
-			consoleOutput("ERROR! 'bot.config' is missing.")
-
-	try:
-		admins = ConfigLoader.loadAdmins()
-	except:
-		error = format_exc()
-		if "FileNotFound" in error:
-			await message.channel.send("ERROR! 'admins.config' is missing.")
-			consoleOutput("ERROR! 'admins.config' is missing.")
-	try:
-		command_perms = ConfigLoader.loadCommandPerms()
-	except:
-		error = format_exc()
-		if "FileNotFound" in error:
-			await message.channel.send("ERROR! 'commands.config' is missing.")
-			consoleOutput("ERROR! 'commands.config' is missing.")
-
-	await message.channel.send("Reloaded configuration files.")
-	consoleOutput("Reloaded configuration files.")
-
-commandprefix = ConfigLoader.loadGeneralConfig("commandprefix") #sets the command prefix.
-core_files_foldername = ConfigLoader.loadGeneralConfig("core_files_foldername") #folder in which the bot looks for its resources
-token_filename = ConfigLoader.loadGeneralConfig("api_secret_filename") #file that contains the api token
-admins = ConfigLoader.loadAdmins()
-command_perms = ConfigLoader.loadCommandPerms()
+#load configuration files
+commandprefix = config.loadGeneralConfig("commandprefix") #sets the command prefix.
+core_files_foldername = config.loadGeneralConfig("core_files_foldername") #folder in which the bot looks for its resources
+token_filename = config.loadGeneralConfig("api_secret_filename") #file that contains the api token
+wolfram_alpha_token = config.loadGeneralConfig("wolfram_alpha_token") #file that contains the api token for wolfram alpha
+admins = config.loadAdmins()
+command_perms = config.loadCommandPerms()
 
 #initialize client and databases
 client = discord.Client()
 verifyFolderExistence("databases")
 userData = database.Database("databases/users.json")
-
-#custom error class for comedic purposes in hilariously catastrophic scenarios
-class ExcuseMeWhatTheFuckError(Exception):
-    pass
 
 def isAdmin(userid):
 	userid = str(userid)
@@ -153,6 +58,7 @@ def isWholeWordInString(sentence,searchterm):
 	return found
 
 sent_images = {} #initialize dictionary of received images
+voiceclients = {} #list of active voice clients to be referenced by commands.
 
 @client.event
 async def on_ready():
@@ -192,42 +98,40 @@ async def on_message(message):
 
 			#https://stackoverflow.com/questions/35484190/python-if-elif-else-chain-alternitive
 			command_set = {
-				"help":commands.help,
-				"test":commands.test,
-				"dice":commands.dice,
-				"oxygen":commands.oxygen,
-				"coin_toss":commands.coin_toss,
-				"reverse":commands.reverse,
-				"info":commands.info,
-				"avatar":commands.avatar,
-				"rps":commands.rps,
-				"say":commands.say,
-				"list_meeps":commands.list_meeps,
-				"mca":commands.mca,
-				"translate":commands.translate,
-				"figlet":commands.figlet,
-				"wikipedia":commands.wikipedia,
-				"purge":commands.purge,
-				"scp":commands.scp_read,
+				"help":commands.general.help,
+				"test":commands.general.test,
+				"dice":commands.general.dice,
+				"oxygen":commands.general.oxygen,
+				"coin_toss":commands.general.coin_toss,
+				"reverse":commands.general.reverse,
+				"info":commands.general.info,
+				"avatar":commands.general.avatar,
+				"rps":commands.general.rps,
+				"say":commands.general.say,
+				"list_meeps":commands.general.list_meeps,
+				"mca":commands.general.mca,
+				"translate":commands.general.translate,
+				"figlet":commands.general.figlet,
+				"wikipedia":commands.general.wikipedia,
+				"purge":commands.general.purge,
+				"scp":commands.general.scp_read,
+				"math":commands.general.math_solve,
 
-				"beauty":commands.beauty,
-				"protecc":commands.protecc,
-				"deepfry":commands.deepfry,
+				"beauty":commands.image.beauty,
+				"protecc":commands.image.protecc,
+				"deepfry":commands.image.deepfry,
 
-				"rickroll":commands.vc_rickroll,
-				"play":commands.vc_playyt,
-				"speak":commands.vc_speak,
-				"disconnect":commands.vc_disconnect,
+				"rickroll":commands.voice.vc_rickroll,
+				"play":commands.voice.vc_playyt,
+				"speak":commands.voice.vc_speak,
+				"disconnect":commands.voice.vc_disconnect,
 
-				"list_crime":commands.list_crime,
-				"set_crime":commands.set_crime,
-				"change_crime":commands.change_crime,
+				"list_crime":commands.criminality.list_crime,
+				"set_crime":commands.criminality.set_crime,
+				"change_crime":commands.criminality.change_crime,
 
-				"shutdown":commands.shutdown,
-				"getuserdata":commands.getuserdata,
-				"setuserdata":commands.setuserdata,
-				"execute":commands.execute,
-				"reload":reloadConfigs
+				"shutdown":commands.admin.shutdown,
+				"execute":commands.admin.execute
 			}
 
 			if command in command_set and command in command_perms:
@@ -261,7 +165,9 @@ async def on_message(message):
 						"commandprefix":commandprefix, #configured prefix for commands
 						"userData":userData, #user information database
 						"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
-						"previous_img":previous_img #last image sent in the channel
+						"wolfram_alpha_token":wolfram_alpha_token, #api token for wolfram alpha
+						"previous_img":previous_img, #last image sent in the channel
+						"connectedvoicechannels":voiceclients
 					}
 					#execute the command
 					await action(passedvariables)
@@ -299,6 +205,10 @@ Economy
 `"""+error+"`")
 		consoleOutput(error)
 
+
+#while True: print(eval(input("BOT> ")))
+
+
 try:
 	tokenfile = open(token_filename,"r")
 except:
@@ -330,9 +240,4 @@ while True:
 			consoleOutput(error)
 			consoleOutput("Waiting 10 seconds then restarting bot...")
 			sleep(10)
-
-			#following "The Great Disconnect" (the Pi disconnected from WiFi and filled the disk with 18GB of errors),
-			#it now store logs in separate files. on bot restarts, we should re-evaluate which log file to write to.
-			time = localtime() #get the time
-			logfilename = "logs/log_"+str(time[0])+"-"+str(time[1])+"-"+str(time[2])+".txt" #determine which log file we should write to based on the date
 			continue

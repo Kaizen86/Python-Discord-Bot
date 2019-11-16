@@ -62,6 +62,8 @@ These commands do not have a classification.
 	>purge <number of messages>
 	Retrieves an SCP document from the SCP Wiki and posts it into the chat.
 	>scp <id>
+	Solves a mathematical problem using the Wolfram Alpha API
+	>math <problem>
 ```
 
 Image manipulation commands
@@ -106,14 +108,8 @@ Bot Administration Commands
 These commands are intended for the bot owners. Accessing them will send a warning to the owner.
 	Shutdown the bot.
 	>shutdown
-	Retrieve stored value for user attribute in database.
-	>getuserdata <mention> <attribute>
-	Update stored value for user attribute in database.
-	>setuserdata <mention> <attribute> <value>
 	Execute a shell command on the host computer.
 	>execute <shell command>
-	Reloads the bot configuration files. Useful for applying changes.
-	>reload
 ```
 
 ## Dependencies
@@ -129,5 +125,6 @@ Run 'pip install' on all of these packages to install them:
 - bidict
 - html2text
 - gtts
+- wolframalpha
 
 Voice commands also require ffmpeg to be installed.
