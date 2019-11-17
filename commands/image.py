@@ -34,7 +34,7 @@ async def beauty(passedvariables):
 		user = await client.fetch_user(userid) #retrieve information of user
 	except:
 		error = format_exc()
-		if "Not Found" in error:
+		if "NotFound" in error:
 			await message.channel.send("No user exists with the ID "+userid)
 			consoleOutput("No user exists with the ID "+userid)
 		else:
@@ -80,7 +80,7 @@ async def protecc(passedvariables):
 		user = await client.fetch_user(userid) #retrieve information of user
 	except:
 		error = format_exc()
-		if "Not Found" in error:
+		if "NotFound" in error:
 			await message.channel.send("No user exists with the ID "+userid)
 			consoleOutput("No user exists with the ID "+userid)
 		else:

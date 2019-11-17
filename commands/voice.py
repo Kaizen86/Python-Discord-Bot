@@ -5,6 +5,7 @@ from ast import literal_eval #playyt
 from typing import BinaryIO #rickroll
 
 from discord import FFmpegPCMAudio #rickroll
+from random import randint
 import nacl #rickroll
 import youtube_dl #playyt
 

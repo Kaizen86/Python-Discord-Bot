@@ -2,7 +2,7 @@ from commands.modules.common import *
 from traceback import format_exc #for error handling
 
 #internal
-from random import randint #dice, coin_toss, rps, 
+from random import randint #dice, coin_toss, rps
 from requests import get as get_request #mca, scp_read
 from sys import version_info as python_info #help
 from io import BytesIO #mca
@@ -604,4 +604,17 @@ async def math_solve(passedvariables):
 		else: consoleOutput(error)
 		await message.channel.send("Unable to connect to Wolfram Alpha. Sorry.")
 		return
+	if result["@success"] != "true": #check if the problem could not be solved.
+		error = "Unable to solve problem."
+		consoleOutput(error)
+		if "tips" in result.keys(): #add a tip if there is one.
+			error += "\n"+result["tips"]["tip"]
+		await message.channel.send(error)
+		return
+	#process the result to extract the answer
+	for item in result["pod"]:
+		if item["@title"] != "Result": continue #ignore any fields that do not contain the answer
+		answer = item["subpod"]["plaintext"] #read the answer
+	result = question +" = "+ answer
+	consoleOutput(result)
 	await message.channel.send(result[:1995]) #just in case response exceeds discord message length limit, trim it to the first 1995 characters

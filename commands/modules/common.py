@@ -2,6 +2,8 @@ from time import localtime #file logs
 from os import listdir #folder existence checks
 from os import mkdir #make new folder if needed
 from os import remove as delete_file #uploadImageFromObject()
+from random import randint #uploadImageFromObject()
+from discord import File
 import re #used to remove non-numbers from mentions to extract the user id
 from traceback import format_exc #for error handling
 
@@ -40,7 +42,7 @@ async def uploadImageFromObject(image,message):
 	imageid = str(randint(1,99999999))+".png"  #just to make sure nothing is overwritten in heavy loads.
 	try:
 		image.save(imageid) #save it...
-		await message.channel.send(file=discord.File(imageid, filename="img.png")) #then send the image.
+		await message.channel.send(file=File(imageid, filename="img.png")) #then send the image.
 	except:
 		await message.channel.send("Error while trying to send image.")
 		consoleOutput(format_exc())
