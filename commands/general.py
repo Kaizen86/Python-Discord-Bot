@@ -60,8 +60,8 @@ Deletes a certain number of messages in the same channel that the command was se
 {0}purge <number of messages>
 Retrieves an SCP document for any SCP.
 {0}scp <scp id>
-Solves a mathematical problem using the Wolfram Alpha API
-{0}math <problem>
+Answers a question using the Wolfram Alpha API
+{0}wolfram <question>
 ```""".format(commandprefix))
 	await message.author.send("""
 Image manipulation commands
@@ -611,10 +611,18 @@ async def math_solve(passedvariables):
 			error += "\n"+result["tips"]["tip"]
 		await message.channel.send(error)
 		return
-	#process the result to extract the answer
-	for item in result["pod"]:
-		if item["@title"] != "Result": continue #ignore any fields that do not contain the answer
-		answer = item["subpod"]["plaintext"] #read the answer
-	result = question +" = "+ answer
-	consoleOutput(result)
-	await message.channel.send(result[:1995]) #just in case response exceeds discord message length limit, trim it to the first 1995 characters
+	#process the result to extract the answer and working out
+	answer = ""
+	for pod in result["pod"]:
+		subpod = pod['subpod'] #get the subpod
+		try:
+			text = subpod['plaintext']  #attempt to extract the plaintext
+			if answer == None: continue #check if we extracted anything at all
+			answer = str(text)+"\n"
+		except: #turns out the pod is actually a list of plaintexts
+			for item in subpod:
+				text = subpod['plaintext'] #extract the plaintext from each of those
+				if answer == None: continue #check if we extracted anything at all
+				answer = str(text)+"\n" #add it to the answer
+	consoleOutput(answer)
+	await message.channel.send(answer[:1995]) #just in case response exceeds discord message length limit, trim it to the first 1995 characters

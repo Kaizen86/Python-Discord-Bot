@@ -62,8 +62,8 @@ These commands do not have a classification.
 	>purge <number of messages>
 	Retrieves an SCP document from the SCP Wiki and posts it into the chat.
 	>scp <id>
-	Solves a mathematical problem using the Wolfram Alpha API
-	>math <problem>
+	Answers a question using the Wolfram Alpha API
+	>wolfram <question>
 ```
 
 Image manipulation commands
