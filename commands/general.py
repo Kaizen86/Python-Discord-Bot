@@ -587,7 +587,7 @@ async def scp_read(passedvariables):
 
 		await message.channel.send("[DOCUMENT END]")
 
-async def math_solve(passedvariables):
+async def wolfram(passedvariables):
 	#include all the required variables
 	token = passedvariables["wolfram_alpha_token"]
 	commandprefix = passedvariables["commandprefix"]
@@ -605,10 +605,10 @@ async def math_solve(passedvariables):
 		await message.channel.send("Unable to connect to Wolfram Alpha. Sorry.")
 		return
 	if result["@success"] != "true": #check if the problem could not be solved.
-		error = "Unable to solve problem."
+		error = "Unable to answer question."
 		consoleOutput(error)
 		if "tips" in result.keys(): #add a tip if there is one.
-			error += "\n"+result["tips"]["tip"]
+			error += "\n"+str(result["tips"]["tip"]["@text"])
 		await message.channel.send(error)
 		return
 	#process the result to extract the answer and working out

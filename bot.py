@@ -68,7 +68,21 @@ async def on_ready():
 	await client.change_presence(activity=discord.Game(name=commandprefix+"help"))
 
 @client.event
-async def on_message(message):
+async def on_guild_join(guild): #send a message to the first available channel in a new server
+	consoleOutput(F"###Joined new server###\nServer name is {guild.name} (#{guild.id}) with {len(guild.members)} members.")
+	sent = False
+	for channel in guild.channels:
+		if not sent:
+			try: await channel.send("Hello! I am the Wheatley core. To see what I can do, run the "+commandprefix+"help command.")
+			except: continue #Ignore any errors about access denied or whatever, just try the next channel.
+		sent = True
+
+@client.event
+async def on_guild_remove(guild): #log in console when the bot is removed from a guild
+	consoleOutput(F"###Left server###\nServer name is {guild.name} (#{guild.id})")
+
+@client.event
+async def on_message(message): #main event that spins off command functions
 	try:
 		#check if the message was sent by the bot. if so, drop it to ensure infinite loops of command execution cannot occur.
 		if client.user.id == message.author.id:
@@ -115,7 +129,7 @@ async def on_message(message):
 				"wikipedia":commands.general.wikipedia,
 				"purge":commands.general.purge,
 				"scp":commands.general.scp_read,
-				"math":commands.general.math_solve,
+				"wolfram":commands.general.wolfram,
 
 				"beauty":commands.image.beauty,
 				"protecc":commands.image.protecc,
