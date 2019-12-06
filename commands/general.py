@@ -17,6 +17,22 @@ import wolframalpha #math
 from commands.modules import shadow_translator #translate (i made this one :D)
 shadowtranslator = shadow_translator.ShadowTranslator()
 
+def split_into_snippets(text, desired_snippet_length=1980, delimiter=" "):
+	"""Given a long string, split it up into snippets of a specified length. Useful for formatting a long message into several sendable messages."""
+	snippets = []
+	i = 0
+	offset = 0
+	last_known_space = 0
+	while i < len(text): #loop over the text
+		if text[i] == delimiter: last_known_space = i #scan for spaces.
+		if i-offset >= desired_snippet_length: #if we exceed the desired length...
+			#print everything behind that space to where we last printed.
+			snippets.append(text[offset:][:last_known_space-offset])
+			offset = last_known_space + 1 #begin a new snippet.
+		i += 1 #increment our 'cursor'
+	snippets.append(text[offset:][:len(text)]) #the last snippet should have any leftover text.
+	return snippets
+
 #general commands
 async def help(passedvariables):
 	#include all the required variables
@@ -568,23 +584,10 @@ async def scp_read(passedvariables):
 				return #end the command here.
 
 		#Split the text up into 'snippets', each a maximum of 1980 characters. A snippet should never cut through a word halfway.
-		desired_snippet_length = 1980 #if a word exceeds this length, it wont split properly and snippets tend to be duplicated. However, such a word does not exist in any SCP.
-		snippets = []
-		i = 0
-		offset = 0
-		last_known_space = 0
-		while i < len(text): #loop over the text
-			if text[i] == " ": last_known_space = i #scan for spaces.
-			if i-offset >= desired_snippet_length: #if we exceed the desired length...
-				#print everything behind that space to where we last printed.
-				snippets.append(text[offset:][:last_known_space-offset])
-				offset = last_known_space + 1 #begin a new snippet.
-			i += 1 #increment our 'cursor'
-		snippets.append(text[offset:][:len(text)]) #the last snippet should have any leftover text.
+		snippets = split_into_snippets(text)
 
 		#finally, send all of the snippets back.
 		for snippet in snippets: await message.channel.send("```"+snippet+" ```")
-
 		await message.channel.send("[DOCUMENT END]")
 
 async def wolfram(passedvariables):
