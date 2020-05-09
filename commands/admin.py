@@ -29,6 +29,25 @@ async def shutdown(passedvariables):
 	sleep(2)
 	force_exit(0) #Goodnight!
 
+async def nickname(passedvariables):
+	message = passedvariables["message"]
+	client = passedvariables["client"]
+	commandprefix = passedvariables["commandprefix"]
+
+	msg = await message.channel.send("Access granted. Updating nickname...")
+	consoleOutput("Access granted. Updating nickname...")
+
+	nickname = message.content[len(commandprefix+"nickname "):]
+	if len(nickname) == 0: nickname = None #handle resetting nickname
+	try:
+		me = message.guild.get_member(client.user.id) #get bot's member in the server that the message was sent
+		await me.edit(nick=nickname) #update our nickname
+	except:
+		error = format_exc()
+		await msg.edit(content=msg.content+"\nError changing nickname, likely insufficient permissions.\n```"+error+"```")
+	consoleOutput("Finished execution.")
+	await message.edit(content=msg.content+"\nFinished execution.")
+
 async def execute(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]

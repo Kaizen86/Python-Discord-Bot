@@ -75,7 +75,7 @@ Voice channel commands
 ```
 	Rickrolls the voice channel you are connected to.
 	>rickroll
-	Plays a youtube video either from a URL or from a search term. Please be aware THIS IS NOT STABLE!!
+	Plays a youtube video either from a URL or from a search term. This is not entirely stable and can occasionally crash. I blame FFMPEG.
 	>play <url/search term>
 	Runs the input text through text to speech and speaks it.
 	>speak <text>
@@ -106,6 +106,8 @@ Bot Administration Commands
 These commands are intended for the bot owners. Accessing them will send a warning to the owner.
 	Shutdown the bot.
 	>shutdown
+	Attempts to update the bot's nickname on a server. Leave empty to reset to nothing.
+	>nickname <new name>
 	Execute a shell command on the host computer.
 	>execute <shell command>
 ```

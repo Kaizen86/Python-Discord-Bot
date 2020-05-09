@@ -142,6 +142,7 @@ async def on_message(message): #main event that spins off command functions
 				"change_crime":commands.criminality.change_crime,
 
 				"shutdown":commands.admin.shutdown,
+				"nickname":commands.admin.nickname,
 				"execute":commands.admin.execute
 			}
 
