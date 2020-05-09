@@ -46,7 +46,7 @@ async def nickname(passedvariables):
 		error = format_exc()
 		await msg.edit(content=msg.content+"\nError changing nickname, likely insufficient permissions.\n```"+error+"```")
 	consoleOutput("Finished execution.")
-	await message.edit(content=msg.content+"\nFinished execution.")
+	await msg.edit(content=msg.content+"\nFinished execution.")
 
 async def execute(passedvariables):
 	#include all the required variables
