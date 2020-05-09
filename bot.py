@@ -30,7 +30,6 @@ import commands.modules.config as config
 commandprefix = config.loadGeneralConfig("commandprefix") #sets the command prefix.
 core_files_foldername = config.loadGeneralConfig("core_files_foldername") #folder in which the bot looks for its resources
 token_filename = config.loadGeneralConfig("api_secret_filename") #file that contains the api token
-wolfram_alpha_token = config.loadGeneralConfig("wolfram_alpha_token") #file that contains the api token for wolfram alpha
 admins = config.loadAdmins()
 command_perms = config.loadCommandPerms()
 
@@ -129,7 +128,6 @@ async def on_message(message): #main event that spins off command functions
 				"wikipedia":commands.general.wikipedia,
 				"purge":commands.general.purge,
 				"scp":commands.general.scp_read,
-				"wolfram":commands.general.wolfram,
 
 				"beauty":commands.image.beauty,
 				"protecc":commands.image.protecc,
@@ -179,7 +177,6 @@ async def on_message(message): #main event that spins off command functions
 						"commandprefix":commandprefix, #configured prefix for commands
 						"userData":userData, #user information database
 						"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
-						"wolfram_alpha_token":wolfram_alpha_token, #api token for wolfram alpha
 						"previous_img":previous_img, #last image sent in the channel
 						"connectedvoicechannels":voiceclients
 					}

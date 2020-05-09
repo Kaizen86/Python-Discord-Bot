@@ -62,8 +62,6 @@ These commands do not have a classification.
 	>purge <number of messages>
 	Retrieves an SCP document from the SCP Wiki and posts it into the chat.
 	>scp <id>
-	Answers a question using the Wolfram Alpha API
-	>wolfram <question>
 ```
 
 Image manipulation commands
@@ -125,6 +123,5 @@ Run 'pip install' on all of these packages to install them:
 - bidict
 - html2text
 - gtts
-- wolframalpha
 
 Voice commands also require ffmpeg to be installed.

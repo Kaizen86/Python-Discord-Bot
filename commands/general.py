@@ -13,7 +13,6 @@ import pyfiglet #figlet
 import wikipedia as wiki #wikipedia
 from html2text import html2text #scp_read
 from PIL import Image #mca
-import wolframalpha #math
 from commands.modules import shadow_translator #translate (i made this one :D)
 shadowtranslator = shadow_translator.ShadowTranslator()
 
@@ -589,43 +588,3 @@ async def scp_read(passedvariables):
 		#finally, send all of the snippets back.
 		for snippet in snippets: await message.channel.send("```"+snippet+" ```")
 		await message.channel.send("[DOCUMENT END]")
-
-async def wolfram(passedvariables):
-	#include all the required variables
-	token = passedvariables["wolfram_alpha_token"]
-	commandprefix = passedvariables["commandprefix"]
-	message = passedvariables["message"]
-	question = message.content #extract message content
-	question = question[len(commandprefix+"math")+1:] #change according to length of command name + 1 for the space
-	
-	wolfram = wolframalpha.Client(token) #initialise a new client
-	try:
-		result = wolfram.query(question) #query the api with out question
-	except:
-		error = format_exc()
-		if "SSL: CERTIFICATE_VERIFY_FAILED" in error: consoleOutput("SSL error while trying to connect. Try waiting for 24 hours.")
-		else: consoleOutput(error)
-		await message.channel.send("Unable to connect to Wolfram Alpha. Sorry.")
-		return
-	if result["@success"] != "true": #check if the problem could not be solved.
-		error = "Unable to answer question."
-		consoleOutput(error)
-		if "tips" in result.keys(): #add a tip if there is one.
-			error += "\n"+str(result["tips"]["tip"]["@text"])
-		await message.channel.send(error)
-		return
-	#process the result to extract the answer and working out
-	answer = ""
-	for pod in result["pod"]:
-		subpod = pod['subpod'] #get the subpod
-		try:
-			text = subpod['plaintext']  #attempt to extract the plaintext
-			if answer == None: continue #check if we extracted anything at all
-			answer = str(text)+"\n"
-		except: #turns out the pod is actually a list of plaintexts
-			for item in subpod:
-				text = subpod['plaintext'] #extract the plaintext from each of those
-				if answer == None: continue #check if we extracted anything at all
-				answer = str(text)+"\n" #add it to the answer
-	consoleOutput(answer)
-	await message.channel.send(answer[:1995]) #just in case response exceeds discord message length limit, trim it to the first 1995 characters
