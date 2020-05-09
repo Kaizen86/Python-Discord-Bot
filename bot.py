@@ -57,7 +57,6 @@ def isWholeWordInString(sentence,searchterm):
 	return found
 
 sent_images = {} #initialize dictionary of received images
-voiceclients = {} #list of active voice clients to be referenced by commands.
 
 @client.event
 async def on_ready():
@@ -178,7 +177,6 @@ async def on_message(message): #main event that spins off command functions
 						"userData":userData, #user information database
 						"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
 						"previous_img":previous_img, #last image sent in the channel
-						"connectedvoicechannels":voiceclients
 					}
 					#execute the command
 					await action(passedvariables)

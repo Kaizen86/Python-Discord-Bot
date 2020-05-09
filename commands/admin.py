@@ -13,21 +13,21 @@ async def shutdown(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
 	client = passedvariables["client"]
-	voiceclients = passedvariables["connectedvoicechannels"]
 
 	await message.channel.send("Shutting down bot...")
-	consoleOutput("Closing all voice clients...")
-	i=1
-	for id in voiceclients: #try to disconnect all the voice channels
-		try:
-			await voiceclients[id].disconnect()
-			consoleOutput(F"Closed {i}/{len(voiceclients)} voice clients.")
-			i+=1
-		except Exception as err: consoleOutput("Error: "+str(err))
+	if len(client.voice_clients) > 0:
+		consoleOutput("Closing all voice clients...")
+		i = 1
+		for vc in client.voice_clients: #try to disconnect all the voice channels
+			try:
+				await vc.disconnect()
+				consoleOutput(F"Closed {i}/{len(client.voice_clients)+1} voice clients.") #+1 because we just closed one
+				i += 1
+			except Exception as err: consoleOutput("Error: "+str(err))
 	consoleOutput("Shutting down.")
 	await client.change_presence(status=Status.invisible)
 	sleep(2)
-	force_exit(0)
+	force_exit(0) #Goodnight!
 
 async def execute(passedvariables):
 	#include all the required variables

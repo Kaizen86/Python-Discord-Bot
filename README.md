@@ -118,7 +118,6 @@ Run 'pip install' on all of these packages to install them:
 - requests
 - pyfiglet
 - youtube-dl
-- pynacl
 - wikipedia
 - bidict
 - html2text

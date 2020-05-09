@@ -1,67 +1,76 @@
 from commands.modules.common import *
 from traceback import format_exc #for error handling
+from discord import FFmpegPCMAudio #used by everything except disconnect
 
-from ast import literal_eval #playyt
-from typing import BinaryIO #rickroll
-
-from discord import FFmpegPCMAudio #rickroll
-import nacl #rickroll
+import gtts #speak
+from time import sleep #speak
 from random import randint #speak
+from ast import literal_eval #playyt
 import youtube_dl #playyt
+
+async def connectvc(voice_clients, author):
+	#check if we are already in the voice channel that the requesting user is.
+	for vc in voice_clients:
+		if vc.guild == author.guild:
+			if vc.channel == author.voice.channel:
+				#same server, same channel, use that connection
+				consoleOutput("Found existing voice channel connection.")
+				break
+			else:
+				#same server, different channel.
+				consoleOutput("Reconnect to different channel within the same server.")
+				await vc.disconnect() #we must first disconnect the vc
+				vc = await author.voice.channel.connect() #then we can make a new connection
+				consoleOutput("Success!")
+				break
+	else: #we are not already in the vc, so we join it.
+		consoleOutput("Connecting...")
+		vc = await author.voice.channel.connect()
+		consoleOutput("Success!")
+	return vc
 
 #voice channel commands
 async def vc_rickroll(passedvariables):
 	#include all the required variables
-	connectedvoicechannels = passedvariables["connectedvoicechannels"]
 	message = passedvariables["message"]
 	core_files_foldername = passedvariables["core_files_foldername"]
+	client = passedvariables["client"]
 
-	if message.guild.id in connectedvoicechannels:
-		#already playing in another voice channel, don't reconnect
-		voiceclient = connectedvoicechannels[message.guild.id]
-		consoleOutput("Restored existing voice client.")
-
-	if message.author.voice:
-		channel = message.author.voice.channel
-		consoleOutput("Located channel.")
-	else:
+	#confirm that the user is in a voice channel
+	if not message.author.voice:
 		await message.channel.send("You are not in a voice channel.")
 		consoleOutput("User is not in channel.")
 		return
 
-	audio = FFmpegPCMAudio(core_files_foldername+"/audio/rickroll.mp3", executable='ffmpeg') #open file
+	#either create a voice client or use an existing one
+	vc = await connectvc(client.voice_clients, message.author)
+
+	#load audio file from disk
+	audio = FFmpegPCMAudio(core_files_foldername+"/audio/rickroll.mp3", executable='ffmpeg')
 	audio.volume = 5 #set audio level to 5 out of... something. probably 10.
 	consoleOutput("Opened audio file.")
 
-	voiceclient = await channel.connect() #connect to the channel
-	connectedvoicechannels[message.guild.id] = voiceclient #add the voiceclient to a list for future access.
-	consoleOutput("Connected.")
-
-	voiceclient.play(audio) #and finally, play the audio file.
+	vc.play(audio) #and finally, play the audio file.
 	await message.channel.send("Rickrolling.")
 	consoleOutput("Rickrolling.")
 
 async def vc_playyt(passedvariables):
 	#include all the required variables
-	connectedvoicechannels = passedvariables["connectedvoicechannels"]
 	message = passedvariables["message"]
+	client = passedvariables["client"]
 	commandprefix = passedvariables["commandprefix"]
 	core_files_foldername = passedvariables["core_files_foldername"]
 
 	usage = commandprefix+"play <url/search term>"
 
-	if message.guild.id in connectedvoicechannels:
-		#already playing in another voice channel, don't reconnect
-		voiceclient = connectedvoicechannels[message.guild.id]
-		consoleOutput("Restored existing voice client.")
-
-	if message.author.voice:
-		channel = message.author.voice.channel
-		consoleOutput("Located channel.")
-	else:
+	#confirm that the user is in a voice channel
+	if not message.author.voice:
 		await message.channel.send("You are not in a voice channel.")
 		consoleOutput("User is not in channel.")
 		return
+
+	#either create a voice client or use an existing one
+	vc = await connectvc(client.voice_clients, message.author)
 
 	try:
 		url = message.content[len(commandprefix)+5:] #4 for the word, 1 more for a space.
@@ -108,53 +117,38 @@ async def vc_playyt(passedvariables):
 	await outputmsg.edit(content=outputmsg.content+"\nOpened audio stream.")
 	consoleOutput("Opened audio stream.")
 
-	if not "voiceclient" in locals(): #is voiceclient already defined?
-		voiceclient = await channel.connect() #connect to the channel
-		connectedvoicechannels[message.guild.id] = voiceclient #add the voiceclient to a list for future access.
-		await outputmsg.edit(content=outputmsg.content+"\nConnected to voice channel.")
-		consoleOutput("Connected to voice channel.")
-
-	voiceclient.play(audio) #and finally, play the audio file.
+	vc.play(audio) #and finally, play the audio file.
 	await outputmsg.edit(content=outputmsg.content+"\nPlaying.")
 	consoleOutput("Success.")
 
 async def vc_speak(passedvariables):
 	#include all the required variables
-	connectedvoicechannels = passedvariables["connectedvoicechannels"]
 	message = passedvariables["message"]
+	client = passedvariables["client"]
 	commandprefix = passedvariables["commandprefix"]
 	core_files_foldername = passedvariables["core_files_foldername"]
 
 	usage = commandprefix+"speak <text>"
 
-	if message.guild.id in connectedvoicechannels:
-		#already playing in another voice channel, don't reconnect
-		voiceclient = connectedvoicechannels[message.guild.id]
-		consoleOutput("Restored existing voice client.")
-
-	if message.author.voice:
-		channel = message.author.voice.channel
-		consoleOutput("Located channel.")
-	else:
+	#confirm that the user is in a voice channel
+	if not message.author.voice:
 		await message.channel.send("You are not in a voice channel.")
 		consoleOutput("User is not in channel.")
 		return
+
+	#either create a voice client or use an existing one
+	vc = await connectvc(client.voice_clients, message.author)
 
 	text = message.content[len(commandprefix)+6:] #5 for the word, 1 more for a space.
 	await message.delete() #we can now remove the message for stealth purposes.
 	randomid = randint(0,99999999)
 	gtts.gTTS(text, lang="en-uk", slow=False).save(str(randomid)+".mp3")
 
-	audio = discord.FFmpegPCMAudio(str(randomid)+".mp3", executable='ffmpeg') #open file
+	audio = FFmpegPCMAudio(str(randomid)+".mp3", executable='ffmpeg') #open file
 	audio.volume = 5 #set audio level to 5 out of... something. probably 10.
 	consoleOutput("Opened audio file.")
 
-	if not "voiceclient" in locals(): #is voiceclient already defined?
-		voiceclient = await channel.connect() #connect to the channel
-		connectedvoicechannels[message.guild.id] = voiceclient #add the voiceclient to a list for future access.
-		consoleOutput("Connected.")
-
-	voiceclient.play(audio) #and finally, play the audio file.
+	vc.play(audio) #and finally, play the audio file.
 	consoleOutput("Playing audio.")
 	for i in range(1000): #since we cant know when it's done with the file, repeatedly try to delete it until it works. this is a massive bodge, but it works. capped at 1000 attempts just in case.
 		sleep(1)
@@ -165,14 +159,16 @@ async def vc_speak(passedvariables):
 		except Exception as err: pass #ignore errors and keep trying.
 
 async def vc_disconnect(passedvariables):
-	connectedvoicechannels = passedvariables["connectedvoicechannels"]
 	message = passedvariables["message"]
-	if message.guild.id in connectedvoicechannels:
-		#already playing in another voice channel; disconnect.
-		voiceclient = connectedvoicechannels[message.guild.id]
-		consoleOutput("Disconnecting from voice channel.")
-		await voiceclient.disconnect()
-		await message.channel.send("Disconnected.")
-	else:
-		await message.channel.send("I am not in a voice channel on this server.")
-		consoleOutput("Bot is not in a voice channel on this server.")
+	client = passedvariables["client"]
+
+	#confirm that the user is in a voice channel
+	if not message.author.voice:
+		await message.channel.send("You are not in a voice channel.")
+		consoleOutput("User is not in channel.")
+		return
+
+	vc = await connectvc(client.voice_clients, message.author)
+	await vc.disconnect()
+	consoleOutput("Disconnected.")
+	await message.channel.send("Disconnected.")
