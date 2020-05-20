@@ -18,20 +18,21 @@ print("Loading sub-vital...")
 #sub-vital
 from traceback import format_exc #for error handling
 from commands.modules import database #for all database controls
+from time import sleep #bot loop
+from time import time as get_unix_epoch #command cooldowns
 
 consoleOutput("Loading commands and their libraries...")
 import commands.commands as commands #Load all the commands and their code from the commands.py file
-from time import sleep #bot loop
 
 consoleOutput("Modules loaded. Loading configs...")
 import commands.modules.config as config
 
 #load configuration files
-commandprefix = config.loadGeneralConfig("commandprefix") #sets the command prefix.
-core_files_foldername = config.loadGeneralConfig("core_files_foldername") #folder in which the bot looks for its resources
-token_filename = config.loadGeneralConfig("api_secret_filename") #file that contains the api token
+commandprefix = config.loadConfigFile("bot.config","commandprefix") #sets the command prefix.
+core_files_foldername = config.loadConfigFile("bot.config","core_files_foldername") #folder in which the bot looks for its resources
+token_filename = config.loadConfigFile("bot.config","api_secret_filename") #file that contains the api token
+command_perms = config.loadConfigFile("commands.config") #configuration for specific commands, get the entire thing
 admins = config.loadAdmins()
-command_perms = config.loadCommandPerms()
 
 #initialize client and databases
 client = discord.Client()
@@ -57,6 +58,9 @@ def isWholeWordInString(sentence,searchterm):
 	return found
 
 sent_images = {} #initialize dictionary of received images
+#Stores command cooldown information
+#This is a dictionary of dictionaries, top level is command name to dictionary, second level is user id to unix epoch timestamp
+command_cooldowns = {}
 
 @client.event
 async def on_ready():
@@ -109,6 +113,7 @@ async def on_message(message): #main event that spins off command functions
 			await message.channel.trigger_typing() #typing stops either after 10 seconds or when a message is sent.
 
 			#https://stackoverflow.com/questions/35484190/python-if-elif-else-chain-alternitive
+			#Kind of like a vector table
 			command_set = {
 				"help":commands.general.help,
 				"test":commands.general.test,
@@ -125,7 +130,6 @@ async def on_message(message): #main event that spins off command functions
 				"translate":commands.general.translate,
 				"figlet":commands.general.figlet,
 				"wikipedia":commands.general.wikipedia,
-				"purge":commands.general.purge,
 				"scp":commands.general.scp_read,
 
 				"beauty":commands.image.beauty,
@@ -143,46 +147,65 @@ async def on_message(message): #main event that spins off command functions
 
 				"shutdown":commands.admin.shutdown,
 				"nickname":commands.admin.nickname,
+				"purge":commands.general.purge,
 				"execute":commands.admin.execute
 			}
 
 			if command in command_set and command in command_perms:
-				can_do_command = True
-				if command_perms[command]["enabled"]:
-					if command_perms[command]["adminsonly"]:
+				if command_perms[command]["enabled"]: #verify the command is enabled via the config
+					if command_perms[command]["adminsonly"]: #then check if only admins can use it
 						#permission check
 						if not isAdmin(message.author.id):
-							can_do_command = False
 							await message.channel.send("Access denied.")
 							consoleOutput("Access denied.")
+							return
 				else:
-					can_do_command = False
 					await message.channel.send("This command has been disabled.")
 					consoleOutput("Command has been disabled.")
+					return
 
-				if can_do_command:
-					#find the command being referenced
-					action = command_set[command]
+				#check if the command is in a cooldown state for that user
+				if command in command_cooldowns.keys(): #check if that specific command has any users on cooldown
+					if message.author.id in command_cooldowns[command].keys(): #now check if the message author is in that list
+						#they are. check if their cooldown period has ended.
+						time_remaining = command_perms[command]["cooldown"] - (int(get_unix_epoch()) - command_cooldowns[command][message.author.id])
+						if time_remaining > 0:
+							consoleOutput(F"User is blocked from that command for {time_remaining} seconds.")
+							await message.channel.send(F"You need to wait {time_remaining} seconds before you can do that again.")
+							return
+						else:
+							#remove the entry since their cooldown has expired
+							command_cooldowns[command].pop(message.author.id)
 
-					#get the last image sent in the channel from our list for a command to use
-					try:
-						previous_img = sent_images[message.guild.id][message.channel.id]
-					except:
-						previous_img = None #no image to pass to command.
+				#The user is allowed to execute the command and it is not disabled.
+				#lookup the command being referenced
+				action = command_set[command]
 
-					#define passedvariables (dictionary that contains additional objects)
-					passedvariables = {
-						"client":client, #client object
-						"message":message, #message object
-						"commandprefix":commandprefix, #configured prefix for commands
-						"userData":userData, #user information database
-						"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
-						"previous_img":previous_img, #last image sent in the channel
-					}
-					#execute the command
-					await action(passedvariables)
+				#get the last image sent in the channel from our list for a command to use
+				try:
+					previous_img = sent_images[message.guild.id][message.channel.id]
+				except:
+					previous_img = None #no image to pass to command.
+
+				#define passedvariables (dictionary that contains additional objects)
+				passedvariables = {
+					"client":client, #client object
+					"message":message, #message object
+					"commandprefix":commandprefix, #configured prefix for commands
+					"userData":userData, #user information database
+					"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
+					"previous_img":previous_img, #last image sent in the channel
+				}
+				#finally, execute the command.
+				await action(passedvariables)
+
+				#now we need to add a cooldown period for that command for that user if applicable
+				if command_perms[command]["cooldown"] > 0:
+					consoleOutput("Cooldown in effect for that user.")
+					if command not in command_cooldowns.keys(): command_cooldowns[command] = {}
+					command_cooldowns[command][message.author.id] = int(get_unix_epoch())
 			else:
-				#if none of the above worked, report unknown command.
+				#if the command does not have a function to run (because it isnt in command_set) OR its entry is omitted from the config, report unknown command.
 				await message.channel.send("Unknown command '"+command+"'.")
 
 		#triggerwords

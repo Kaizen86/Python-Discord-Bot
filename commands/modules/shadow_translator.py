@@ -1,3 +1,8 @@
+#Authors note:
+#This is one of the older remnants of the bot, made a few years ago.
+#This was back when I was still learning (I still am) and as such
+#it can be a bit hard to read. But it does work.
+
 from bidict import bidict
 
 class ShadowTranslator:
@@ -38,7 +43,7 @@ class ShadowTranslator:
 	def ConvertToShadow(self, phrase):
 		string = ""
 		for letter in phrase.upper():
-			if letter is "":
+			if letter == "":
 				print("blank")
 				string += "  " #spaces should be symbolised as two spaces in shadow
 
