@@ -52,19 +52,11 @@ sent_images = {} #initialize dictionary of received images
 #This is a dictionary of dictionaries, top level is command name to dictionary, second level is user id to unix epoch timestamp
 command_cooldowns = {}
 
-#define additionalobjects dictionary that contains necesscary objects for commmands
-additionalobjects = {
-	"client":client, #client object
-	"message":message, #message object
-	"commandprefix":commandprefix, #configured prefix for commands
-	"userData":userData, #user information database
-	"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
-	"previous_img":previous_img, #last image sent in the channel
-}
-
 @client.event
 async def on_ready():
 	consoleOutput("Logged on as " + client.user.name + " with the ID " + str(client.user.id) + ".")
+	consoleOutput("Bot is in {} guild.".format(len(client.guild)))
+	for guild in guilds: consoleOutput("\t{}".format(guild.name))
 	consoleOutput("------")
 	#await client.change_presence(activity=discord.Game(name="DEBUG MODE, BOT NON-FUNCTIONAL"))
 	await client.change_presence(activity=discord.Game(name=commandprefix+"help"))
@@ -187,8 +179,18 @@ async def on_message(message): #main event that spins off command functions
 				except:
 					previous_img = None #no image to pass to command.
 
+				#define passedvariables dictionary that contains necesscary objects for commmands
+				passedvariables = {
+					"client":client, #client object
+					"message":message, #message object
+					"commandprefix":commandprefix, #configured prefix for commands
+					"userData":userData, #user information database
+					"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
+					"previous_img":previous_img #last image sent in the channel
+				}
+
 				#finally, execute the command.
-				await action(additionalobjects)
+				await action(passedvariables)
 
 				#now we need to add a cooldown period for that command for that user if applicable
 				if command_perms[command]["cooldown"] > 0:
@@ -200,7 +202,7 @@ async def on_message(message): #main event that spins off command functions
 				await message.channel.send("Unknown command '"+command+"'.")
 
 			#spin off function to check for phrases to react to autonomously
-			commands.react_phrases.main(additionalobjects)
+			await commands.react_phrases.main(passedvariables)
 	except:
 		error = format_exc()
 		await message.channel.send("""Internal error while running command! Error traceback:
