@@ -521,8 +521,7 @@ async def purge(passedvariables):
 `"""+error+"`")
 			consoleOutput(error)
 		return #end command
-	deletedmsgs = await message.channel.purge(limit=msgcount) #returns a list of information about the deleted messages.
-	await message.channel.send("Deleted "+str(len(deletedmsgs))+" messages.")
+	await message.channel.purge(limit=msgcount) #purges the channel
 
 async def scp_read(passedvariables):
 		#include all the required variables
