@@ -46,21 +46,21 @@ def isAdmin(userid):
 		if entry == userid:
 			return True
 	return False
-def isWholeWordInString(sentence,searchterm):
-	searchterms = searchterm.split()
-	found = True
-	#https://cmsdk.com/python/checking-if-a-whole-word-is-in-a-text-file-in-python-without-regex.html
-	sentence = ''.join(char for char in sentence if char.isalpha() or char.isspace()).split()
-	for searchterm in searchterms:
-		if not searchterm in sentence:
-			found = False
-			break
-	return found
 
 sent_images = {} #initialize dictionary of received images
 #Stores command cooldown information
 #This is a dictionary of dictionaries, top level is command name to dictionary, second level is user id to unix epoch timestamp
 command_cooldowns = {}
+
+#define additionalobjects dictionary that contains necesscary objects for commmands
+additionalobjects = {
+	"client":client, #client object
+	"message":message, #message object
+	"commandprefix":commandprefix, #configured prefix for commands
+	"userData":userData, #user information database
+	"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
+	"previous_img":previous_img, #last image sent in the channel
+}
 
 @client.event
 async def on_ready():
@@ -187,17 +187,8 @@ async def on_message(message): #main event that spins off command functions
 				except:
 					previous_img = None #no image to pass to command.
 
-				#define passedvariables (dictionary that contains additional objects)
-				passedvariables = {
-					"client":client, #client object
-					"message":message, #message object
-					"commandprefix":commandprefix, #configured prefix for commands
-					"userData":userData, #user information database
-					"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
-					"previous_img":previous_img, #last image sent in the channel
-				}
 				#finally, execute the command.
-				await action(passedvariables)
+				await action(additionalobjects)
 
 				#now we need to add a cooldown period for that command for that user if applicable
 				if command_perms[command]["cooldown"] > 0:
@@ -208,30 +199,8 @@ async def on_message(message): #main event that spins off command functions
 				#if the command does not have a function to run (because it isnt in command_set) OR its entry is omitted from the config, report unknown command.
 				await message.channel.send("Unknown command '"+command+"'.")
 
-		#triggerwords
-		msg_lowercase = message.content.lower()
-		if isWholeWordInString(msg_lowercase, "meep"):
-			await message.channel.send("Meep")
-			userData.set_user_data(message.author.id,"meeps",int(userData.get_user_data(message.author.id,"meeps"))+1)
-		if isWholeWordInString(msg_lowercase, "wheatley") and isWholeWordInString(msg_lowercase, "moron"): #message must have the words "wheatley" and "moron" to trigger.
-				await message.channel.send("I AM NOT A MORON!")
-		if isWholeWordInString(msg_lowercase, "pineapple"):
-				await message.channel.send("""```
-Pine
-Independance
-Never
-Ends
-Attacks
-People
-Providing
-Little
-Economy
-```""")
-		if isWholeWordInString(msg_lowercase, "no u") or isWholeWordInString(msg_lowercase, "no you"):
-				await message.channel.send(file=discord.File(core_files_foldername+"/images/no_u.jpg", filename="img.png"))
-		if isWholeWordInString(msg_lowercase, "the more you know"):
-				await message.channel.send(file=discord.File(core_files_foldername+"/images/moreyouknow.gif", filename="img.png"))
-
+			#spin off function to check for phrases to react to autonomously
+			commands.react_phrases.main(additionalobjects)
 	except:
 		error = format_exc()
 		await message.channel.send("""Internal error while running command! Error traceback:
