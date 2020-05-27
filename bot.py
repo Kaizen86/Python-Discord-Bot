@@ -98,26 +98,26 @@ async def on_message(message): #main event that spins off command functions
 			#bot joins / emoji throws an exception because we use ASCII, so this ignores messages that contain unhandleable characters.
 			return
 
+		#define passedvariables dictionary that contains necesscary objects for commmands
+		passedvariables = {
+			"client":client, #client object
+			"message":message, #message object
+			"commandprefix":commandprefix, #configured prefix for commands
+			"userData":userData, #user information database
+			"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
+			"previous_img":None #last image sent in the channel
+		}
+		#get the last image sent in the channel from our list for a command to use
+		try:
+			passedvariables["previous_img"] = sent_images[message.guild.id][message.channel.id]
+		except:
+			pass #no image to pass to command.
+
 		#log command usage
 		if message.content.startswith(commandprefix):
 			consoleOutput(author_name + " executed command  " + message.content)
 			#start the bot 'typing'. this gives feedback that the bot is calculating the command output.
 			await message.channel.trigger_typing() #typing stops either after 10 seconds or when a message is sent.
-
-			#define passedvariables dictionary that contains necesscary objects for commmands
-			passedvariables = {
-				"client":client, #client object
-				"message":message, #message object
-				"commandprefix":commandprefix, #configured prefix for commands
-				"userData":userData, #user information database
-				"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
-				"previous_img":None #last image sent in the channel
-			}
-			#get the last image sent in the channel from our list for a command to use
-			try:
-				passedvariables["previous_img"] = sent_images[message.guild.id][message.channel.id]
-			except:
-				pass #no image to pass to command.
 
 			#https://stackoverflow.com/questions/35484190/python-if-elif-else-chain-alternitive
 			#Kind of like a vector table
@@ -200,8 +200,8 @@ async def on_message(message): #main event that spins off command functions
 				#if the command does not have a function to run (because it isnt in command_set) OR its entry is omitted from the config, report unknown command.
 				await message.channel.send("Unknown command '"+command+"'.")
 
-			#spin off function to check for phrases to react to autonomously
-			await commands.react_phrases.main(passedvariables)
+		#spin off function to check for phrases to react to autonomously
+		await commands.react_phrases.main(passedvariables)
 	except:
 		error = format_exc()
 		await message.channel.send("""Internal error while running command! Error traceback:
