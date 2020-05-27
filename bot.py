@@ -55,8 +55,8 @@ command_cooldowns = {}
 @client.event
 async def on_ready():
 	consoleOutput("Logged on as " + client.user.name + " with the ID " + str(client.user.id) + ".")
-	consoleOutput("Bot is in {} guild.".format(len(client.guild)))
-	for guild in guilds: consoleOutput("\t{}".format(guild.name))
+	consoleOutput("Bot is in {} guild(s).".format(len(client.guilds)))
+	for guild in client.guilds: consoleOutput("\t{}".format(guild.name))
 	consoleOutput("------")
 	#await client.change_presence(activity=discord.Game(name="DEBUG MODE, BOT NON-FUNCTIONAL"))
 	await client.change_presence(activity=discord.Game(name=commandprefix+"help"))
