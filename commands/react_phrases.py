@@ -9,6 +9,7 @@ def isWholeWordInString(sentence,searchterm):
 async def main(passedvariables):
     message = passedvariables["message"]
     userData = passedvariables["userData"]
+    core_files_foldername = passedvariables["core_files_foldername"]
 
     #react to certain phrases
     msg_lowercase = message.content.lower()
