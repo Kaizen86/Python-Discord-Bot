@@ -104,6 +104,21 @@ async def on_message(message): #main event that spins off command functions
 			#start the bot 'typing'. this gives feedback that the bot is calculating the command output.
 			await message.channel.trigger_typing() #typing stops either after 10 seconds or when a message is sent.
 
+			#define passedvariables dictionary that contains necesscary objects for commmands
+			passedvariables = {
+				"client":client, #client object
+				"message":message, #message object
+				"commandprefix":commandprefix, #configured prefix for commands
+				"userData":userData, #user information database
+				"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
+				"previous_img":None #last image sent in the channel
+			}
+			#get the last image sent in the channel from our list for a command to use
+			try:
+				passedvariables["previous_img"] = sent_images[message.guild.id][message.channel.id]
+			except:
+				pass #no image to pass to command.
+
 			#https://stackoverflow.com/questions/35484190/python-if-elif-else-chain-alternitive
 			#Kind of like a vector table
 			command_set = {
@@ -172,22 +187,6 @@ async def on_message(message): #main event that spins off command functions
 				#The user is allowed to execute the command and it is not disabled.
 				#lookup the command being referenced
 				action = command_set[command]
-
-				#get the last image sent in the channel from our list for a command to use
-				try:
-					previous_img = sent_images[message.guild.id][message.channel.id]
-				except:
-					previous_img = None #no image to pass to command.
-
-				#define passedvariables dictionary that contains necesscary objects for commmands
-				passedvariables = {
-					"client":client, #client object
-					"message":message, #message object
-					"commandprefix":commandprefix, #configured prefix for commands
-					"userData":userData, #user information database
-					"core_files_foldername":core_files_foldername, #name of the folder that contains bot executables and stuff
-					"previous_img":previous_img #last image sent in the channel
-				}
 
 				#finally, execute the command.
 				await action(passedvariables)
