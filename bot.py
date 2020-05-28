@@ -145,7 +145,7 @@ async def on_message(message): #main event that spins off command functions
 
 				"rickroll":commands.voice.vc_rickroll,
 				"play":commands.voice.vc_playyt,
-				"speak":commands.voice.vc_speak,
+				"s":commands.voice.vc_speak,
 				"disconnect":commands.voice.vc_disconnect,
 
 				"list_crime":commands.criminality.list_crime,
