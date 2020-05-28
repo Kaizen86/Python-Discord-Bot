@@ -128,7 +128,7 @@ async def vc_speak(passedvariables):
 	commandprefix = passedvariables["commandprefix"]
 	core_files_foldername = passedvariables["core_files_foldername"]
 
-	usage = commandprefix+"speak <text>"
+	usage = commandprefix+"s <text>"
 
 	#confirm that the user is in a voice channel
 	if not message.author.voice:
@@ -139,7 +139,12 @@ async def vc_speak(passedvariables):
 	#either create a voice client or use an existing one
 	vc = await connectvc(client.voice_clients, message.author)
 
-	text = message.content[len(commandprefix)+6:] #5 for the word, 1 more for a space.
+	text = message.content[len(commandprefix)+2:] #1 for the word, 1 more for a space.
+	if len(text) == 0:
+		message.channel.send("""Please specify some text.
+"""+usage)
+		return
+
 	await message.delete() #we can now remove the message for stealth purposes.
 	randomid = randint(0,99999999)
 	gtts.gTTS(text, lang="en-uk", slow=False).save(str(randomid)+".mp3")
