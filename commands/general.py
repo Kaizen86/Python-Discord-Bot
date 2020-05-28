@@ -93,7 +93,7 @@ Rickrolls the voice channel you are connected to.
 Plays a youtube video either from a URL or from a search term. This is not entirely stable and can occasionally crash. I blame FFMPEG.
 {0}play <url/search term>
 Runs the input text through text to speech and speaks it.
-{0}speak <text>
+{0}s <text>
 Disconnects the bot from the current voice channel.
 {0}disconnect
 ```

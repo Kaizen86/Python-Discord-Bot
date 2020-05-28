@@ -78,7 +78,7 @@ Voice channel commands
 	Plays a youtube video either from a URL or from a search term. This is not entirely stable and can occasionally crash. I blame FFMPEG.
 	>play <url/search term>
 	Runs the input text through text to speech and speaks it.
-	>speak <text>
+	>s <text>
 	Disconnects the bot from the connected voice channel.
 	>disconnect
 ```
