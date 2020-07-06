@@ -20,21 +20,5 @@ async def main(passedvariables):
     if isWholeWordInString(msg_lowercase, "wheatley") and isWholeWordInString(msg_lowercase, "moron"): #message must have the words "wheatley" and "moron" to count.
         await message.channel.send("I AM NOT A MORON!")
 
-    if isWholeWordInString(msg_lowercase, "pineapple"):
-        await message.channel.send("""```
-Pine
-Independance
-Never
-Ends
-Attacks
-People
-Providing
-Little
-Economy
-```""")
-
-    if isWholeWordInString(msg_lowercase, "no u") or isWholeWordInString(msg_lowercase, "no you"):
-        await message.channel.send(file=File(core_files_foldername+"/images/no_u.jpg", filename="img.png"))
-
     if isWholeWordInString(msg_lowercase, "the more you know"):
         await message.channel.send(file=File(core_files_foldername+"/images/moreyouknow.gif", filename="img.png"))

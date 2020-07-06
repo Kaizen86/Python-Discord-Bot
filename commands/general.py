@@ -98,12 +98,15 @@ Disconnects the bot from the current voice channel.
 {0}disconnect
 ```
 
-Criminality Commands
+Currency Commands
 ```
-These commands control or list the criminality values of a user.
-{0}list_crime <mention>
-{0}set_crime <mention> <value>
-{0}change_crime <mention> <increment value by>
+These commands are for the builtin currency system that can be used in servers.
+{0}balance [mention]
+
+These money commands can only be run by a Bot Admin.
+{0}add_money <mention> <value>
+{0}set_money <mention> <value>
+{0}globalset_money <mention> <value>
 ```
 
 Trigger Words
@@ -111,14 +114,12 @@ Trigger Words
 These are words that have make the bot do something if you say them.
 	"meep"
 	"wheatley" AND "moron"
-	"pineapple"
-	"no u" OR "no you"
 	"the more you know"
 ```
 
 Bot Administration Commands
 ```
-These commands are intended for the bot owners. Accessing them will send a warning to the owner.
+These commands can only be run by the Bot Admins.
 Shutdown the bot.
 {0}shutdown
 Attempts to update the bot's nickname on a server. Leave empty to reset to nothing.
