@@ -149,9 +149,10 @@ async def on_message(message): #main event that spins off command functions
 				"s":commands.voice.vc_speak,
 				"disconnect":commands.voice.vc_disconnect,
 
-				"list_crime":commands.criminality.list_crime,
-				"set_crime":commands.criminality.set_crime,
-				"change_crime":commands.criminality.change_crime,
+				"balance":commands.money.balance,
+				"add_money":commands.money.add_money,
+				"set_money":commands.money.set_money,
+				"globalset_money":commands.money.globalset_money,
 
 				"shutdown":commands.admin.shutdown,
 				"nickname":commands.admin.nickname,
