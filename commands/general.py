@@ -71,12 +71,8 @@ Generates an ASCII art of the input text.
 {0}figlet <text>
 Gets a Wikipedia page on a topic. If the topic name includes spaces, wrap it in quotation marks.
 {0}wikipedia <topic>
-Deletes a certain number of messages in the same channel that the command was sent.
-{0}purge <number of messages>
 Retrieves an SCP document for any SCP.
 {0}scp <scp id>
-Answers a question using the Wolfram Alpha API
-{0}wolfram <question>
 ```""".format(commandprefix))
 	await message.author.send("""
 Image manipulation commands
@@ -123,9 +119,11 @@ These commands can only be run by the Bot Admins.
 Shutdown the bot.
 {0}shutdown
 Attempts to update the bot's nickname on a server. Leave empty to reset to nothing.
->nickname <new name>
+{0}nickname <new name>
 Execute a shell command on the host computer.
 {0}execute <shell command>
+Deletes a certain number of messages in the same channel that the command was sent.
+{0}purge <number of messages>
 ```
 Created by <@285465719292821506>.
 Python version is {1}.{2}""".format(commandprefix,str(python_info.major),str(python_info.minor)))

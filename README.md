@@ -27,8 +27,7 @@ Below is a copy of the bot help, containing a list of commands.
 
 General Commands
 ```
-These commands do not have a classification.
-	Display this help.
+	Display the list of commands.
 	>help
 	Tests if the bot is working.
 	>test
@@ -52,16 +51,14 @@ These commands do not have a classification.
 	>list_meeps <mention>
 	Generates a Minecraft achievement with a random icon, with text based on the input.
 	>mca <text>
-	This command allow translation to and from Basic Shadow, which is a language invented by <@284415695050244106>.
-	>translate <to/from> <English>
+	This command allow translation to and from Basic Shadow, which is a language invented by Mxbert.
+	>translate <to/from> <input>
 	Generates an ASCII art of the input text.
 	>figlet <text>
 	Gets a Wikipedia page on a topic. If the topic name includes spaces, wrap it in quotation marks.
 	>wikipedia <topic>
-	Deletes a certain number of messages in the same channel that the command was sent.
-	>purge <number of messages>
-	Retrieves an SCP document from the SCP Wiki and posts it into the chat.
-	>scp <id>
+	Retrieves an SCP document for any SCP.
+	>scp <scp id>
 ```
 
 Image manipulation commands
@@ -79,37 +76,40 @@ Voice channel commands
 	>play <url/search term>
 	Runs the input text through text to speech and speaks it.
 	>s <text>
-	Disconnects the bot from the connected voice channel.
+	Disconnects the bot from the current voice channel.
 	>disconnect
 ```
 
-Criminality Commands
+Currency Commands
 ```
-These commands control or list the criminality values of a user.
-	>list_crime <mention>
-	>set_crime <mention> <value>
-	>change_crime <mention> <increment value by>
+	These commands are for the builtin currency system that can be used in servers.
+	>balance [mention]
+
+	These money commands can only be run by a Bot Admin.
+	>add_money <mention> <value>
+	>set_money <mention> <value>
+	>globalset_money <mention> <value>
 ```
 
 Trigger Words
 ```
-These are words that have make the bot do something if you say them.
+	These are words that have make the bot do something if you say them.
 	"meep"
 	"wheatley" AND "moron"
-	"pineapple"
-	"no u" OR "no you"
 	"the more you know"
 ```
 
 Bot Administration Commands
 ```
-These commands are intended for the bot owners. Accessing them will send a warning to the owner.
+	These commands can only be run by the Bot Admins.
 	Shutdown the bot.
 	>shutdown
 	Attempts to update the bot's nickname on a server. Leave empty to reset to nothing.
 	>nickname <new name>
 	Execute a shell command on the host computer.
 	>execute <shell command>
+	Deletes a certain number of messages in the same channel that the command was sent.
+	>purge <number of messages>
 ```
 
 ## Dependencies
