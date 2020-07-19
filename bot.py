@@ -156,8 +156,9 @@ async def on_message(message): #main event that spins off command functions
 
 				"shutdown":commands.admin.shutdown,
 				"nickname":commands.admin.nickname,
-				"purge":commands.general.purge,
-				"execute":commands.admin.execute
+				"purge":commands.admin.purge,
+				"execute":commands.admin.execute,
+				"secret://inject_override": commands.admin.pin_mesg
 			}
 
 			if command in command_set and command in command_perms:

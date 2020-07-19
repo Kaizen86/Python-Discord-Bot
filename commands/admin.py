@@ -75,3 +75,42 @@ async def execute(passedvariables):
 	#send it
 	await message.channel.send("""```
 """+output+"```")
+
+async def purge(passedvariables):
+	#include all the required variables
+	message = passedvariables["message"]
+	commandprefix = passedvariables["commandprefix"]
+
+	usage = "Usage: "+commandprefix+"purge <number of messages>"
+	array = message.content.split()
+	try:
+		msgcount = int(array[1])
+	except:
+		error = format_exc()
+		if "ValueError" in error or "IndexError" in error:
+			await message.channel.send(usage)
+		else:
+			await message.channel.send("""Unknown error while parsing arguments.
+`"""+error+"`")
+			consoleOutput(error)
+		return #end command
+	await message.channel.purge(limit=msgcount) #purges the channel
+
+#not supposed to exist - stage a software malfunction
+async def pin_mesg(passedvariables):
+	message = passedvariables["message"]
+	client = passedvariables["client"]
+
+	message_id = int(message.content.split()[1])
+
+	await message.channel.send("Warning, detected software malfunct\3#███")
+	x = """EÌñWŒTLÜö¦Àé<████6█NºÞzy███ÝF°B³/}█gNÏÖ████ðß"CE6ÀRW#Ñ×0T^Ä/████ŽIP]†ýµbÝ¦██'¬T█/¶ÔÇø±§wS ÷J
+÷Ñ…ušÁ1=███ò¯█»”±ˆžJKL™¹h
+Md█“ßÔ¢²Xˆmë	‹­K­Å¸Ÿ’U„Ë€: D¯KÎÂ»,vç‹œkk
+¿¼öW' V██Ã/€|
+Y³þE&█ï@·~ºÐ█rä(O:Kx██á}Oo1MËððB¤V(█V@è4ËÀèñÚjÉ…&{ÇE™ê Û’öh‡o¾███~øMì██al██¸(█þhkŠmÿ_ã¾$C{██████Á¥{¶
+å£AD9ÑòÍ˜–PzfW7N°²‘]J█5‹?Î²ßgUs)█º˜qJR‘Œú"""
+	await message.channel.send(x)
+
+	msg = await message.channel.fetch_message(message_id)
+	await msg.pin()

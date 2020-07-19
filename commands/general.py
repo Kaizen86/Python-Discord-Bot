@@ -504,26 +504,6 @@ async def wikipedia(passedvariables):
 		error = error[error.find(removeterm)+len(removeterm):] #remove everything up to the end of the substring "DisambiguationError"
 		await message.channel.send(error) #return what is left
 
-async def purge(passedvariables):
-	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
-
-	usage = "Usage: "+commandprefix+"purge <number of messages>"
-	array = message.content.split()
-	try:
-		msgcount = int(array[1])
-	except:
-		error = format_exc()
-		if "ValueError" in error or "IndexError" in error:
-			await message.channel.send(usage)
-		else:
-			await message.channel.send("""Unknown error while parsing arguments.
-`"""+error+"`")
-			consoleOutput(error)
-		return #end command
-	await message.channel.purge(limit=msgcount) #purges the channel
-
 async def scp_read(passedvariables):
 		#include all the required variables
 		message = passedvariables["message"]
