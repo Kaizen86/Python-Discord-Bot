@@ -145,7 +145,6 @@ async def vc_speak(passedvariables):
 """+usage)
 		return
 
-	await message.delete() #we can now remove the message for stealth purposes.
 	randomid = randint(0,99999999)
 	gtts.gTTS(text, lang="en-uk", slow=False).save(str(randomid)+".mp3")
 
