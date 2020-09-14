@@ -98,7 +98,7 @@ async def on_message(message): #main event that spins off command functions
 			#bot joins / emoji throws an exception because we use ASCII, so this ignores messages that contain unhandleable characters.
 			return
 		if len(command) == 0: return #ignore empty commands, because the user probably didn't want to invoke us.
-		if command.startswith(">:"): return #ignore emoticons with eyebrows, for example >:)
+		if message.content.startswith(">:") or message.content.startswith(">;"): return #ignore emoticons with eyebrows, for example: >:)
 
 		#define passedvariables dictionary that contains necesscary objects for commmands
 		passedvariables = {
