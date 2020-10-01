@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 print("Program is now executing.")
 
 #load common functions used in this file
