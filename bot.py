@@ -79,8 +79,8 @@ async def on_guild_remove(guild): #log in console when the bot is removed from a
 @client.event
 async def on_message(message): #main event that spins off command functions
 	try:
-		#check if the message was sent by the bot. if so, drop it to ensure infinite loops of command execution cannot occur.
-		if client.user.id == message.author.id:
+		#check if the message was sent by a bot. if so, drop it to ensure infinite loops of command execution cannot occur.
+		if message.author.bot:
 			return
 
 		#convert any unicode in author name to ascii. quick and dirty way to prevent codec errors
