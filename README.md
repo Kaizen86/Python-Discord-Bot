@@ -102,11 +102,11 @@ Trigger Words
 Bot Administration Commands
 ```
 	These commands can only be run by the Bot Admins.
-	Shutdown the bot.
+	Shuts the bot down.
 	>shutdown
 	Attempts to update the bot's nickname on a server. Leave empty to reset to nothing.
-	>nickname <new name>
-	Execute a shell command on the host computer.
+	>nickname [new name]
+	Execute a shell command on the bot server.
 	>execute <shell command>
 	Deletes a certain number of messages in the same channel that the command was sent.
 	>purge <number of messages>

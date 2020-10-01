@@ -36,97 +36,90 @@ def split_into_snippets(text, desired_snippet_length=1980, delimiter=" "):
 async def help(passedvariables):
 	#include all the required variables
 	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
-	#send help message to dm of user
-	await message.author.send("""General Commands
-```
-These commands do not have a classification.
-Display this help.
-{0}help
-Tests if the bot is working.
-{0}test
-Rolls a dice with an optional minimum and maximum limits.
-{0}dice [minimum] [maximum]
-Gives advice on where to find oxygen. In other words, the perfect command.
-{0}oxygen
-Tosses a coin. That's it.
-{0}coin_toss
-Reverses the given text.
-{0}reverse <text>
-Gets information about a mentioned user.
-{0}info <mention>
-Gets the avatar of a mentioned user.
-{0}avatar <mention>
-Play a game of rock paper scissors with the bot. (I promise it doesn't cheat)
-{0}rps <rock/paper/scissors>
-Gets the bot to repeat the input text. The bot will then try and delete your message to make it look real.
-{0}say <text>
-Gets the number of times the mentioned user has "meeped".
-{0}list_meeps <mention>
-Generates a Minecraft achievement with a random icon, with text based on the input.
-{0}mca <text>
-This command allow translation to and from Basic Shadow, which is a language invented by <@284415695050244106{0}.
-{0}translate <to/from> <input>
-Generates an ASCII art of the input text.
-{0}figlet <text>
-Gets a Wikipedia page on a topic. If the topic name includes spaces, wrap it in quotation marks.
-{0}wikipedia <topic>
-Retrieves an SCP document for any SCP.
-{0}scp <scp id>
-```""".format(commandprefix))
-	await message.author.send("""
-Image manipulation commands
-```
-{0}beauty <mention>
-{0}protecc <mention>
-{0}deepfry
-```
+	x = passedvariables["commandprefix"]
 
-Voice channel commands
-```
-Rickrolls the voice channel you are connected to.
-{0}rickroll
-Plays a youtube video either from a URL or from a search term. This is not entirely stable and can occasionally crash. I blame FFMPEG.
-{0}play <url/search term>
-Runs the input text through text to speech and speaks it.
-{0}s <text>
-Disconnects the bot from the current voice channel.
-{0}disconnect
-```
+	#general commands
+	embed = discord.Embed(
+        title="General Commands",
+		description="Here is the list of recognised commands:",
+		color=discord.Color.blue(),
 
-Currency Commands
-```
-These commands are for the builtin currency system that can be used in servers.
-{0}balance [mention]
+    )
+	embed.set_author(name="Wheatley Command List")
+	embed.add_field(name=x+"help", value="Display the list of commands.", inline=False)
+	embed.add_field(name=x+"test", value="Tests if the bot is working.", inline=False)
+	embed.add_field(name=x+"dice [minimum] [maximum]", value="Rolls a dice with an optional minimum and maximum limits.", inline=False)
+	embed.add_field(name=x+"oxygen", value="Gives advice on where to find oxygen. In other words, the perfect command.", inline=False)
+	embed.add_field(name=x+"coin_toss", value="Tosses a coin. That's it.", inline=False)
+	embed.add_field(name=x+"reverse <text>", value="Reverses the given text.", inline=False)
+	embed.add_field(name=x+"info <mention>", value="Gets information about a mentioned user.", inline=False)
+	embed.add_field(name=x+"avatar <mention>", value="Gets the avatar of a mentioned user.", inline=False)
+	embed.add_field(name=x+"rps <rock/paper/scissors>", value="Play a game of rock paper scissors with the bot. (I promise it doesn't cheat)", inline=False)
+	embed.add_field(name=x+"say <text>", value="Gets the bot to repeat the input text. The bot will then try and delete your message to make it look real.", inline=False)
+	embed.add_field(name=x+"list_meeps <mention>", value="Gets the number of times the mentioned user has \"meeped\".", inline=False)
+	embed.add_field(name=x+"mca <text>", value="Generates a Minecraft achievement with a random icon, with text based on the input.", inline=False)
+	embed.add_field(name=x+"translate <to/from> <input>", value="This command allow translation to and from Basic Shadow, which is a language invented by my friend Mxbert.", inline=False)
+	embed.add_field(name=x+"figlet <text>", value="Generates an ASCII art of the input text.", inline=False)
+	embed.add_field(name=x+"wikipedia <topic>", value="Gets a Wikipedia page on a topic. If the topic name includes spaces, wrap it in quotation marks.", inline=False)
+	embed.add_field(name=x+"scp <scp id>", value="Retrieves an SCP document for any SCP.", inline=False)
+	await message.author.send(embed=embed)
 
-These money commands can only be run by a Bot Admin.
-{0}add_money <mention> <value>
-{0}set_money <mention> <value>
-{0}globalset_money <mention> <value>
-```
+	#image commands
+	embed = discord.Embed(
+        title="Image Manipulation",
+		color=discord.Color.magenta(),
+    )
+	embed.add_field(name=x+"beauty <mention>", value="Photoshops the avatar of the mentioned user. Run it to see what it does.", inline=False)
+	embed.add_field(name=x+"protecc <mention>", value="Photoshops the avatar of the mentioned user. Run it to see what it does.", inline=False)
+	embed.add_field(name=x+"deepfry", value="Deepfrys the last image posted in a channel for maximum crunchiness.", inline=False)
+	await message.author.send(embed=embed)
 
-Trigger Words
-```
-These are words that have make the bot do something if you say them.
-	"meep"
-	"wheatley" AND "moron"
-	"the more you know"
-```
+	#voice commands
+	embed = discord.Embed(
+        title="Voice Channel",
+		color=discord.Color.green(),
+    )
+	embed.add_field(name=x+"rickroll", value="Rickrolls the voice channel you are connected to.", inline=False)
+	embed.add_field(name=x+"play <url/search term>", value="Plays a youtube video either from a URL or from a search term. If searching for a video, it uses the first result. This is not entirely stable and can occasionally crash. I blame FFMPEG.", inline=False)
+	embed.add_field(name=x+"s <text>", value="Runs the input text through Google Translate text to speech and speaks it to the voice channel you are connected to.", inline=False)
+	embed.add_field(name=x+"disconnect", value="Leave the currently connected voice channel.", inline=False)
+	await message.author.send(embed=embed)
 
-Bot Administration Commands
-```
-These commands can only be run by the Bot Admins.
-Shutdown the bot.
-{0}shutdown
-Attempts to update the bot's nickname on a server. Leave empty to reset to nothing.
-{0}nickname <new name>
-Execute a shell command on the host computer.
-{0}execute <shell command>
-Deletes a certain number of messages in the same channel that the command was sent.
-{0}purge <number of messages>
-```
-Created by <@285465719292821506>.
-Python version is {1}.{2}""".format(commandprefix,str(python_info.major),str(python_info.minor)))
+	#currency commands
+	embed = discord.Embed(
+        title="Currency",
+		description="These commands are for the builtin currency system that can be used in servers.",
+		color=discord.Color.gold(),
+    )
+	embed.add_field(name=x+"balance [mention]", value="Lists the balance for either you or the mentioned user.", inline=False)
+	embed.add_field(name=x+"add_money [mention] <value>", value="Increments a user's balance by the specified value. Can only be run by a Bot Admin.", inline=False)
+	embed.add_field(name=x+"set_money [mention] <value>", value="Can only be run by a Bot Admin.", inline=False)
+	embed.add_field(name=x+"globalset_money <mention> <value>", value="Can only be run by a Bot Admin.", inline=False)
+	await message.author.send(embed=embed)
+
+	embed = discord.Embed(
+        title="Key Phrases",
+		description="These are words or phrases that have make the bot do something if you say them.",
+		color=discord.Color.dark_blue(),
+    )
+	embed.add_field(name="\"meep\"", value="\u200b", inline=False)
+	embed.add_field(name="\"wheatley\" AND 'moron\"", value="Message must contain both words to count.", inline=False)
+	embed.add_field(name="\"the more you know\"", value="\u200b", inline=False)
+	await message.author.send(embed=embed)
+
+	embed = discord.Embed(
+		title="Bot Administration",
+		description="These commands can only be run by the Bot Admins.",
+		color=discord.Color.orange(),
+	)
+	embed.add_field(name=x+"shutdown", value="Shuts the bot down.", inline=False)
+	embed.add_field(name=x+"nickname [new name]", value="Attempts to update the bot's nickname on a server. Leave empty to reset to nothing.", inline=False)
+	embed.add_field(name=x+"execute <shell command>", value="Execute a shell command on the bot server.", inline=False)
+	embed.add_field(name=x+"purge <number of messages>", value="Deletes a certain number of messages in the same channel that the command was sent.", inline=False)
+	await message.author.send(embed=embed)
+
+	await message.author.send("Created by <@285465719292821506>.\nPython version is {0}.{1}".format(str(python_info.major),str(python_info.minor)))
+
 	await message.channel.send("List of commands sent in DM.")
 
 async def test(passedvariables):
