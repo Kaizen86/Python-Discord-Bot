@@ -1,6 +1,10 @@
 #!/usr/bin/python3
 print("Program is now executing.")
 
+#make sure we are running in the same directory as the script
+import os
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
 #load common functions used in this file
 from commands.modules.common import consoleOutput, verifyFolderExistence, generateLogfileName, ExcuseMeWhatTheFuckError
 
