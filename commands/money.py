@@ -1,10 +1,10 @@
 from commands.modules.common import *
 from traceback import format_exc #for error handling
 
-async def balance(passedvariables):
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
-	userData = passedvariables["userData"]
+async def balance(globaldata):
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
+	userData = globaldata["userData"]
 
 	usage = "Usage: {0}balance [mention]".format(commandprefix)
 	array = message.content.split()
@@ -17,10 +17,10 @@ async def balance(passedvariables):
 	await message.channel.send("Balance for <@{0}> is {1} credits.".format(userid,value))
 
 #admin only commands
-async def add_money(passedvariables):
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
-	userData = passedvariables["userData"]
+async def add_money(globaldata):
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
+	userData = globaldata["userData"]
 
 	usage = "Usage: {0}add_money <value> [mention]".format(commandprefix)
 	array = message.content.split()
@@ -47,10 +47,10 @@ async def add_money(passedvariables):
 		"Balance for <@{0}> was {1}, is now {2}.".format(
 		userid, prev_money, new_money))
 
-async def set_money(passedvariables):
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
-	userData = passedvariables["userData"]
+async def set_money(globaldata):
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
+	userData = globaldata["userData"]
 
 	usage = "Usage: {0}set_money <value> [mention]".format(commandprefix)
 	array = message.content.split()
@@ -76,10 +76,10 @@ async def set_money(passedvariables):
 		"Balance for <@{0}> was {1}, is now {2}.".format(
 		userid, prev_money, value))
 
-async def globalset_money(passedvariables):
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
-	userData = passedvariables["userData"]
+async def globalset_money(globaldata):
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
+	userData = globaldata["userData"]
 
 	usage = "Usage: {0}globalset_money <value>".format(commandprefix)
 	array = message.content.split()

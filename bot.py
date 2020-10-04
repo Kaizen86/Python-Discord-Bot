@@ -105,8 +105,8 @@ async def on_message(message): #main event that spins off command functions
 		if len(command) == 0: return #ignore empty commands, because the user probably didn't want to invoke us.
 		if message.content.startswith(">:") or message.content.startswith(">;"): return #ignore emoticons with eyebrows, for example: >:)
 
-		#define passedvariables dictionary that contains necesscary objects for commmands
-		passedvariables = {
+		#define globaldata dictionary that contains necesscary objects for commmands
+		globaldata = {
 			"client":client, #client object
 			"message":message, #message object
 			"commandprefix":commandprefix, #configured prefix for commands
@@ -116,7 +116,7 @@ async def on_message(message): #main event that spins off command functions
 		}
 		#get the last image sent in the channel from our list for a command to use
 		try:
-			passedvariables["previous_img"] = sent_images[message.guild.id][message.channel.id]
+			globaldata["previous_img"] = sent_images[message.guild.id][message.channel.id]
 		except:
 			pass #no image to pass to command.
 
@@ -198,7 +198,7 @@ async def on_message(message): #main event that spins off command functions
 				action = command_set[command]
 
 				#finally, execute the command.
-				await action(passedvariables)
+				await action(globaldata)
 
 				#now we need to add a cooldown period for that command for that user if applicable
 				if command_perms[command]["cooldown"] > 0:
@@ -210,7 +210,7 @@ async def on_message(message): #main event that spins off command functions
 				await message.channel.send("Unknown command '"+command+"'.")
 
 		#spin off function to check for phrases to react to autonomously
-		await commands.react_phrases.main(passedvariables)
+		await commands.react_phrases.main(globaldata)
 	except:
 		error = format_exc()
 		await message.channel.send("""Internal error while running command! Error traceback:

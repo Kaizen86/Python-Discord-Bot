@@ -33,10 +33,10 @@ def split_into_snippets(text, desired_snippet_length=1980, delimiter=" "):
 	return snippets
 
 #general commands
-async def help(passedvariables):
+async def help(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	x = passedvariables["commandprefix"]
+	message = globaldata["message"]
+	x = globaldata["commandprefix"]
 
 	#general commands
 	embed = discord.Embed(
@@ -122,15 +122,15 @@ async def help(passedvariables):
 
 	await message.channel.send("List of commands sent in DM.")
 
-async def test(passedvariables):
+async def test(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
+	message = globaldata["message"]
 	await message.channel.send("Yes, <@"+str(message.author.id)+">. This bot is online.")
 
-async def dice(passedvariables):
+async def dice(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
 
 	usage = "Usage: "+commandprefix+"dice [minimum] [maximum]"
 	#get command parameters and allocate into appropriate variables.
@@ -164,14 +164,14 @@ async def dice(passedvariables):
 	else:
 		await message.channel.send("Minimum & maximum must be numbers.")
 
-async def oxygen(passedvariables):
+async def oxygen(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
+	message = globaldata["message"]
 	await message.channel.send("Look around and you will find it.")
 
-async def coin_toss(passedvariables):
+async def coin_toss(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
+	message = globaldata["message"]
 	result = randint(1,8)
 	if result <= 4:
 		result = "Tails"
@@ -179,10 +179,10 @@ async def coin_toss(passedvariables):
 		result = "Heads"
 	await message.channel.send(result+".")
 
-async def reverse(passedvariables):
+async def reverse(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
 
 	usage = "Usage: "+commandprefix+"reverse <text>"
 	try:
@@ -199,11 +199,11 @@ async def reverse(passedvariables):
 	else:
 		await message.channel.send(usage)
 
-async def info(passedvariables):
+async def info(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
-	client = passedvariables["client"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
+	client = globaldata["client"]
 
 	usage = "Usage: "+commandprefix+"info <mention>"
 	array = message.content.split()
@@ -241,11 +241,11 @@ async def info(passedvariables):
 	embed.set_image(url=user.avatar_url)
 	await message.channel.send(embed=embed)
 
-async def avatar(passedvariables):
+async def avatar(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
-	client = passedvariables["client"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
+	client = globaldata["client"]
 
 	usage = "Usage: "+commandprefix+"avatar <mention>"
 	array = message.content.split()
@@ -278,10 +278,10 @@ async def avatar(passedvariables):
 	embed.set_image(url=user.avatar_url)
 	await message.channel.send(embed=embed)
 
-async def rps(passedvariables):
+async def rps(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
 
 	usage = "Usage: "+commandprefix+"rps <rock/paper/scissors>"
 	array = message.content.split()
@@ -332,10 +332,10 @@ async def rps(passedvariables):
 	#send result
 	await message.channel.send("You chose "+userchoice+". I chose "+cpuchoice+". "+result)
 
-async def say(passedvariables):
+async def say(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
 
 	usage = "Usage: "+commandprefix+"say <text>"
 	try:
@@ -356,11 +356,11 @@ async def say(passedvariables):
 	else:
 		await message.channel.send(usage)
 
-async def list_meeps(passedvariables):
+async def list_meeps(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
-	userData = passedvariables["userData"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
+	userData = globaldata["userData"]
 
 	usage = "Usage: "+commandprefix+"list_meeps <mention>"
 	array = message.content.split()
@@ -378,10 +378,10 @@ async def list_meeps(passedvariables):
 	value = str(userData.get_user_data(userid,"meeps"))
 	await message.channel.send("<@"+userid+"> has meeped "+value+" times.")
 
-async def mca(passedvariables):
+async def mca(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
 
 	usage = "Usage: "+commandprefix+"mca <text>"
 	try:
@@ -406,10 +406,10 @@ async def mca(passedvariables):
 	else:
 		await message.channel.send(usage)
 
-async def translate(passedvariables):
+async def translate(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
 
 	usage = "Usage: "+commandprefix+"translate <to/from> <text>"
 	#get command parameters and allocate into appropriate variables.
@@ -444,10 +444,10 @@ async def translate(passedvariables):
 		#how did you get here??
 		raise ExcuseMeWhatTheFuckError("Unexpected error in mode selection")
 
-async def figlet(passedvariables):
+async def figlet(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
 
 	usage = "Usage: "+commandprefix+"figlet <text>"
 
@@ -465,10 +465,10 @@ async def figlet(passedvariables):
 	except discord.errors.HTTPException:
 		await message.channel.send("Message too long.")
 
-async def wikipedia(passedvariables):
+async def wikipedia(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
 
 	usage = "Usage: "+commandprefix+"wikipedia <topic>"
 
@@ -495,10 +495,10 @@ async def wikipedia(passedvariables):
 		error = error[error.find(removeterm)+len(removeterm):] #remove everything up to the end of the substring "DisambiguationError"
 		await message.channel.send(error) #return what is left
 
-async def scp_read(passedvariables):
+async def scp_read(globaldata):
 		#include all the required variables
-		message = passedvariables["message"]
-		commandprefix = passedvariables["commandprefix"]
+		message = globaldata["message"]
+		commandprefix = globaldata["commandprefix"]
 
 		usage = "Usage: "+commandprefix+"scp <scp id>"
 		array = message.content.split()

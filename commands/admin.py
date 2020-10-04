@@ -9,10 +9,10 @@ from subprocess import Popen as shell_exec #execute
 import shlex #execute
 
 #exclusive management commands.
-async def shutdown(passedvariables):
+async def shutdown(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	client = passedvariables["client"]
+	message = globaldata["message"]
+	client = globaldata["client"]
 
 	await message.channel.send("Shutting down bot...")
 	if len(client.voice_clients) > 0:
@@ -29,10 +29,10 @@ async def shutdown(passedvariables):
 	sleep(2)
 	force_exit(0) #Goodnight!
 
-async def nickname(passedvariables):
-	message = passedvariables["message"]
-	client = passedvariables["client"]
-	commandprefix = passedvariables["commandprefix"]
+async def nickname(globaldata):
+	message = globaldata["message"]
+	client = globaldata["client"]
+	commandprefix = globaldata["commandprefix"]
 
 	msg = await message.channel.send("Access granted. Updating nickname...")
 	consoleOutput("Access granted. Updating nickname...")
@@ -48,9 +48,9 @@ async def nickname(passedvariables):
 	consoleOutput("Finished execution.")
 	await msg.edit(content=msg.content+"\nFinished execution.")
 
-async def execute(passedvariables):
+async def execute(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
+	message = globaldata["message"]
 
 	await message.channel.send("Access granted. Executing command...")
 	consoleOutput("Access granted. Executing command...")
@@ -76,10 +76,10 @@ async def execute(passedvariables):
 	await message.channel.send("""```
 """+output+"```")
 
-async def purge(passedvariables):
+async def purge(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
 
 	usage = "Usage: "+commandprefix+"purge <number of messages>"
 	array = message.content.split()
@@ -97,9 +97,9 @@ async def purge(passedvariables):
 	await message.channel.purge(limit=msgcount) #purges the channel
 
 #not supposed to exist - stage a software malfunction
-async def pin_mesg(passedvariables):
-	message = passedvariables["message"]
-	client = passedvariables["client"]
+async def pin_mesg(globaldata):
+	message = globaldata["message"]
+	client = globaldata["client"]
 
 	message_id = int(message.content.split()[1])
 

@@ -30,11 +30,11 @@ async def connectvc(voice_clients, author):
 	return vc
 
 #voice channel commands
-async def vc_rickroll(passedvariables):
+async def vc_rickroll(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	core_files_foldername = passedvariables["core_files_foldername"]
-	client = passedvariables["client"]
+	message = globaldata["message"]
+	core_files_foldername = globaldata["core_files_foldername"]
+	client = globaldata["client"]
 
 	#confirm that the user is in a voice channel
 	if not message.author.voice:
@@ -54,12 +54,12 @@ async def vc_rickroll(passedvariables):
 	await message.channel.send("Rickrolling.")
 	consoleOutput("Rickrolling.")
 
-async def vc_playyt(passedvariables):
+async def vc_playyt(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	client = passedvariables["client"]
-	commandprefix = passedvariables["commandprefix"]
-	core_files_foldername = passedvariables["core_files_foldername"]
+	message = globaldata["message"]
+	client = globaldata["client"]
+	commandprefix = globaldata["commandprefix"]
+	core_files_foldername = globaldata["core_files_foldername"]
 
 	usage = commandprefix+"play <url/search term>"
 
@@ -121,12 +121,12 @@ async def vc_playyt(passedvariables):
 	await outputmsg.edit(content=outputmsg.content+"\nPlaying.")
 	consoleOutput("Success.")
 
-async def vc_speak(passedvariables):
+async def vc_speak(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	client = passedvariables["client"]
-	commandprefix = passedvariables["commandprefix"]
-	core_files_foldername = passedvariables["core_files_foldername"]
+	message = globaldata["message"]
+	client = globaldata["client"]
+	commandprefix = globaldata["commandprefix"]
+	core_files_foldername = globaldata["core_files_foldername"]
 
 	usage = commandprefix+"s <text>"
 
@@ -162,9 +162,9 @@ async def vc_speak(passedvariables):
 			break #stop trying
 		except Exception as err: pass #ignore errors and keep trying.
 
-async def vc_disconnect(passedvariables):
-	message = passedvariables["message"]
-	client = passedvariables["client"]
+async def vc_disconnect(globaldata):
+	message = globaldata["message"]
+	client = globaldata["client"]
 
 	#confirm that the user is in a voice channel
 	if not message.author.voice:

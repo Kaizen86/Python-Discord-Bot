@@ -7,12 +7,12 @@ from requests import get as get_request #beauty, protecc
 from PIL import Image, ImageOps, ImageEnhance #mca, beauty, protecc, deepfry
 
 #image manipulation commands
-async def beauty(passedvariables):
+async def beauty(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
-	client = passedvariables["client"]
-	core_files_foldername = passedvariables["core_files_foldername"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
+	client = globaldata["client"]
+	core_files_foldername = globaldata["core_files_foldername"]
 
 	usage = "Usage: "+commandprefix+"beauty <mention>"
 	array = message.content.split()
@@ -53,12 +53,12 @@ async def beauty(passedvariables):
 	background.paste(resized, (389, 338), resized) #move the foreground into the correct area for the second target area
 
 	await uploadImageFromObject(background,message)
-async def protecc(passedvariables):
+async def protecc(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
-	client = passedvariables["client"]
-	core_files_foldername = passedvariables["core_files_foldername"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
+	client = globaldata["client"]
+	core_files_foldername = globaldata["core_files_foldername"]
 
 	usage = "Usage: "+commandprefix+"protecc <mention>"
 	array = message.content.split()
@@ -96,13 +96,13 @@ async def protecc(passedvariables):
 	background.paste(foreground, (382, 129), foreground) #move the foreground into the correct area for the target area
 
 	await uploadImageFromObject(background,message)
-async def deepfry(passedvariables):
+async def deepfry(globaldata):
 	#include all the required variables
-	message = passedvariables["message"]
-	commandprefix = passedvariables["commandprefix"]
-	client = passedvariables["client"]
-	core_files_foldername = passedvariables["core_files_foldername"]
-	img = passedvariables["previous_img"]
+	message = globaldata["message"]
+	commandprefix = globaldata["commandprefix"]
+	client = globaldata["client"]
+	core_files_foldername = globaldata["core_files_foldername"]
+	img = globaldata["previous_img"]
 
 	if not img:
 		await message.channel.send("Please post an image in the channel for me to deepfry.")
@@ -142,4 +142,3 @@ async def deepfry(passedvariables):
 	#upload finished image
 	await uploadImageFromObject(img,message)
 	delete_file(filename)
-
