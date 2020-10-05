@@ -152,7 +152,12 @@ async def vc_speak(globaldata):
 	audio.volume = 5 #set audio level to 5 out of... something. probably 10.
 	consoleOutput("Opened audio file.")
 
-	vc.play(audio) #and finally, play the audio file.
+	try: vc.play(audio) #and finally, play the audio file.
+	except discord.errors.ClientException:
+		#handle errors where multiple people may be trying to use it in a vc at once
+		await message.channel.send("Already speaking. :/")
+		return
+
 	consoleOutput("Playing audio.")
 	for i in range(1000): #since we cant know when it's done with the file, repeatedly try to delete it until it works. this is a massive bodge, but it works. capped at 1000 attempts just in case.
 		sleep(1)
