@@ -5,17 +5,38 @@ import discord
 from discord.ext import commands
 import asyncio
 
-
-cog_list = [
+#Array of cogs to load
+extensions = [
     'cogs.test'
 ]
 
+#Open token file and extract the token
+token_filename = "api_secret.token"
+try:
+    token_lines = open(token_filename,"r").readlines()
+except:
+    exit("""
+Token file missing, aborting.
+Create the '{0}' file containing the bot token and retry.""".format(token_filename))
+else:
+    token = None
+    for line in token_lines:
+        #ignore commented lines or empty lines
+        if not (line.startswith("#") or line.isspace() or len(line) == 0):
+            token = line
+if token is None: exit(token_filename+" does not contain a token.")
+else: print("Loaded token.")
+
+#Initialise bot client
 bot = commands.Bot(
 	command_prefix=commands.when_mentioned_or("."),
 	description="Simple test bot for Cogs"
 )
 
-for extension in cog_list:
+#Load cogs
+for extension in extensions:
+    print("Loading extension: "+extension)
     bot.load_extension(extension)
 
-bot.run("NTM2NTMxOTAxMjc2NDg3Njkw.XERyRQ.pgNxeicn-JXfvqGyCmq6TNSizT8")
+#Start bot using the token
+bot.run(token)
