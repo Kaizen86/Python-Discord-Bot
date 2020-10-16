@@ -1,6 +1,7 @@
 from commands.modules.common import *
 from traceback import format_exc #for error handling
 from discord import FFmpegPCMAudio #used by everything except disconnect
+from discord.errors import ClientException
 
 import gtts #speak
 from time import sleep #speak
@@ -153,7 +154,7 @@ async def vc_speak(globaldata):
 	consoleOutput("Opened audio file.")
 
 	try: vc.play(audio) #and finally, play the audio file.
-	except discord.errors.ClientException:
+	except ClientException:
 		#handle errors where multiple people may be trying to use it in a vc at once
 		await message.channel.send("Already speaking. :/")
 		return
