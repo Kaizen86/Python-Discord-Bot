@@ -5,6 +5,8 @@ import discord
 from discord.ext import commands
 import asyncio
 
+command_prefix = "."
+
 #Array of cogs to load
 extensions = [
     'cogs.voice',
@@ -32,8 +34,8 @@ else: print("Loaded token.")
 
 #Initialise bot client
 bot = commands.Bot(
-	command_prefix=commands.when_mentioned_or("."),
-	description="Simple test bot for Cogs"
+	command_prefix=commands.when_mentioned_or(command_prefix),
+	description="Wheatley Discord Bot, now with extra cogs!"
 )
 
 #Load cogs
@@ -43,5 +45,13 @@ for extension in extensions:
     bot.load_extension(extension)
 print("All extensions loaded.\nRunning bot.")
 
+#Set the custom status to say how to get help when the bot loads
+@bot.event
+async def on_ready():
+	print("Bot ready.")
+	await bot.change_presence(
+		status=discord.Status.online,
+		activity=discord.Game(name=command_prefix+"help")
+	)
 #Start bot using the token
 bot.run(token)
