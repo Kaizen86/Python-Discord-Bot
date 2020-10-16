@@ -7,7 +7,8 @@ import asyncio
 
 #Array of cogs to load
 extensions = [
-    'cogs.voice'
+    'cogs.voice',
+    'cogs.admin'
 ]
 
 #Open token file and extract the token
