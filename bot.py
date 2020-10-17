@@ -4,31 +4,32 @@ print("Program is now executing.")
 import discord
 from discord.ext import commands
 import asyncio
+from traceback import format_exc
 
 command_prefix = "."
 
 #Array of cogs to load
 extensions = [
-    'cogs.voice',
-    'cogs.admin'
+	'cogs.voice',
+	'cogs.admin'
 ]
 
 #Open token file and extract the token
 token_filename = "api_secret.token"
 try:
-    token_lines = open(token_filename,"r").readlines()
+	token_lines = open(token_filename,"r").readlines()
 except:
-    #Readlines failed, probably missing file.
-    exit("""
+	#Readlines failed, probably missing file.
+	exit("""
 Token file missing, aborting.
 Create the '{0}' file containing the bot token and retry.""".format(token_filename))
 else:
-    #We loaded something, find the token in the file.
-    token = None
-    for line in token_lines:
-        #Ignore commented lines or empty lines
-        if not (line.startswith("#") or line.isspace() or len(line) == 0):
-            token = line
+	#We loaded something, find the token in the file.
+	token = None
+	for line in token_lines:
+		#Ignore commented lines or empty lines
+		if not (line.startswith("#") or line.isspace() or len(line) == 0):
+			token = line
 if token is None: exit(token_filename+" does not contain a token.")
 else: print("Loaded token.")
 
@@ -39,10 +40,13 @@ bot = commands.Bot(
 )
 
 #Load cogs
-print("Loading extensions...")
 for extension in extensions:
-    print("\t"+extension)
-    bot.load_extension(extension)
+	print("Loading:\t"+extension,end=" ")
+	try: bot.load_extension(extension)
+	except:
+		print("[ERROR]")
+		print(format_exc())
+	else: print("")
 print("All extensions loaded.\nRunning bot.")
 
 #Set the custom status to say how to get help when the bot loads
