@@ -46,7 +46,7 @@ for extension in extensions:
 	except:
 		print("[ERROR]")
 		print(format_exc())
-	else: print("")
+	else: print("[OK]")
 print("All extensions loaded.\nRunning bot.")
 
 #Set the custom status to say how to get help when the bot loads
