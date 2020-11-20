@@ -1,11 +1,14 @@
 #!/usr/bin/python3
 print("Program is now executing.")
-
 import discord
 from discord.ext import commands
 import asyncio
 from traceback import format_exc
 from datetime import datetime
+
+#Make sure we are running in the same directory as the script
+import os
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 #Return the time as well as the date. Used in the log functions
 def time(): return datetime.now().strftime("%m/%d %H:%M:%S ")
@@ -62,6 +65,7 @@ async def on_ready():
 		status=discord.Status.online,
 		activity=discord.Game(name=command_prefix+"help")
 	)
+#Report when a command was run
 @bot.event
 async def on_command(ctx):
 	print(time()+"[bot] '{0}' executed command '{1}'".format(ctx.message.author.name,ctx.message.content))
