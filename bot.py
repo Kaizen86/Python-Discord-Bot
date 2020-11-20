@@ -88,6 +88,6 @@ async def on_command_error(self, ctx, error):
 #Start bot using the token
 while True:
 	try: bot.run(token)
-	except: print(time()+"[bot] Fatal exception caused bot crash.")
+	except: print(time()+"[bot] Fatal exception caused bot crash.\n"+format_exc())
 	print(time()+"[bot] Waiting 10 second before restarting...")
 	sleep(10)
