@@ -5,6 +5,7 @@ from discord.ext import commands
 import asyncio
 from traceback import format_exc
 from datetime import datetime
+from time import sleep
 
 #Make sure we are running in the same directory as the script
 import os
@@ -85,4 +86,8 @@ async def on_command_error(self, ctx, error):
 		await ctx.send("Hey {0}, something went wrong in the code.\nHere is the simplified error: {1}".format(me.mention, error))
 
 #Start bot using the token
-bot.run(token)
+while True:
+	try: bot.run(token)
+	except: print(time()+"[bot] Fatal exception caused bot crash.")
+	print(time()+"[bot] Waiting 10 second before restarting...")
+	sleep(10)
