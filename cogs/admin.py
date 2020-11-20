@@ -5,7 +5,7 @@ from os import _exit as force_exit
 from datetime import datetime
 
 #Return the time as well as the date. Used in the log functions
-def log(string): return datetime.now().strftime("%m/%d %H:%M:%S ")
+def time(): return datetime.now().strftime("%m/%d %H:%M:%S ")
 
 class AdminCog(commands.Cog):
 	def __init__(self, bot):
@@ -28,7 +28,7 @@ class AdminCog(commands.Cog):
 		await msg.edit(content=msg.content+output+"\nOperation finished.")
 		log(output)
 		log("###Reload completed.###")
-		
+
 	"""
 
 	@commands.command()

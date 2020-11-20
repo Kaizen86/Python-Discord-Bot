@@ -101,14 +101,14 @@ class MemeMaker(commands.Cog):
 					log("Downloaded content.")
 					try: return Image.open(BytesIO(data)).convert("RGBA")
 					except:
-						await ctx.send("Unable to load image.")
+						log("Unable to open attached image.")
 						return
 				else:
-					await ctx.send("Attachment is not an image.")
+					log("Attachment is not an image.")
 					return
 			else:
 				#Neither a URL nor attachment was provided
-				await ctx.send("No image was provided.")
+				log("No image was provided.")
 				return
 		else:
 			#Attempt to download the image
@@ -116,7 +116,7 @@ class MemeMaker(commands.Cog):
 			response = requests.get(url)
 			try: return Image.open(BytesIO(response.content)).convert("RGBA")
 			except:
-				await ctx.send("Unable to load image from URL.")
+				log("Unable to load image from URL.")
 				return
 
 	@commands.command()
@@ -131,7 +131,7 @@ class MemeMaker(commands.Cog):
 		image = await self.retrieve_image(ctx, url)
 		if image == None:
 			log("No image?")
-			await ctx.send("Apologies, but that doesn't seem to have an image.")
+			await ctx.send("Apologies, but that message doesn't seem to have an image.")
 			return
 		#Process the image
 		log("Processing")
