@@ -86,8 +86,9 @@ async def on_command_error(self, ctx, error):
 		await ctx.send("Hey {0}, something went wrong in the code.\nHere is the simplified error: {1}".format(me.mention, error))
 
 #Start bot using the token
+loop = asyncio.get_event_loop()
 while True:
-	try: bot.run(token)
+	try: loop.run_until_complete(bot.run(token))
 	except: print(time()+"[bot] Fatal exception caused bot crash.\n"+format_exc())
 	print(time()+"[bot] Waiting 10 second before restarting...")
 	sleep(10)
