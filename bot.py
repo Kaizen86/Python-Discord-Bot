@@ -5,13 +5,18 @@ import discord
 from discord.ext import commands
 import asyncio
 from traceback import format_exc
+from datetime import datetime
+
+#Return the time as well as the date. Used in the log functions
+def time(): return datetime.now().strftime("%m/%d %H:%M:%S ")
 
 command_prefix = "."
 
 #Array of cogs to load
 extensions = [
-	'cogs.voice',
-	'cogs.admin'
+	#'cogs.voice',
+	'cogs.admin',
+	'cogs.meme-maker'
 ]
 
 #Open token file and extract the token
@@ -36,7 +41,7 @@ else: print("Loaded token.")
 #Initialise bot client
 bot = commands.Bot(
 	command_prefix=commands.when_mentioned_or(command_prefix),
-	description="Wheatley Discord Bot, now with extra cogs!"
+	description="Yusuke Discord Bot"
 )
 
 #Load cogs
@@ -52,10 +57,28 @@ print("All extensions loaded.\nRunning bot.")
 #Set the custom status to say how to get help when the bot loads
 @bot.event
 async def on_ready():
-	print("Bot ready.")
+	print(time()+"Bot ready.")
 	await bot.change_presence(
 		status=discord.Status.online,
 		activity=discord.Game(name=command_prefix+"help")
 	)
+@bot.event
+async def on_command(ctx):
+	print(time()+"[bot] '{0}' executed command '{1}'".format(ctx.message.author.name,ctx.message.content))
+
+#Ping me in the server when a command error occurs
+@commands.Cog.listener()
+async def on_command_error(self, ctx, error):
+	def log(string): print("[Error handler] "+str(string))
+	log(error)
+	me = None
+	try: me = await ctx.guild.fetch_member(285465719292821506)
+	except: pass #Just in case we get an error from doing that, it can happen.
+	if me is None:
+		log("Could not find Blattoid here")
+		await ctx.send("Whoops, something broke. Please send Blattoid this message for me:\n"+str(error))
+	else:
+		await ctx.send("Hey {0}, something went wrong in the code.\nHere is the simplified error: {1}".format(me.mention, error))
+
 #Start bot using the token
 bot.run(token)

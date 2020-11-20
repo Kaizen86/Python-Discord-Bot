@@ -6,6 +6,7 @@ class VoiceCog(commands.Cog):
 
 	@commands.command()
 	async def test(self, ctx):
+		await ctx.send("module is wip")
 		await ctx.send(ctx.voice_client is not None)
 
 	@test.before_invoke
