@@ -28,13 +28,13 @@ class PerspectiveTransformHelper:
 	    return numpy.array(res).reshape(8)
 
 	def transform(template, content, transform_coordinates):
-		def log(string): print(time()+"[MemeMaker.PerspectiveTransformHelper] "+str(string))
-		log("OverlayImages.overlay()")
 		"""Takes 2 PIL.Image objects (the meme template and the content to apply) as well as perspective transform coordinates.
 		Returns an image where the content is transformed and overlayed behind the template image.
 
 		The transform coordinates consist of a list of 4 tuples. The tuples are pixel coordinates for where each corner in
 		the content should be relocated to. The order is top-left, top-right, bottom-right, bottom-left."""
+		def log(string): return #Disabled for brevity, I am done with debugging it for now. #print(time()+"[MemeMaker.PerspectiveTransformHelper] "+str(string))
+
 		#Upscale content to the template size
 		content = content.resize(template.size)
 
