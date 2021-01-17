@@ -11,16 +11,13 @@ from time import sleep
 import os
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-#Return the time as well as the date. Used in the log functions
-def time(): return datetime.now().strftime("%m/%d %H:%M:%S ")
-
-command_prefix = "."
-
+command_prefix = ","
 #Array of cogs to load
 extensions = [
-	#'cogs.voice',
 	'cogs.admin',
-	'cogs.meme-maker'
+	#'cogs.meme-maker',
+	'cogs.util',
+	'cogs.voice'
 ]
 
 #Open token file and extract the token
@@ -58,6 +55,9 @@ for extension in extensions:
 	else: print("[OK]")
 print("All extensions loaded.\nRunning bot.")
 
+#Return the time as well as the date. Used in the log functions
+def time(): return datetime.now().strftime("%m/%d %H:%M:%S ")
+
 #Set the custom status to say how to get help when the bot loads
 @bot.event
 async def on_ready():
@@ -78,7 +78,7 @@ async def on_command_error(self, ctx, error):
 	log(error)
 	me = None
 	try: me = await ctx.guild.fetch_member(285465719292821506)
-	except: pass #Just in case we get an error from doing that, it can happen.
+	except: pass #Just in case we get an error from doing that. It can happen.
 	if me is None:
 		log("Could not find Blattoid here")
 		await ctx.send("Whoops, something broke. Please send Blattoid this message for me:\n"+str(error))
