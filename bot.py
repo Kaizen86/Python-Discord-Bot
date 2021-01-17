@@ -12,11 +12,11 @@ import os
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 command_prefix = ","
-#Array of cogs to load
+#List of cogs to load
 extensions = [
 	'cogs.admin',
 	#'cogs.meme-maker',
-	'cogs.util',
+	'cogs.utilities'
 	'cogs.voice'
 ]
 
