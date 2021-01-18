@@ -14,9 +14,12 @@ class VoiceCog(commands.Cog):
 
 	@commands.command()
 	async def join(self, ctx):
-		"""Developer test command for the voice channel code
-		Will try to connect to the voice channel you are currently in and then outputs some nonsense."""
-		await ctx.send(ctx.voice_client is None) #Verify we are connected
+		"""Join the voice channel you are in
+		I will try to connect to the voice channel you are currently in and then add a reaction to your message to say if I suceeded."""
+		if ctx.voice_client is not None: await ctx.message.add_reaction('✅') #React with a check if we suceeded in joining the vc
+		else: #Otherwise react with a cross
+			await ctx.message.add_reaction('❎')
+			return
 
 	"""
 	@commands.command()
@@ -28,7 +31,6 @@ class VoiceCog(commands.Cog):
 
 	@commands.command()
 	async def leave(self, ctx):
-		return
 		if await self.BotInSameVoiceChannelAsMember(ctx, ctx.author):
 			await ctx.voice_client.disconnect()
 			#This is the only way I was able to get message reactions to work properly and is probably the intended way.
