@@ -1,5 +1,7 @@
 from discord.ext import commands
-from discord import Emoji
+from discord.utils import get
+from discord import FFmpegPCMAudio
+from youtube_dl import YoutubeDL
 
 class VoiceCog(commands.Cog):
 	def __init__(self, bot):
@@ -31,13 +33,22 @@ class VoiceCog(commands.Cog):
 			await ctx.message.add_reaction('❎')
 			return
 
-	"""
 	@commands.command()
 	async def play(self, ctx, url: str):
-		player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-		ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-		await ctx.send('Now playing: {}'.format(player.title))
-	"""
+		#Credit to stackoverflow for this one https://stackoverflow.com/questions/63024148/discord-music-bot-voiceclient-object-has-no-attribute-create-ytdl-player
+		ydl_opts = {'format': 'bestaudio', 'noplaylist':'True'}
+		ffmpeg_options = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+		voice = get(self.bot.voice_clients, guild=ctx.guild)
+
+		if not voice.is_playing():
+			with YoutubeDL(ydl_opts) as ydl:
+				info = ydl.extract_info(url, download=False)
+			URL = info['formats'][0]['url']
+			voice.play(FFmpegPCMAudio(URL, **ffmpeg_options))
+			await ctx.message.add_reaction('✅')
+		else:
+			await ctx.send("Already playing song")
+			return
 
 	"""
 	@commands.command()
@@ -68,7 +79,7 @@ class VoiceCog(commands.Cog):
 				await self.LeaveCall(before.channel.id)
 
 	@join.before_invoke
-	#@play.before_invoke
+	@play.before_invoke
 	async def ensure_voice(self, ctx):
 		if ctx.author.voice: #Is the summoning user in a vc?
 			channel = ctx.author.voice.channel
