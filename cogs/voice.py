@@ -53,8 +53,7 @@ class VoiceCog(commands.Cog):
 				return
 			#We are not in a vc, therefore we should connect to theirs.
 			await channel.connect()
-		else: #They are not in a vc, inform them and raise an appropriate exception.
+		else: #They are not in a vc, inform them.
 			await ctx.send("You are not connected to a voice channel.")
-			raise commands.CommandError("Author not connected to a voice channel.")
 def setup(bot):
     bot.add_cog(VoiceCog(bot))
