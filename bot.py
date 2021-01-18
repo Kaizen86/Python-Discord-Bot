@@ -80,15 +80,13 @@ async def on_command_error(ctx, error):
 		await ctx.send("Sorry, I don't know what that is.\nRun the help command to see what I can do.")
 		return
 	#It's an unknown error, ping me.
-	me = None
 	try: me = await ctx.guild.fetch_member(285465719292821506)
-	except: pass #Just in case we get an error from doing that. It can happen.
-	if me is None:
+	except: #If I am not in the server then an exception will be thrown.
 		log("Could not find Blattoid in the server")
 		await ctx.send("Whoops, something broke. Please send Blattoid this message for me:\n"+str(error))
-	else:
+	else: #If the try succeeded then I am present in the server and the 'me' variable will contain a valid member object.
 		await ctx.send("Hey {0}, something went wrong in the code.\nHere is the error message: {1}".format(me.mention, error))
-	log(error.with_traceback) #Print the traceback to make debugging easier.
+	log(error.with_traceback()) #Print the traceback to make debugging easier.
 
 #Start bot using the token
 loop = asyncio.get_event_loop()
