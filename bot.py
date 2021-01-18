@@ -3,7 +3,7 @@ print("Program is now executing.")
 import discord
 from discord.ext import commands
 import asyncio
-from traceback import format_exc
+from traceback import format_exc, format_exception #Confusing function names are confusing
 from datetime import datetime
 from time import sleep
 
@@ -74,7 +74,7 @@ async def on_command(ctx):
 #Ping me in the server when a command error occurs
 @bot.event
 async def on_command_error(ctx, error):
-	def log(string): print("[Error handler] "+str(string))
+	def log(string): print(time()+"[Error handler] "+str(string))
 	log(error)
 	if type(error) == commands.errors.CommandNotFound:
 		await ctx.send("Sorry, I don't know what that is.\nRun the help command to see what I can do.")
@@ -86,7 +86,7 @@ async def on_command_error(ctx, error):
 		await ctx.send("Whoops, something broke. Please send Blattoid this message for me:\n"+str(error))
 	else: #If the try succeeded then I am present in the server and the 'me' variable will contain a valid member object.
 		await ctx.send("Hey {0}, something went wrong in the code.\nHere is the error message: {1}".format(me.mention, error))
-	log(error.with_traceback()) #Print the traceback to make debugging easier.
+	log(''.join(format_exception(etype=type(error), value=error, tb=error.__traceback__))) #Print the traceback to make debugging easier.
 
 #Start bot using the token
 loop = asyncio.get_event_loop()
