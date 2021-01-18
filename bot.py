@@ -72,8 +72,8 @@ async def on_command(ctx):
 	print(time()+"[bot] '{0}' executed command '{1}'".format(ctx.message.author.name,ctx.message.content))
 
 #Ping me in the server when a command error occurs
-@commands.Cog.listener()
-async def on_command_error(self, ctx, error):
+@bot.event
+async def on_command_error(ctx, error):
 	def log(string): print("[Error handler] "+str(string))
 	log(error)
 	me = None
