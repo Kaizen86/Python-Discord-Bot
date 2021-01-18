@@ -16,7 +16,7 @@ command_prefix = ","
 extensions = [
 	'cogs.admin',
 	#'cogs.meme-maker',
-	'cogs.utilities'
+	'cogs.utilities',
 	'cogs.voice'
 ]
 
