@@ -1,15 +1,25 @@
 from discord.ext import commands
 from discord import Emoji
+
 class VoiceCog(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
 	async def BotInSameVoiceChannelAsMember(self, ctx, member):
+		"""Given a member object, check if they are connected to the same voice channel as us."""
 		if member.voice: #Is the summoning user in a vc?
 			if ctx.voice_client is not None: #Are we in a vc?
 				#Yes. Do the channel IDs match?
-				if member.voice.channel.id == ctx.voice_client.channel.id: return True #yes.
+				if member.voice.channel.id == ctx.voice_client.channel.id: return True #Yes.
 		#In all other cases, return False.
+		return False
+
+	async def LeaveCall(self, channelid):
+		"""Check if the bot has a voice client present in the specified channel and if so, disconnect from it."""
+		for vc in self.bot.voice_clients:
+			if vc.channel.id == channelid:
+				await vc.disconnect()
+				return True
 		return False
 
 	@commands.command()
@@ -29,6 +39,7 @@ class VoiceCog(commands.Cog):
 		await ctx.send('Now playing: {}'.format(player.title))
 	"""
 
+	"""
 	@commands.command()
 	async def leave(self, ctx):
 		if await self.BotInSameVoiceChannelAsMember(ctx, ctx.author):
@@ -36,10 +47,25 @@ class VoiceCog(commands.Cog):
 			#This is the only way I was able to get message reactions to work properly and is probably the intended way.
 			#Kind of annoys me having emoji in source code as it sticks out like a sore thumb but it can't be helped.
 			await ctx.message.add_reaction('✅')
-		else: await ctx.send("lol no")
+		else: await ctx.send("You are not in the same voice call as me.")
+	"""
 
-
-	# discord.on_voice_state_update(member, before, after) #use this to detect members leaving voice calls and decide whether that should prompt us to leave as well. no point being connected if nobody else is.
+	#Client has stated that the bot should only leave a vc when everyone disconnects
+	@commands.Cog.listener()
+	async def on_voice_state_update(self, member, before, after):
+		#Detect members leaving voice calls and decide whether that should prompt us to leave as well.
+		if member.bot: return #Ignore events coming from bots
+		if after.channel is None: #If the member in question left, after.channel will be None.
+			#Check how many *people* are still in the channel
+			humans = 0
+			for member in before.channel.members:
+				 #Count the humans in the channel they just left
+				 #This is a good idea for two reasons:
+				 #	A) we ourselves are a bot
+				 #	B) other bots may also be in the call.
+				if not member.bot: humans += 1
+			if humans == 0: #All the people have just left, leave the call if we happen to be in it.
+				await self.LeaveCall(before.channel.id)
 
 	@join.before_invoke
 	#@play.before_invoke
