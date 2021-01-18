@@ -3,7 +3,7 @@ from discord.utils import get
 from discord import FFmpegPCMAudio
 from youtube_dl import YoutubeDL
 
-class VoiceCog(commands.Cog):
+class Voice(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
@@ -16,14 +16,6 @@ class VoiceCog(commands.Cog):
 		#In all other cases, return False.
 		return False
 
-	async def LeaveCall(self, channelid):
-		"""Check if the bot has a voice client present in the specified channel and if so, disconnect from it."""
-		for vc in self.bot.voice_clients:
-			if vc.channel.id == channelid:
-				await vc.disconnect()
-				return True
-		return False
-
 	@commands.command()
 	async def join(self, ctx):
 		"""Join the voice channel you are in
@@ -34,21 +26,44 @@ class VoiceCog(commands.Cog):
 			return
 
 	@commands.command()
-	async def play(self, ctx, url: str):
+	async def play(self, ctx, *, url: str = None):
+		"""Plays a youtube video from a link
+		You can only give one link.
+		play <link>"""
+		if not url:
+			await ctx.send("Please, you must give me a link to the song.")
+			return
+		elif not await self.BotInSameVoiceChannelAsMember(ctx, ctx.author):
+			await ctx.send("You are not in the same voice call as me.")
+			return
 		#Credit to stackoverflow for this one https://stackoverflow.com/questions/63024148/discord-music-bot-voiceclient-object-has-no-attribute-create-ytdl-player
+		#Adapted a bit, though.
 		ydl_opts = {'format': 'bestaudio', 'noplaylist':'True'}
 		ffmpeg_options = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
-		voice = get(self.bot.voice_clients, guild=ctx.guild)
 
-		if not voice.is_playing():
-			with YoutubeDL(ydl_opts) as ydl:
-				info = ydl.extract_info(url, download=False)
-			URL = info['formats'][0]['url']
-			voice.play(FFmpegPCMAudio(URL, **ffmpeg_options))
-			await ctx.message.add_reaction('✅')
+		if ctx.voice_client is not None:
+			if ctx.voice_client.is_playing(): await ctx.voice_client.stop()
+
+		with YoutubeDL(ydl_opts) as ydl:
+			info = ydl.extract_info(url, download=False)
+		URL = info['formats'][0]['url']
+		ctx.voice_client.play(FFmpegPCMAudio(URL, **ffmpeg_options))
+		await ctx.send('Playing song')
+
+	#TODO: Add 'search' command
+
+	@commands.command()
+	async def stop(self, ctx):
+		"""Cancels whatever is playing"""
+		if not ctx.voice_client:
+			await ctx.send("I am not in a voice call.")
+		elif not ctx.voice_client.is_playing():
+			await ctx.send("I am not playing anything at the moment.")
+		elif not await self.BotInSameVoiceChannelAsMember(ctx, ctx.author):
+			await ctx.send("You are not in the same voice call as me.")
 		else:
-			await ctx.send("Already playing song")
-			return
+			ctx.voice_client.stop()
+			await ctx.send('Stopped playing')
 
 	"""
 	@commands.command()
@@ -66,25 +81,24 @@ class VoiceCog(commands.Cog):
 	async def on_voice_state_update(self, member, before, after):
 		#Detect members leaving voice calls and decide whether that should prompt us to leave as well.
 		if member.bot: return #Ignore events coming from bots
-		if after.channel is None: #If the member in question left, after.channel will be None.
-			#Check how many *people* are still in the channel
-			humans = 0
-			for member in before.channel.members:
-				 #Count the humans in the channel they just left
-				 #This is a good idea for two reasons:
-				 #	A) we ourselves are a bot
-				 #	B) other bots may also be in the call.
-				if not member.bot: humans += 1
-			if humans == 0: #All the people have just left, leave the call if we happen to be in it.
-				await self.LeaveCall(before.channel.id)
+		voice = get(self.bot.voice_clients, guild=member.guild)
+		if voice is None: return #Are we even in a voice call?
+		if voice.channel.id is not before.channel.id: return #Ignore events that are unrelated to our channel
+		#Count how many people are still in the channel
+		humans = 0
+		for member in before.channel.members:
+			if not member.bot: humans += 1
+		if humans == 0: #All the people have left, so we should leave the call.
+			await voice.disconnect()
 
 	@join.before_invoke
 	@play.before_invoke
+	#@search.before_invoke
 	async def ensure_voice(self, ctx):
 		if ctx.author.voice: #Is the summoning user in a vc?
 			channel = ctx.author.voice.channel
 			if ctx.voice_client is not None: #Are we in a vc?
-				#Yes. Do we have to switch to their channel?
+				#We are not, do we have to switch to their channel?
 				if channel.id == ctx.voice_client.channel.id: return #No.
 				await ctx.guild.change_voice_state(channel=channel) #Yes, switch to theirs.
 				return
@@ -92,5 +106,6 @@ class VoiceCog(commands.Cog):
 			await channel.connect()
 		else: #They are not in a vc, inform them.
 			await ctx.send("You are not connected to a voice channel.")
+
 def setup(bot):
-    bot.add_cog(VoiceCog(bot))
+    bot.add_cog(Voice(bot))
