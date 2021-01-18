@@ -16,7 +16,7 @@ class Utilities(commands.Cog):
 		You must specify a user by pinging them.
 		Example: .avatar @Elizabeth"""
 		if not user:
-			await ctx.send("No user specified")
+			await ctx.send("Sorry, please say who you want to see.")
 			return
 
 		embed = discord.Embed(title="Avatar for "+user.name+"#"+user.discriminator)
