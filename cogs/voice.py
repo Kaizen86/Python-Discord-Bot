@@ -1,7 +1,13 @@
+import asyncio
 from discord.ext import commands
 from discord.utils import get
 from discord import FFmpegPCMAudio
+from datetime import datetime
+from pathlib import Path
 from youtube_dl import YoutubeDL
+
+#Return the time as well as the date. Used in the log functions
+def time(): return datetime.now().strftime("%m/%d %H:%M:%S ")
 
 class Voice(commands.Cog):
 	def __init__(self, bot):
@@ -15,6 +21,15 @@ class Voice(commands.Cog):
 				if member.voice.channel.id == ctx.voice_client.channel.id: return True #Yes.
 		#In all other cases, return False.
 		return False
+
+	async def PlayVoiceLine(self, ctx, voiceline_key):
+		print(time()+"[PlayVoiceLine] "+voiceline_key)
+		if ctx.voice_client.is_playing(): ctx.voice_client.stop()
+		audio = FFmpegPCMAudio("{0}/cogs/voice-assets/{1}.mp3".format(Path().absolute(), voiceline_key))
+		ctx.voice_client.play(audio)
+		#Wait for voiceline to finish playing. Probably very suboptimal but I don't see any other way to achieve the desired result.
+		await asyncio.sleep(0.2) #Small delay for file to load and start playing
+		while ctx.voice_client.is_playing(): await asyncio.sleep(0.2)
 
 	@commands.command()
 	async def join(self, ctx):
@@ -65,10 +80,46 @@ class Voice(commands.Cog):
 			ctx.voice_client.stop()
 			await ctx.send('Stopped playing')
 
-	"""
+	@commands.command()
+	async def vl(self, ctx, *, key: str = None):
+		"""Allows you to manually play my voicelines
+		There are 6 lines you can trigger by providing a number 1-6.
+		Of course, I must be connected to a voice channel.
+		vl <number>
+		Below is a list of what each number will trigger.
+		1: Please come again
+		2: Please make sure to be careful
+		3: Shall we meet back here later
+		4: Very well
+		5: Welcome
+		6: Welcome to the Velvet Room"""
+		if not key:
+			await ctx.send("No voiceline key specified")
+			return
+		if not ctx.voice_client:
+			await ctx.send("I am not in a voice call.")
+			return
+		elif ctx.voice_client.is_playing():
+			await ctx.send("I am playing something at the moment.")
+			return
+			
+		key_table = {
+			1: "Please_come_again",
+			2: "Please_make_sure_to_be_careful",
+			3: "Shall_we_meet_back_here_later",
+			4: "Very_well",
+			5: "Welcome",
+			6: "Welcome_to_the_velvet_room"
+		}
+		if key not in key_table:
+			await ctx.send("Sorry, that isn't a voiceline number I recognise.")
+			return
+		await self.PlayVoiceLine(ctx,key_table[key])
+
 	@commands.command()
 	async def leave(self, ctx):
 		if await self.BotInSameVoiceChannelAsMember(ctx, ctx.author):
+			await self.PlayVoiceLine(ctx, "LeaveCall")
 			await ctx.voice_client.disconnect()
 			#This is the only way I was able to get message reactions to work properly and is probably the intended way.
 			#Kind of annoys me having emoji in source code as it sticks out like a sore thumb but it can't be helped.
@@ -77,6 +128,7 @@ class Voice(commands.Cog):
 	"""
 
 	#Client has stated that the bot should only leave a vc when everyone disconnects
+	#FIXME: This triggers a disconnect when a single person leaves the call which is very broken.
 	@commands.Cog.listener()
 	async def on_voice_state_update(self, member, before, after):
 		#Detect members leaving voice calls and decide whether that should prompt us to leave as well.
@@ -93,6 +145,7 @@ class Voice(commands.Cog):
 
 	@join.before_invoke
 	@play.before_invoke
+	@vl.before_invoke
 	#@search.before_invoke
 	async def ensure_voice(self, ctx):
 		if ctx.author.voice: #Is the summoning user in a vc?
