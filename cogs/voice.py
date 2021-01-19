@@ -102,7 +102,7 @@ class Voice(commands.Cog):
 		elif ctx.voice_client.is_playing():
 			await ctx.send("I am playing something at the moment.")
 			return
-			
+
 		key_table = {
 			1: "Please_come_again",
 			2: "Please_make_sure_to_be_careful",
@@ -116,6 +116,7 @@ class Voice(commands.Cog):
 			return
 		await self.PlayVoiceLine(ctx,key_table[key])
 
+	"""
 	@commands.command()
 	async def leave(self, ctx):
 		if await self.BotInSameVoiceChannelAsMember(ctx, ctx.author):
