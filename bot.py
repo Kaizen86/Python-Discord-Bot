@@ -11,7 +11,7 @@ from time import sleep
 import os
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-command_prefix = ","
+command_prefix = "E" #This was not my idea.
 #List of cogs to load
 extensions = [
 	'cogs.admin',
