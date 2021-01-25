@@ -104,12 +104,12 @@ class Voice(commands.Cog):
 			return
 
 		key_table = {
-			1: "Please_come_again",
-			2: "Please_make_sure_to_be_careful",
-			3: "Shall_we_meet_back_here_later",
-			4: "Very_well",
-			5: "Welcome",
-			6: "Welcome_to_the_velvet_room"
+			"1": "Please_come_again",
+			"2": "Please_make_sure_to_be_careful",
+			"3": "Shall_we_meet_back_here_later",
+			"4": "Very_well",
+			"5": "Welcome",
+			"6": "Welcome_to_the_velvet_room"
 		}
 		if key not in key_table:
 			await ctx.send("Sorry, that isn't a voiceline number I recognise.")
