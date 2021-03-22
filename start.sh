@@ -1,4 +1,8 @@
 #!/bin/sh
+
+#Ensure current directory is set to script's location
+cd "$(dirname "$0")"
+
 while true; do
 	echo Starting bot...
 	python3 bot.py
