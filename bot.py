@@ -89,9 +89,6 @@ async def on_command_error(ctx, error):
 	log(''.join(format_exception(etype=type(error), value=error, tb=error.__traceback__))) #Print the traceback to make debugging easier.
 
 #Start bot using the token
-loop = asyncio.get_event_loop()
-while True:
-	try: loop.run_until_complete(bot.run(token))
-	except: print(time()+"[bot] Fatal exception caused bot crash.\n"+format_exc())
-	print(time()+"[bot] Waiting 10 second before restarting...")
-	sleep(10)
+loop = asyncio.new_event_loop()
+try: loop.run_until_complete(bot.run(token))
+except: print(time()+"[bot] Fatal exception caused bot crash.\n"+format_exc())
