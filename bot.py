@@ -10,7 +10,7 @@ from datetime import datetime
 import os
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-command_prefix = "E"  # This was not my idea.
+command_prefix = ":"  # This was not my idea.
 # List of cogs to load
 extensions = [
 ]
@@ -39,7 +39,7 @@ else:
 # Initialise bot client
 bot = commands.Bot(
 	command_prefix=commands.when_mentioned_or(command_prefix),
-	description="Yusuke Discord Bot"
+	description="Felt cute, might flex on you"
 )
 
 # Load cogs

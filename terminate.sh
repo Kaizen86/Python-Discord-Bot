@@ -1,2 +1,2 @@
 #!/bin/bash
-screen -S Elizabeth -X quit
+screen -S FleccBot -X quit

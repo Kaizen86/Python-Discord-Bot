@@ -1,5 +1,5 @@
 #!/bin/bash
-BOT_ID=Elizabeth
+BOT_ID=FleccBot
 
 #Ensure current directory is set to script's location
 cd "$(dirname "$0")"
