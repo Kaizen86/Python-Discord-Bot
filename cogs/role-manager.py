@@ -9,8 +9,14 @@ class RoleManagerCog(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@commands.command()
-	async def colour(self, ctx, *, user_request: str):
+	@commands.command(
+		usage="test"
+	)
+	async def colour(self, ctx, *, user_request: str = None):
+		"""Changes your name to a custom colour.
+
+You can either provide the name of a colour, in which case we will attempt to find it,
+or you can specify the precise hex code starting with a #"""
 		def log(string):
 			print(time() + "[RoleManage.colour] " + str(string))
 		log("")
