@@ -13,6 +13,7 @@ os.chdir(os.path.dirname(os.path.realpath(__file__)))
 command_prefix = ";"  # If this is found at the start of the message, its a command for us
 # List of cogs to load
 extensions = [
+	"cogs.role-manager"
 ]
 
 # Open token file and extract the token
