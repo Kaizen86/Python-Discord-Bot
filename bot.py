@@ -10,7 +10,7 @@ from datetime import datetime
 import os
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-command_prefix = ":"  # This was not my idea.
+command_prefix = ";"  # If this is found at the start of the message, its a command for us
 # List of cogs to load
 extensions = [
 ]
@@ -64,7 +64,7 @@ async def on_ready():
 	print(time() + "Bot ready.")
 	await bot.change_presence(
 		status=discord.Status.online,
-		activity=discord.Game(name=command_prefix + "help")
+		activity=discord.Game(name="local flexpert, " + command_prefix + "help")
 	)
 # Report when a command was run
 @bot.event
