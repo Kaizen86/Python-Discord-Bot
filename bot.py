@@ -40,7 +40,7 @@ else:
 # Initialise bot client
 bot = commands.Bot(
 	command_prefix=commands.when_mentioned_or(command_prefix),
-	description="Felt cute, might flex on you"
+	description="Felt cute, might flex on you <3"
 )
 
 # Load cogs
@@ -65,7 +65,7 @@ async def on_ready():
 	print(time() + "Bot ready.")
 	await bot.change_presence(
 		status=discord.Status.online,
-		activity=discord.Game(name="local flexpert, " + command_prefix + "help")
+		activity=discord.Game(name="Local flexpert, " + command_prefix + "help")
 	)
 # Report when a command was run
 @bot.event
