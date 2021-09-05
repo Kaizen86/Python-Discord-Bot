@@ -1,6 +1,7 @@
 from datetime import datetime
 from traceback import format_exc
 from discord.ext import commands
+import re
 import urllib.request
 import urllib.parse
 import json
@@ -24,8 +25,11 @@ or you can specify the precise hex code starting with a #"""
 		def log(string):
 			print(time() + "[RoleManage.colour] " + str(string))
 
-		if user_request.startswith("#"):
-			await ctx.send("lmao coming soon")
+		if user_request[0] == "#":
+			if not re.search('[0-9a-zA-Z]{6}', user_request[1:]):
+				await ctx.send("Sorry, but that does not seem to be a valid hex code")
+				return
+			hex_code = user_request # Directly set it, we're about to format hex_code anyway.
 		else:
 			# Convert spaces and maybe other characters to % codes
 			quoted = urllib.parse.quote(user_request)
@@ -46,6 +50,7 @@ or you can specify the precise hex code starting with a #"""
 			except urllib.error.URLError:
 				log("Error, cannot contact api.color.pizza. traceback is:\n" + format_exc())
 				await ctx.send("Failure to send colour name resolution request ( o_O)")
+				return
 
 			# Parse the request
 			list = json.loads(response.read())
@@ -56,15 +61,18 @@ or you can specify the precise hex code starting with a #"""
 						hex_code = colour["hex"]
 						break
 				else:  # Pick the first one I guess
-					await ctx.send(str(colours[0]))
+					hex_code = str(colours[0]["hex"])
 			else:  # Inform the user we couldn't find anything
-				await ctx.send("Sorry, couldn't find a match.")
+				await ctx.send("Sorry, couldn't find a match")
+				return
 
-			""" At this point, hex_code contains the colour to apply to the user.
-			TODO: Implement this:
-				Check if this user has a colour role already
-					If they do, simple update it.
-					Otherwise make a new role with the colour, assign them to it, and record that in a database
-				"""
+		hex_code = hex(int("0x" + hex_code[1:], base=16))
+		await ctx.send(hex_code)
+		""" At this point, hex_code contains the colour to apply to the user.
+		TODO: Implement this:
+			Check if this user has a colour role already
+				If they do, simple update it.
+				Otherwise make a new role with the colour, assign them to it, and record that in a database
+			"""
 def setup(bot):
 	bot.add_cog(RoleManagerCog(bot))
