@@ -5,6 +5,7 @@ from discord.ext import commands
 import asyncio
 from traceback import format_exc, format_exception  # Confusing function names are confusing
 from datetime import datetime
+import database.Database as db
 
 # Make sure we are running in the same directory as the script
 import os
@@ -63,6 +64,9 @@ def time():
 @bot.event
 async def on_ready():
 	print(time() + "Bot ready.")
+	# Load database files
+	db.LoadAllFiles(bot)
+	# Update presence
 	await bot.change_presence(
 		status=discord.Status.online,
 		activity=discord.Game(name="Local flexpert, " + command_prefix + "help")
