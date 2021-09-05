@@ -32,8 +32,6 @@ class Database:
 
 def LoadAllFiles(bot):
 	global guilds
-	guilds = []
+	guilds = {}
 	for guild in bot.guilds:
-		guilds.append(Database("{}.json".format(guild.id)))
-
-print(dir())
+		guilds[guild.id] = Database("{}.json".format(guild.id))
