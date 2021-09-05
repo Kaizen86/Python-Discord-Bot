@@ -1,2 +1,3 @@
 # Python Discord Bot
-Time for a fresh start.
+
+![Preview of the bot](README-Assets/bot.png)
