@@ -54,13 +54,15 @@ class RoleManagerCog(commands.Cog):
 			return None
 
 	@commands.command(
-		usage="[name or hex code]"
+		usage="[colour name or hex code]"
 	)
 	async def colour(self, ctx, *, user_request: str = None):
 		"""Changes your name to have a custom colour.
 
 You can either provide the name of a colour, in which case we will attempt to find it,
-or you can specify the precise hex code starting with a #"""
+or you can specify the precise hex code starting with a #
+
+Should you want to remove your colour role, you can do that by saying "remove" instead of a colour."""
 		def log(string):
 			print(time() + "[RoleManage.colour] " + str(string))
 
@@ -69,7 +71,7 @@ or you can specify the precise hex code starting with a #"""
 		role_id = guild_db.read(ctx.author.id)
 		role = get(ctx.guild.roles, id=role_id)
 
-		if user_request in ["remove", "delete", "off", "none", "purge", "rescind"]:
+		if user_request == "remove":
 			# User wants to delete their colour role entirely
 			# Check if the user has a colour role
 			if role:
