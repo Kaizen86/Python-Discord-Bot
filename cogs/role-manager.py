@@ -92,13 +92,13 @@ Should you want to remove your colour role, you can do that by saying "remove" i
 
 		else:
 			try:
-				colour = self.LookupColourName(user_request)
+				hex_code = self.LookupColourName(user_request)
 			except urllib.error.URLError:
 				log("Error, cannot contact api.color.pizza. traceback is:\n" + format_exc())
 				await ctx.send("Failure to send colour name resolution request ( o_O)")
 				return
 
-			if not colour:
+			if not hex_code:
 				await ctx.send("Sorry, couldn't find a match")
 
 		# Convert the hex code into an integer, suitable to be passed to discord.py
