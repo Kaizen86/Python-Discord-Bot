@@ -100,6 +100,7 @@ Should you want to remove your colour role, you can do that by saying "remove" i
 
 			if not hex_code:
 				await ctx.send("Sorry, couldn't find a match")
+				return
 
 		# Convert the hex code into an integer, suitable to be passed to discord.py
 		colour = int("0x" + hex_code[1:], base=16)  # [1:] strips the #
