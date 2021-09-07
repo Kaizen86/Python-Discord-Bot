@@ -17,7 +17,7 @@ class RoleManagerCog(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	def FindHighestRolePosition(roles):
+	def FindHighestRolePosition(self, roles):
 		pos = 0
 		for role in roles:
 			if role.position > pos:
