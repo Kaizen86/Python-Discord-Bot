@@ -130,8 +130,7 @@ Should you want to remove your colour role, you can do that by saying "remove" i
 			role = await ctx.guild.create_role(
 				name=ctx.author.name,  # Call it whatever their username is
 				reason="Generating new colour role - " + user_request,
-				colour=Colour(colour),
-				hoist=True)  # Try to make it visible
+				colour=Colour(colour))  # Of course, give it the custom colour
 
 			# Record the role id in the database alongside the user's id.
 			guild_db.write(ctx.author.id, role.id)
