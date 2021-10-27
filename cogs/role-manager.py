@@ -13,7 +13,7 @@ def time():
 	"""Returns a formatted timestamp suitable for use in log functions"""
 	return datetime.now().strftime("%m/%d %H:%M:%S ")
 
-class RoleManagerCog(commands.Cog):
+class RoleManagement(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
@@ -148,8 +148,8 @@ Should you want to remove your colour role, you can do that by saying "remove" i
 			# Elevate role to highest permittable to ensure it takes precedence
 			if position != 0:  # Only if its possible to change anything
 				await ctx.guild.edit_role_positions(positions={role: position})
-				
+
 		await msg.edit(content=msg.content + "\nAll done!")
 
 def setup(bot):
-	bot.add_cog(RoleManagerCog(bot))
+	bot.add_cog(RoleManagement(bot))
