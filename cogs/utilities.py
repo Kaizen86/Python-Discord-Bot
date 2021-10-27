@@ -9,17 +9,15 @@ class Utilities(commands.Cog):
 		usage="[ping]"
 	)
 	async def avatar(self, ctx, *, user: discord.Member = None):
-		"""Gets somebody's avatar.
+		"""Get somebody's avatar.
 
-Specify a user by pinging them."""
+Specify a user by pinging them, or leave it blank to use your own profile."""
 		if not user:
-			await ctx.send("Sorry, please say who you want to see.")
-			return
+			user = ctx.message.author
 
+		# Construct and send embed
 		embed = discord.Embed(title="Avatar for " + user.name + "#" + user.discriminator)
-		# Strip any query strings from the url to provide the maximum quality image
-		url = user.avatar_url[:user.avatar_url.index("?")]
-		embed.set_image(url=url)
+		embed.set_image(url=user.avatar_url)
 		await ctx.send(embed=embed)
 
 def setup(bot):
