@@ -39,10 +39,15 @@ if token is None:
 else:
     print("Loaded token.")
 
+# Define our desired intents
+intents = discord.Intents.default()
+intents.members = True
+
 # Initialise bot client
 bot = commands.Bot(
     command_prefix=commands.when_mentioned_or(command_prefix),
-    description="Felt cute, might flex on you <3"
+    description="Felt cute, might flex on you <3",
+    intents=intents
 )
 
 # Load cogs

@@ -109,7 +109,7 @@ Should you want to remove your colour role, you can do that by saying "remove" i
 
         # Check if the user has a colour role already
         if role:
-            msg = await ctx.send("Yep sure thing!")
+            await ctx.send("Yep sure thing!")
             # Update the role's colour
             await role.edit(
                 reason="Updating colour role - " + user_request,
@@ -149,6 +149,57 @@ Should you want to remove your colour role, you can do that by saying "remove" i
                 await ctx.guild.edit_role_positions(positions={role: position})
 
         await msg.edit(content=msg.content + "\nAll done!")
+
+    @commands.command(
+        usage="[role ids to disentangle]"
+    )
+    @commands.has_permissions(manage_roles=True)
+    async def extricate(self, ctx, *, user_request: str = ""):
+        msg = await ctx.send("Initialising.")
+
+        guild_db = db.guilds[ctx.guild.id]  # Get this server's role database
+
+        roles = dict()
+        for word in user_request.split(" "):
+            if word.isdigit():
+                id = int(word)
+                roles[id] = ctx.guild.get_role(id)
+            else:
+                await msg.edit(content=msg.content + "\n  Ignoring non-ID '{}'".format(word))
+        if len(roles) == 0:
+            await msg.edit(content=msg.content + "\nNo IDs present, aborting.")
+            return
+
+        msg = await ctx.send("Role disentanglement in progress!")
+        for id in roles:
+            role = roles[id]
+            await msg.edit(content=msg.content + "\n  {}: {} members".format(
+                role.name, len(role.members)))
+            for member in role.members:
+                await msg.edit(content=msg.content + "\n    {}".format(
+                    member.name))
+                # Make a new role with the colour and assign it to the user
+                new_role = await ctx.guild.create_role(
+                    name=member.name,  # Call it whatever their username is
+                    reason="Generating new colour role - extrication process",
+                    colour=role.colour)  # Give it the colour of the old role
+                # Record the role id in the database alongside the user's id.
+                guild_db.write(member.id, new_role.id)
+                # Assign it to a user
+                await member.add_roles(
+                    new_role,
+                    reason="Assigning new colour role to user")
+
+                # Determine where the new role should go; right under ours.
+                position = self.FindHighestRolePosition(ctx.me.roles)
+
+                # Elevate role to highest permittable to ensure it takes precedence
+                if position != 0:  # Only if its possible to change anything
+                    await ctx.guild.edit_role_positions(positions={new_role: position})
+            await role.delete()  # Remove the old role after processing all members
+
+        guild_db.save()  # Save the database to disk
+        await ctx.send("Finished. All old colour roles have been migrated successfully!")
 
 def setup(bot):
     bot.add_cog(RoleManagement(bot))
