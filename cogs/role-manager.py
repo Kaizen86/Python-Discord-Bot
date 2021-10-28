@@ -1,6 +1,7 @@
-from discord import Colour
+import discord
 from discord.ext import commands
 from discord.utils import get
+from PIL import Image
 from traceback import format_exc
 import database.Database as db
 import json
@@ -66,8 +67,28 @@ Should you want to remove your colour role, you can do that by saying "remove" i
         role_id = guild_db.read(ctx.author.id)
         role = get(ctx.guild.roles, id=role_id)
 
-        if user_request == "remove":
-            # User wants to delete their colour role entirely
+        if user_request is None:
+            # No parameters were supplied, show an embed with their colour
+            embed = discord.Embed()
+            if role:
+                embed.title = "Your colour:"
+                embed.colour = role.colour
+                # Create a small image with the colour and attach it to the embed
+                colour_thumbnail = Image.new(
+                    "RGB",
+                    size=(128, 128),
+                    color=(role.colour.r, role.colour.g, role.colour.b))
+                file = discord.File(utils.PillowImageToBytesIO(colour_thumbnail), filename="image.png")
+                embed.set_image(url="attachment://image.png")  # Turns out the URL can reference attachments, what fun!
+                # Send the embed and the colour colour_thumbnail
+                await ctx.send(file=file, embed=embed)
+            else:
+                await ctx.send("""At the moment, you do not have a colour role.
+Instructions for using this command can be found using the 'help' command.""")
+            return  # Stop here
+
+        # Check if they want to delete their colour role entirely
+        elif user_request == "remove":
             # Check if the user has a colour role
             if role:
                 # Delete the role
@@ -79,12 +100,14 @@ Should you want to remove your colour role, you can do that by saying "remove" i
                 await ctx.send("As far as I know, you don't have a colour role.")
                 return
 
+        # Check if they are trying to specify a own colour code
         elif user_request[0] == "#":
             if not re.search('[0-9a-zA-Z]{6}', user_request[1:]):
                 await ctx.send("Sorry, but that does not seem to be a valid hex code")
                 return
             hex_code = user_request  # Directly set it, we're about to format hex_code anyway.
 
+        # In all other circumstances, they have given the name of the colour for us to lookup.
         else:
             try:
                 hex_code = self.LookupColourName(user_request)
@@ -100,7 +123,7 @@ Should you want to remove your colour role, you can do that by saying "remove" i
         # Convert the hex code into an integer, suitable to be passed to discord.py
         colour = int("0x" + hex_code[1:], base=16)  # [1:] strips the #
         if colour == 0:  # There's an edge case where 0 will clear the colour instead of making it black...
-            colour = 1  # So we give a tiny amount of blue instead.
+            colour = 1  # So we give a tiny amount of blue instead. Nobody will notice that, right?
 
         # Check if the user has a colour role already
         if role:
@@ -108,7 +131,7 @@ Should you want to remove your colour role, you can do that by saying "remove" i
             # Update the role's colour
             await role.edit(
                 reason="Updating colour role - " + user_request,
-                colour=Colour(colour))
+                colour=discord.Colour(colour))
 
             # Make sure the user has the role assigned to them
             for user_role in ctx.author.roles:
@@ -125,7 +148,7 @@ Should you want to remove your colour role, you can do that by saying "remove" i
             role = await ctx.guild.create_role(
                 name=ctx.author.name,  # Call it whatever their username is
                 reason="Generating new colour role - " + user_request,
-                colour=Colour(colour))  # Of course, give it the custom colour
+                colour=discord.Colour(colour))  # Of course, give it the custom colour
 
             # Record the role id in the database alongside the user's id.
             guild_db.write(ctx.author.id, role.id)
