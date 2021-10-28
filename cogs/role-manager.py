@@ -109,7 +109,7 @@ Should you want to remove your colour role, you can do that by saying "remove" i
 
         # Check if the user has a colour role already
         if role:
-            await ctx.send("Yep sure thing!")
+            msg = await ctx.send("Yep sure thing!")
             # Update the role's colour
             await role.edit(
                 reason="Updating colour role - " + user_request,
