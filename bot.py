@@ -77,6 +77,14 @@ async def on_ready():
         status=discord.Status.online,
         activity=discord.Game(name="Local flexpert, " + command_prefix + "help")
     )
+
+# Send instructions when we join a new server
+@bot.event
+async def on_guild_join(guild):
+    print(time() + "Joined a new guild called {}!".format(guild.name))
+    # Create brand new database object
+    db.guilds[guild.id] = db.Database("{}.json".format(guild.id))
+
 # Report when a command was run
 @bot.event
 async def on_command(ctx):
