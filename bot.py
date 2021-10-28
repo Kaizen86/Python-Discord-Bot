@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 print("Program is now executing.")
-import discord
 from discord.ext import commands
-import asyncio
 from traceback import format_exc, format_exception  # Confusing function names are confusing
-from datetime import datetime
+from utils import time
+import asyncio
 import database.Database as db
+import discord
 
 # Make sure we are running in the same directory as the script
 import os
@@ -61,10 +61,6 @@ for extension in extensions:
     else:
         print("[OK]")
 print("All extensions loaded.\nRunning bot.")
-
-def time():
-    """Returns a formatted timestamp suitable for use in log functions"""
-    return datetime.now().strftime("%m/%d %H:%M:%S ")
 
 # Set the custom status to say how to get help when the bot loads
 @bot.event

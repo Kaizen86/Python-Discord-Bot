@@ -1,16 +1,12 @@
-from datetime import datetime
-from traceback import format_exc
 from discord import Colour
 from discord.ext import commands
 from discord.utils import get
+from traceback import format_exc
 import database.Database as db
+import json
 import re
 import urllib
-import json
-
-def time():
-    """Returns a formatted timestamp suitable for use in log functions"""
-    return datetime.now().strftime("%m/%d %H:%M:%S ")
+import utils
 
 class RoleManagement(commands.Cog):
     def __init__(self, bot):
@@ -63,7 +59,7 @@ or you can specify the precise hex code starting with a #
 
 Should you want to remove your colour role, you can do that by saying "remove" instead of a colour."""
         def log(string):
-            print(time() + "[RoleManage.colour] " + str(string))
+            print(utils.time() + "[RoleManage.colour] " + str(string))
 
         # Find the user's colour role, if it exists.
         guild_db = db.guilds[ctx.guild.id]

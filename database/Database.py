@@ -1,6 +1,6 @@
+from os import fsync
 import json
 import os.path
-from os import fsync
 
 class Database:
 	def __init__(self, filename):
