@@ -18,7 +18,7 @@ class RoleManagement(commands.Cog):
         for role in roles:
             if role.position > pos:
                 pos = role.position
-        return max(0, pos - 1)
+        return pos
 
     def LookupColourName(self, colour_name: str):
         # Convert spaces and maybe other characters to % codes
@@ -164,7 +164,10 @@ Instructions for using this command can be found using the 'help' command.""")
 
             # Elevate role to highest permittable to ensure it takes precedence
             if position != 0:  # Only if its possible to change anything
-                await ctx.guild.edit_role_positions(positions={role: position})
+                try:
+                    await ctx.guild.edit_role_positions(positions={role: position})
+                except:
+                    await ctx.send(":thinking: I can't move your role around which is a bit odd, but I'll ignore that.")
 
         await msg.edit(content=msg.content + "\nAll done!")
 
