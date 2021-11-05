@@ -1,6 +1,5 @@
 from datetime import datetime
 from io import BytesIO
-import asyncio
 
 def time():
     """Returns a formatted timestamp suitable for use in log functions"""
