@@ -1,13 +1,14 @@
+import logging
+from traceback import format_exc
 import discord
 from discord.ext import commands
 from discord.utils import get
 from PIL import Image
-from traceback import format_exc
 import database.Database as db
+import utils
 import json
 import re
 import urllib
-import utils
 
 class RoleManagement(commands.Cog):
     def __init__(self, bot):
@@ -59,9 +60,6 @@ You can either provide the name of a colour, in which case we will attempt to fi
 or you can specify the precise hex code starting with a #
 
 Should you want to remove your colour role, you can do that by saying "remove" instead of a colour."""
-        def log(string):
-            print(utils.time() + "[RoleManage.colour] " + str(string))
-
         # Find the user's colour role, if it exists.
         guild_db = db.guilds[ctx.guild.id]
         role_id = guild_db.read(ctx.author.id)
@@ -112,7 +110,7 @@ Instructions for using this command can be found using the 'help' command.""")
             try:
                 hex_code = self.LookupColourName(user_request)
             except urllib.error.URLError:
-                log("Error, cannot contact api.color.pizza. traceback is:\n" + format_exc())
+                logging.error("Cannot contact api.color.pizza. traceback is:\n" + format_exc())
                 await ctx.send("Failure to send colour name resolution request ( o_O)")
                 return
 

@@ -1,11 +1,11 @@
 #!/usr/bin/python3
-print("Program is now executing.")
-from discord.ext import commands
+import logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s $(message)s", datefmt="%Y/%m/%d %I:%M:%S")
 from traceback import format_exc, format_exception  # Confusing function names are confusing
-from utils import time
 import asyncio
-import database.Database as db
 import discord
+from discord.ext import commands
+import database
 
 # Make sure we are running in the same directory as the script
 import os
@@ -65,7 +65,7 @@ print("All extensions loaded.\nRunning bot.")
 # Set the custom status to say how to get help when the bot loads
 @bot.event
 async def on_ready():
-    print(time() + "Bot ready.")
+    logging.info("Bot ready.")
     # Load database files
     db.LoadAllFiles(bot)
     # Update presence
@@ -77,20 +77,20 @@ async def on_ready():
 # Send instructions when we join a new server
 @bot.event
 async def on_guild_join(guild):
-    print(time() + "Joined a new guild called {}!".format(guild.name))
+    logging.info("Joined a new guild called {}!".format(guild.name))
     # Create brand new database object
     db.guilds[guild.id] = db.Database("{}.json".format(guild.id))
 
 # Report when a command was run
 @bot.event
 async def on_command(ctx):
-    print(time() + "[bot] '{0}' executed command '{1}'".format(ctx.message.author.name, ctx.message.content))
+    logging.info("[bot] '{0}' executed command '{1}'".format(ctx.message.author.name, ctx.message.content))
 
 # Ping me in the server when a command error occurs
 @bot.event
 async def on_command_error(ctx, error):
     def log(string):
-        print(time() + "[Error handler] " + str(string))
+        logging.info("[Error handler] " + str(string))
     log(error)
     if type(error) == commands.errors.CommandNotFound:
         await ctx.send("Sorry, I don't know what that is.\nRun the help command to see what I can do.")
@@ -115,4 +115,4 @@ loop = asyncio.new_event_loop()
 try:
     loop.run_until_complete(bot.run(token))
 except:
-    print(time() + "[bot] Fatal exception caused bot crash.\n" + format_exc())
+    logging.info("[bot] Fatal exception caused bot crash.\n" + format_exc())
