@@ -5,7 +5,6 @@ from discord.ext import commands
 from discord.utils import get
 from PIL import Image
 import database.Database as db
-import utils
 import json
 import re
 import urllib
@@ -13,6 +12,14 @@ import urllib
 class RoleManagement(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    def PillowImageToBytesIO(image):
+        """Converts a Pillow Image object into a ByteIO object in PNG format.
+    This operation is required for sending images to Discord's API"""
+        image_binary = BytesIO()
+        image.save(image_binary, "PNG")
+        image_binary.seek(0)
+        return image_binary
 
     def FindHighestRolePosition(self, roles):
         pos = 0
