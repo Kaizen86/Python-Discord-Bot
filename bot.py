@@ -56,11 +56,10 @@ for extension in extensions:
     try:
         bot.load_extension(extension)
     except:
-        logging.error(output + "[ERROR]")
-        logging.error(format_exc())
+        logging.error(output + " [ERROR]\n" + format_exc())
     else:
-        logging.info(output + "[OK]")
-logging.info("All extensions loaded.\nRunning bot.")
+        logging.info(output + " [OK]")
+logging.info("All extensions loaded. Running bot.")
 
 # Set the custom status to say how to get help when the bot loads
 @bot.event
