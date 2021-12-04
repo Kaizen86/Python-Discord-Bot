@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s $(message)s", datefmt="%Y/%m/%d %I:%M:%S")
-from traceback import format_exc, format_exception  # Confusing function names are confusing
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%Y/%m/%d %I:%M:%S")
+from traceback import format_exc, format_exception  # First one contextually processes excs., second one formats exc. objects
 import asyncio
 import discord
 from discord.ext import commands
@@ -37,7 +37,7 @@ else:
 if token is None:
     exit(token_filename + " does not contain a token.")
 else:
-    print("Loaded token.")
+    logging.info("Loaded token.")
 
 # Define our desired intents
 intents = discord.Intents.default()
@@ -52,15 +52,15 @@ bot = commands.Bot(
 
 # Load cogs
 for extension in extensions:
-    print("Loading:\t" + extension, end=" ")
+    output = "Loading:\t" + extension
     try:
         bot.load_extension(extension)
     except:
-        print("[ERROR]")
-        print(format_exc())
+        logging.error(output + "[ERROR]")
+        logging.error(format_exc())
     else:
-        print("[OK]")
-print("All extensions loaded.\nRunning bot.")
+        logging.info(output + "[OK]")
+logging.info("All extensions loaded.\nRunning bot.")
 
 # Set the custom status to say how to get help when the bot loads
 @bot.event
@@ -88,11 +88,9 @@ async def on_command(ctx):
 
 # Ping me in the server when a command error occurs
 @bot.event
-async def on_command_error(ctx, error):
-    def log(string):
-        logging.info("[Error handler] " + str(string))
-    log(error)
-    if type(error) == commands.errors.CommandNotFound:
+async def on_command_error(ctx, exception):
+    logging.error(exception)
+    if type(exception) == commands.errors.CommandNotFound:
         await ctx.send("Sorry, I don't know what that is.\nRun the help command to see what I can do.")
         return
     # It's an unknown error, ping me.
@@ -100,15 +98,15 @@ async def on_command_error(ctx, error):
         me = await ctx.guild.fetch_member(285465719292821506)
     except:
         # If I am not in the server then an exception will be thrown.
-        log("Could not find Blattoid in the server")
-        await ctx.send("Whoops, something broke. Please send Blattoid this message for me:\n" + str(error))
+        logging.warn("Could not find Blattoid in the server")
+        await ctx.send("Whoops, something broke. Please send Blattoid this message for me:\n" + str(exception))
     else:
         # If the try succeeded then I am present in the server and the 'me' variable will contain a valid member object.
-        await ctx.send("Hey {0}, something went wrong in the code.\nHere is the error message: {1}".format(me.mention, error))
-    log(''.join(format_exception(  # Print the traceback to make debugging easier.
-        etype=type(error),
-        value=error,
-        tb=error.__traceback__)))
+        await ctx.send("Hey {0}, something went wrong in the code.\nHere is the error message: {1}".format(me.mention, exception))
+    logging.error(''.join(format_exception(  # Print the traceback to make debugging easier.
+        etype=type(exception),
+        value=exception,
+        tb=exception.__traceback__)))
 
 # Start bot using the token
 loop = asyncio.new_event_loop()
