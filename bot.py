@@ -6,7 +6,7 @@ from traceback import format_exc, format_exception  # First one contextually pro
 import asyncio
 import discord
 from discord.ext import commands
-import database
+import database.Database as db
 
 # Make sure we are running in the same directory as the script
 import os
@@ -103,8 +103,9 @@ async def on_command_error(ctx, exception):
     else:
         # If the try succeeded then I am present in the server and the 'me' variable will contain a valid member object.
         await ctx.send("Hey {0}, something went wrong in the code.\nHere is the error message: {1}".format(me.mention, exception))
-    logging.error(''.join(format_exception(  # Print the traceback to make debugging easier.
-        etype=type(exception),
+    # Print the traceback to make debugging easier.
+    logging.error(''.join(format_exception(
+        type(exception),
         value=exception,
         tb=exception.__traceback__)))
 
