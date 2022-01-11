@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%Y/%m/%d %I:%M:%S")
+
 from traceback import format_exc, format_exception  # First one contextually processes excs., second one formats exc. objects
 import asyncio
 import discord
