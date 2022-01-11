@@ -5,6 +5,7 @@ from discord.ext import commands
 from discord.utils import get
 from PIL import Image
 import database.Database as db
+import io
 import json
 import re
 import urllib
@@ -16,7 +17,7 @@ class RoleManagement(commands.Cog):
     def PillowImageToBytesIO(image):
         """Converts a Pillow Image object into a ByteIO object in PNG format.
     This operation is required for sending images to Discord's API"""
-        image_binary = BytesIO()
+        image_binary = io.BytesIO()
         image.save(image_binary, "PNG")
         image_binary.seek(0)
         return image_binary
@@ -83,7 +84,7 @@ Should you want to remove your colour role, you can do that by saying "remove" i
                     "RGB",
                     size=(128, 128),
                     color=(role.colour.r, role.colour.g, role.colour.b))
-                file = discord.File(utils.PillowImageToBytesIO(colour_thumbnail), filename="image.png")
+                file = discord.File(self.PillowImageToBytesIO(colour_thumbnail), filename="image.png")
                 embed.set_image(url="attachment://image.png")  # Turns out the URL can reference attachments, what fun!
                 # Send the embed and the colour colour_thumbnail
                 await ctx.send(file=file, embed=embed)
@@ -164,17 +165,19 @@ Instructions for using this command can be found using the 'help' command.""")
                 role,
                 reason="Assigning new colour role to user")
 
-            # Determine where the new role should go; right under ours.
+            # Determine where the new role should go; right under our topmost role.
             position = self.FindHighestRolePosition(ctx.me.roles)
 
-            # Elevate role to highest permittable to ensure it takes precedence
-            if position != 0:  # Only if its possible to change anything
+            # If the role position is 2 or lower then we can't move it anywhere
+            # (Role indexes count upwards from 1, and since we just made a role it can only be as low as 2)
+            if position > 2:
                 try:
-                    await ctx.guild.edit_role_positions(positions={role: position})
+                    # Attempt to move
+                    await ctx.guild.edit_role_positions(positions={role: position - 1})
                 except:
                     await ctx.send(":thinking: I can't move your role around which is a bit odd, but I'll ignore that.")
 
-        await msg.edit(content=msg.content + "\nAll done!")
+            await msg.edit(content=msg.content + "\nAll done!")
 
 def setup(bot):
     bot.add_cog(RoleManagement(bot))
