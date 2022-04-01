@@ -14,7 +14,7 @@ class RoleManagement(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def PillowImageToBytesIO(image):
+    def PillowImageToBytesIO(self, image):
         """Converts a Pillow Image object into a ByteIO object in PNG format.
     This operation is required for sending images to Discord's API"""
         image_binary = io.BytesIO()
